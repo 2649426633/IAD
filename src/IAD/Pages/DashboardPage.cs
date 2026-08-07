@@ -26,7 +26,7 @@ namespace IAD.Pages
                 Padding = Padding.Empty
             };
 
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 112F));
+            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 150F));
             root.RowStyles.Add(new RowStyle(SizeType.Absolute, 168F));
             root.RowStyles.Add(new RowStyle(SizeType.Absolute, 132F));
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
@@ -40,53 +40,73 @@ namespace IAD.Pages
 
         private Control BuildOverview()
         {
-            string[,] data =
-            {
-                { "项目名称", "单项目产线A" },
-                { "产品类型", "电子组件" },
-                { "产线名称", "产线A" },
-                { "当前阶段", "在线检测" },
-                { "项目负责人", "张工" },
-                { "创建时间", "2025-03-01 09:30:00" },
-                { "备注", "-" }
-            };
-
             TableLayoutPanel overview = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
-                ColumnCount = data.GetLength(0),
-                RowCount = 1,
+                ColumnCount = 4,
+                RowCount = 2,
                 BackColor = UiTheme.Surface,
                 Margin = Padding.Empty,
-                Padding = new Padding(8, 2, 8, 6)
+                Padding = new Padding(14, 4, 14, 8)
             };
 
-            for (int i = 0; i < data.GetLength(0); i++)
-            {
-                overview.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F / data.GetLength(0)));
+            overview.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            overview.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            overview.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            overview.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            overview.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            overview.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
 
-                TableLayoutPanel item = new TableLayoutPanel
-                {
-                    Dock = DockStyle.Fill,
-                    ColumnCount = 1,
-                    RowCount = 2,
-                    BackColor = UiTheme.Surface,
-                    Margin = new Padding(0, 0, i == data.GetLength(0) - 1 ? 0 : 1, 0),
-                    Padding = new Padding(8, 0, 8, 0)
-                };
-                item.RowStyles.Add(new RowStyle(SizeType.Percent, 45F));
-                item.RowStyles.Add(new RowStyle(SizeType.Percent, 55F));
+            overview.Controls.Add(BuildOverviewItem("项目名称", "单项目产线A"), 0, 0);
+            overview.Controls.Add(BuildOverviewItem("产品类型", "电子组件"), 1, 0);
+            overview.Controls.Add(BuildOverviewItem("产线名称", "产线A"), 2, 0);
+            overview.Controls.Add(BuildOverviewItem("当前阶段", "在线检测"), 3, 0);
 
-                Label key = UiFactory.Label(data[i, 0], 8.6F, false, ContentAlignment.BottomLeft);
-                key.ForeColor = UiTheme.Muted;
-                Label value = UiFactory.Label(data[i, 1], 9.5F, true, ContentAlignment.TopLeft);
+            overview.Controls.Add(BuildOverviewItem("项目负责人", "张工"), 0, 1);
 
-                item.Controls.Add(key, 0, 0);
-                item.Controls.Add(value, 0, 1);
-                overview.Controls.Add(item, i, 0);
-            }
+            Control created = BuildOverviewItem("创建时间", "2025-03-01 09:30:00");
+            overview.Controls.Add(created, 1, 1);
+            overview.SetColumnSpan(created, 2);
+
+            overview.Controls.Add(BuildOverviewItem("备注", "-"), 3, 1);
 
             return UiFactory.Card("项目概况", overview);
+        }
+
+        private Control BuildOverviewItem(string keyText, string valueText)
+        {
+            TableLayoutPanel item = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 1,
+                RowCount = 2,
+                BackColor = UiTheme.Surface,
+                Margin = new Padding(8, 2, 12, 2),
+                Padding = new Padding(10, 2, 10, 2)
+            };
+
+            item.RowStyles.Add(new RowStyle(SizeType.Absolute, 21F));
+            item.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+
+            Label key = UiFactory.Label(keyText, 8.5F, false, ContentAlignment.MiddleLeft);
+            key.ForeColor = UiTheme.Muted;
+
+            Label value = UiFactory.Label(valueText, 9.7F, true, ContentAlignment.TopLeft);
+            value.Padding = new Padding(0, 1, 0, 0);
+            value.AutoEllipsis = true;
+
+            item.Controls.Add(key, 0, 0);
+            item.Controls.Add(value, 0, 1);
+
+            item.Paint += delegate(object sender, PaintEventArgs e)
+            {
+                using (Pen pen = new Pen(UiTheme.SoftBorder))
+                {
+                    e.Graphics.DrawLine(pen, 0, item.Height - 1, item.Width, item.Height - 1);
+                }
+            };
+
+            return item;
         }
 
         private Control BuildProcess()
