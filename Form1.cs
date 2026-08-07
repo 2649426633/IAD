@@ -115,7 +115,7 @@ namespace IAD
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.FromArgb(246, 246, 246),
                 ForeColor = _dark,
-                Font = new Font("Segoe UI", 20F, FontStyle.Light),
+                Font = new Font("Segoe UI", 20F, FontStyle.Regular),
                 TabStop = false,
                 Margin = Padding.Empty
             };
