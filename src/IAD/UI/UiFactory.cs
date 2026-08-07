@@ -167,7 +167,7 @@ namespace IAD.UI
             return table;
         }
 
-        public static Panel Stat(string title, string value, string note)
+        public static Panel Stat(string title, string value)
         {
             Panel panel = new Panel
             {
@@ -183,26 +183,30 @@ namespace IAD.UI
                     e.Graphics.DrawRectangle(pen, 0, 0, Math.Max(0, panel.Width - 1), Math.Max(0, panel.Height - 1));
                 }
             };
+
             TableLayoutPanel layout = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
                 ColumnCount = 1,
-                RowCount = 4,
+                RowCount = 3,
                 BackColor = UiTheme.Surface,
                 Padding = new Padding(8, 8, 8, 8)
             };
-            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 23F));
-            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 35F));
-            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 22F));
-            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 28F));
+            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 48F));
+            layout.RowStyles.Add(new RowStyle(SizeType.Percent, 24F));
             layout.Controls.Add(Label(title, 10.2F, true, ContentAlignment.MiddleCenter), 0, 0);
-            layout.Controls.Add(Label(value, 17.5F, false, ContentAlignment.MiddleCenter), 0, 1);
-            layout.Controls.Add(Label(note, 8.4F, false, ContentAlignment.MiddleCenter), 0, 2);
+            layout.Controls.Add(Label(value, 18F, false, ContentAlignment.MiddleCenter), 0, 1);
             Label time = Label("数据截止：2025-05-16 24:00", 7.8F, false, ContentAlignment.BottomCenter);
             time.ForeColor = UiTheme.Muted;
-            layout.Controls.Add(time, 0, 3);
+            layout.Controls.Add(time, 0, 2);
             panel.Controls.Add(layout);
             return panel;
+        }
+
+        public static Panel Stat(string title, string value, string note)
+        {
+            return Stat(title, value);
         }
 
         public static FlowLayoutPanel Toolbar(params string[] names)
