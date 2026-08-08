@@ -24,12 +24,13 @@ namespace IAD.Services
             DatabaseInitializer.Initialize(connectionFactory);
 
             IProductRepository productRepository = new ProductRepository(connectionFactory);
+            IProductDefinitionSettingsRepository definitionSettingsRepository = new ProductDefinitionSettingsRepository(connectionFactory);
             IDefectCategoryRepository categoryRepository = new DefectCategoryRepository(connectionFactory);
             IRoiRepository roiRepository = new RoiRepository(connectionFactory);
             IInspectionRecipeRepository recipeRepository = new InspectionRecipeRepository(connectionFactory);
             IInspectionResultRepository resultRepository = new InspectionResultRepository(connectionFactory);
 
-            Products = new ProductService(productRepository, categoryRepository, roiRepository);
+            Products = new ProductService(productRepository, definitionSettingsRepository, categoryRepository, roiRepository);
             Recipes = new RecipeService(productRepository, recipeRepository);
             Results = new ResultService(productRepository, resultRepository);
 
