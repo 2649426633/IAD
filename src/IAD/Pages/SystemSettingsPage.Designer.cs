@@ -1,13 +1,107 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using IAD.UI;
 
 namespace IAD.Pages
 {
-    public partial class SystemSettingsPage
+    partial class SystemSettingsPage
     {
         private IContainer components = null;
+        private TableLayoutPanel rootLayout;
+        private TableLayoutPanel row1;
+        private GroupBox grpRuntime;
+        private TableLayoutPanel runtimeLayout;
+        private Label lblCpuKey;
+        private TextBox txtCpu;
+        private Label lblGpuKey;
+        private TextBox txtGpu;
+        private Label lblHalconKey;
+        private TextBox txtHalcon;
+        private Label lblOnnxKey;
+        private TextBox txtOnnx;
+        private Label lblPythonKey;
+        private TextBox txtPython;
+        private Label lblTensorRtKey;
+        private TextBox txtTensorRt;
+        private GroupBox grpStorage;
+        private TableLayoutPanel storageLayout;
+        private Label lblImagesPathKey;
+        private TextBox txtImagesPath;
+        private Label lblMasksPathKey;
+        private TextBox txtMasksPath;
+        private Label lblModelsPathKey;
+        private TextBox txtModelsPath;
+        private Label lblResultsPathKey;
+        private TextBox txtResultsPath;
+        private Label lblLogsPathKey;
+        private TextBox txtLogsPath;
+        private Label lblCachePathKey;
+        private TextBox txtCachePath;
+        private GroupBox grpOffline;
+        private TableLayoutPanel offlineLayout;
+        private Label lblPackageVersionKey;
+        private TextBox txtPackageVersion;
+        private Label lblDeployModeKey;
+        private ComboBox cboDeployMode;
+        private Label lblPlatformKey;
+        private TextBox txtPlatform;
+        private Label lblDependenciesKey;
+        private TextBox txtDependencies;
+        private Label lblPackageSizeKey;
+        private TextBox txtPackageSize;
+        private Label lblPackageStateKey;
+        private ComboBox cboPackageState;
+        private TableLayoutPanel row2;
+        private GroupBox grpLogging;
+        private TableLayoutPanel loggingLayout;
+        private Label lblLogLevelKey;
+        private ComboBox cboLogLevel;
+        private Label lblRetentionKey;
+        private NumericUpDown numRetentionDays;
+        private Label lblFileSizeKey;
+        private NumericUpDown numLogFileSize;
+        private Label lblExceptionPolicyKey;
+        private ComboBox cboExceptionPolicy;
+        private Label lblAlarmKey;
+        private ComboBox cboAlarm;
+        private GroupBox grpBackup;
+        private TableLayoutPanel backupLayout;
+        private Label lblAutoBackupKey;
+        private CheckBox chkAutoBackup;
+        private Label lblBackupTimeKey;
+        private TextBox txtBackupTime;
+        private Label lblBackupCountKey;
+        private NumericUpDown numBackupCount;
+        private Label lblBackupPathKey;
+        private TextBox txtBackupPath;
+        private Label lblRestoreKey;
+        private Button btnRestore;
+        private GroupBox grpRoles;
+        private DataGridView dgvRoles;
+        private DataGridViewTextBoxColumn dgvRolesCol1;
+        private DataGridViewTextBoxColumn dgvRolesCol2;
+        private DataGridViewTextBoxColumn dgvRolesCol3;
+        private TableLayoutPanel row3;
+        private GroupBox grpAdapters;
+        private DataGridView dgvAdapters;
+        private DataGridViewTextBoxColumn dgvAdaptersCol1;
+        private DataGridViewTextBoxColumn dgvAdaptersCol2;
+        private DataGridViewTextBoxColumn dgvAdaptersCol3;
+        private DataGridViewTextBoxColumn dgvAdaptersCol4;
+        private DataGridViewTextBoxColumn dgvAdaptersCol5;
+        private GroupBox grpVersion;
+        private TableLayoutPanel versionLayout;
+        private Label lblSystemVersionKey;
+        private Label lblSystemVersion;
+        private Label lblBuildVersionKey;
+        private Label lblBuildVersion;
+        private Label lblDeployStateKey;
+        private Label lblDeployState;
+        private Label lblStorageModeKey;
+        private Label lblStorageMode;
+        private Label lblCurrentUserKey;
+        private Label lblCurrentUser;
+        private Button btnSaveSettings;
 
         protected override void Dispose(bool disposing)
         {
@@ -18,134 +112,290 @@ namespace IAD.Pages
         private void InitializeComponent()
         {
             this.components = new Container();
+            this.rootLayout = new TableLayoutPanel();
+            this.row1 = new TableLayoutPanel();
+            this.grpRuntime = new GroupBox();
+            this.runtimeLayout = new TableLayoutPanel();
+            this.lblCpuKey = new Label();
+            this.txtCpu = new TextBox();
+            this.lblGpuKey = new Label();
+            this.txtGpu = new TextBox();
+            this.lblHalconKey = new Label();
+            this.txtHalcon = new TextBox();
+            this.lblOnnxKey = new Label();
+            this.txtOnnx = new TextBox();
+            this.lblPythonKey = new Label();
+            this.txtPython = new TextBox();
+            this.lblTensorRtKey = new Label();
+            this.txtTensorRt = new TextBox();
+            this.grpStorage = new GroupBox();
+            this.storageLayout = new TableLayoutPanel();
+            this.lblImagesPathKey = new Label();
+            this.txtImagesPath = new TextBox();
+            this.lblMasksPathKey = new Label();
+            this.txtMasksPath = new TextBox();
+            this.lblModelsPathKey = new Label();
+            this.txtModelsPath = new TextBox();
+            this.lblResultsPathKey = new Label();
+            this.txtResultsPath = new TextBox();
+            this.lblLogsPathKey = new Label();
+            this.txtLogsPath = new TextBox();
+            this.lblCachePathKey = new Label();
+            this.txtCachePath = new TextBox();
+            this.grpOffline = new GroupBox();
+            this.offlineLayout = new TableLayoutPanel();
+            this.lblPackageVersionKey = new Label();
+            this.txtPackageVersion = new TextBox();
+            this.lblDeployModeKey = new Label();
+            this.cboDeployMode = new ComboBox();
+            this.lblPlatformKey = new Label();
+            this.txtPlatform = new TextBox();
+            this.lblDependenciesKey = new Label();
+            this.txtDependencies = new TextBox();
+            this.lblPackageSizeKey = new Label();
+            this.txtPackageSize = new TextBox();
+            this.lblPackageStateKey = new Label();
+            this.cboPackageState = new ComboBox();
+            this.row2 = new TableLayoutPanel();
+            this.grpLogging = new GroupBox();
+            this.loggingLayout = new TableLayoutPanel();
+            this.lblLogLevelKey = new Label();
+            this.cboLogLevel = new ComboBox();
+            this.lblRetentionKey = new Label();
+            this.numRetentionDays = new NumericUpDown();
+            this.lblFileSizeKey = new Label();
+            this.numLogFileSize = new NumericUpDown();
+            this.lblExceptionPolicyKey = new Label();
+            this.cboExceptionPolicy = new ComboBox();
+            this.lblAlarmKey = new Label();
+            this.cboAlarm = new ComboBox();
+            this.grpBackup = new GroupBox();
+            this.backupLayout = new TableLayoutPanel();
+            this.lblAutoBackupKey = new Label();
+            this.chkAutoBackup = new CheckBox();
+            this.lblBackupTimeKey = new Label();
+            this.txtBackupTime = new TextBox();
+            this.lblBackupCountKey = new Label();
+            this.numBackupCount = new NumericUpDown();
+            this.lblBackupPathKey = new Label();
+            this.txtBackupPath = new TextBox();
+            this.lblRestoreKey = new Label();
+            this.btnRestore = new Button();
+            this.grpRoles = new GroupBox();
+            this.dgvRoles = new DataGridView();
+            this.dgvRolesCol1 = new DataGridViewTextBoxColumn();
+            this.dgvRolesCol2 = new DataGridViewTextBoxColumn();
+            this.dgvRolesCol3 = new DataGridViewTextBoxColumn();
+            this.row3 = new TableLayoutPanel();
+            this.grpAdapters = new GroupBox();
+            this.dgvAdapters = new DataGridView();
+            this.dgvAdaptersCol1 = new DataGridViewTextBoxColumn();
+            this.dgvAdaptersCol2 = new DataGridViewTextBoxColumn();
+            this.dgvAdaptersCol3 = new DataGridViewTextBoxColumn();
+            this.dgvAdaptersCol4 = new DataGridViewTextBoxColumn();
+            this.dgvAdaptersCol5 = new DataGridViewTextBoxColumn();
+            this.grpVersion = new GroupBox();
+            this.versionLayout = new TableLayoutPanel();
+            this.lblSystemVersionKey = new Label();
+            this.lblSystemVersion = new Label();
+            this.lblBuildVersionKey = new Label();
+            this.lblBuildVersion = new Label();
+            this.lblDeployStateKey = new Label();
+            this.lblDeployState = new Label();
+            this.lblStorageModeKey = new Label();
+            this.lblStorageMode = new Label();
+            this.lblCurrentUserKey = new Label();
+            this.lblCurrentUser = new Label();
+            this.btnSaveSettings = new Button();
+            ((ISupportInitialize)(this.numRetentionDays)).BeginInit();
+            ((ISupportInitialize)(this.numLogFileSize)).BeginInit();
+            ((ISupportInitialize)(this.numBackupCount)).BeginInit();
+            ((ISupportInitialize)(this.dgvRoles)).BeginInit();
+            ((ISupportInitialize)(this.dgvAdapters)).BeginInit();
             this.SuspendLayout();
-            this.AutoScaleDimensions = new SizeF(8F, 15F);
+
+            this.rootLayout.BackColor = Color.FromArgb(247,247,247);
+            this.rootLayout.ColumnCount = 1;
+            this.rootLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100F));
+            this.rootLayout.Dock = DockStyle.Fill;
+            this.rootLayout.RowCount = 3;
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Percent,34F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Percent,33F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Percent,33F));
+
+            this.row1.ColumnCount = 3;
+            this.row1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,33F));
+            this.row1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,34F));
+            this.row1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,33F));
+            this.row1.Dock = DockStyle.Fill;
+            this.grpRuntime.Dock = DockStyle.Fill;
+            this.grpRuntime.Text = "运行时与硬件配置";
+            this.grpRuntime.Controls.Add(this.runtimeLayout);
+            this.runtimeLayout.ColumnCount = 2;
+            this.runtimeLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,38F));
+            this.runtimeLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,62F));
+            this.runtimeLayout.Dock = DockStyle.Fill;
+            this.runtimeLayout.RowCount = 6;
+            this.lblCpuKey.Text = "CPU"; this.txtCpu.Text = "Intel Core i7-12700K";
+            this.lblGpuKey.Text = "GPU"; this.txtGpu.Text = "NVIDIA RTX 3070 8GB";
+            this.lblHalconKey.Text = "HALCON Runtime"; this.txtHalcon.Text = "24.11";
+            this.lblOnnxKey.Text = "ONNX Runtime"; this.txtOnnx.Text = "1.16.3 / CUDA";
+            this.lblPythonKey.Text = "Python Runtime"; this.txtPython.Text = "3.10.14";
+            this.lblTensorRtKey.Text = "TensorRT"; this.txtTensorRt.Text = "8.6.1.6";
+            this.runtimeLayout.Controls.Add(this.lblCpuKey,0,0); this.runtimeLayout.Controls.Add(this.txtCpu,1,0);
+            this.runtimeLayout.Controls.Add(this.lblGpuKey,0,1); this.runtimeLayout.Controls.Add(this.txtGpu,1,1);
+            this.runtimeLayout.Controls.Add(this.lblHalconKey,0,2); this.runtimeLayout.Controls.Add(this.txtHalcon,1,2);
+            this.runtimeLayout.Controls.Add(this.lblOnnxKey,0,3); this.runtimeLayout.Controls.Add(this.txtOnnx,1,3);
+            this.runtimeLayout.Controls.Add(this.lblPythonKey,0,4); this.runtimeLayout.Controls.Add(this.txtPython,1,4);
+            this.runtimeLayout.Controls.Add(this.lblTensorRtKey,0,5); this.runtimeLayout.Controls.Add(this.txtTensorRt,1,5);
+
+            this.grpStorage.Dock = DockStyle.Fill;
+            this.grpStorage.Text = "存储路径配置";
+            this.grpStorage.Controls.Add(this.storageLayout);
+            this.storageLayout.ColumnCount = 2;
+            this.storageLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,30F));
+            this.storageLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,70F));
+            this.storageLayout.Dock = DockStyle.Fill;
+            this.storageLayout.RowCount = 6;
+            this.lblImagesPathKey.Text = "Images"; this.txtImagesPath.Text = "D:\\InspectSys\\Data\\Images";
+            this.lblMasksPathKey.Text = "Masks"; this.txtMasksPath.Text = "D:\\InspectSys\\Data\\Masks";
+            this.lblModelsPathKey.Text = "Models"; this.txtModelsPath.Text = "D:\\InspectSys\\Models";
+            this.lblResultsPathKey.Text = "Results"; this.txtResultsPath.Text = "D:\\InspectSys\\Results";
+            this.lblLogsPathKey.Text = "Logs"; this.txtLogsPath.Text = "D:\\InspectSys\\Logs";
+            this.lblCachePathKey.Text = "Cache"; this.txtCachePath.Text = "D:\\InspectSys\\Cache";
+            this.storageLayout.Controls.Add(this.lblImagesPathKey,0,0); this.storageLayout.Controls.Add(this.txtImagesPath,1,0);
+            this.storageLayout.Controls.Add(this.lblMasksPathKey,0,1); this.storageLayout.Controls.Add(this.txtMasksPath,1,1);
+            this.storageLayout.Controls.Add(this.lblModelsPathKey,0,2); this.storageLayout.Controls.Add(this.txtModelsPath,1,2);
+            this.storageLayout.Controls.Add(this.lblResultsPathKey,0,3); this.storageLayout.Controls.Add(this.txtResultsPath,1,3);
+            this.storageLayout.Controls.Add(this.lblLogsPathKey,0,4); this.storageLayout.Controls.Add(this.txtLogsPath,1,4);
+            this.storageLayout.Controls.Add(this.lblCachePathKey,0,5); this.storageLayout.Controls.Add(this.txtCachePath,1,5);
+
+            this.grpOffline.Dock = DockStyle.Fill;
+            this.grpOffline.Text = "离线部署与包状态";
+            this.grpOffline.Controls.Add(this.offlineLayout);
+            this.offlineLayout.ColumnCount = 2;
+            this.offlineLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,42F));
+            this.offlineLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,58F));
+            this.offlineLayout.Dock = DockStyle.Fill;
+            this.offlineLayout.RowCount = 6;
+            this.lblPackageVersionKey.Text = "部署包版本"; this.txtPackageVersion.Text = "v1.3.0";
+            this.lblDeployModeKey.Text = "部署模式"; this.cboDeployMode.Items.AddRange(new object[] { "单机离线部署", "局域网部署" }); this.cboDeployMode.SelectedIndex = 0;
+            this.lblPlatformKey.Text = "目标平台"; this.txtPlatform.Text = "Windows 10/11 x64";
+            this.lblDependenciesKey.Text = "依赖"; this.txtDependencies.Text = "Python / ONNX / HALCON";
+            this.lblPackageSizeKey.Text = "包大小"; this.txtPackageSize.Text = "1.26 GB";
+            this.lblPackageStateKey.Text = "状态"; this.cboPackageState.Items.AddRange(new object[] { "已就绪", "未就绪" }); this.cboPackageState.SelectedIndex = 0;
+            this.offlineLayout.Controls.Add(this.lblPackageVersionKey,0,0); this.offlineLayout.Controls.Add(this.txtPackageVersion,1,0);
+            this.offlineLayout.Controls.Add(this.lblDeployModeKey,0,1); this.offlineLayout.Controls.Add(this.cboDeployMode,1,1);
+            this.offlineLayout.Controls.Add(this.lblPlatformKey,0,2); this.offlineLayout.Controls.Add(this.txtPlatform,1,2);
+            this.offlineLayout.Controls.Add(this.lblDependenciesKey,0,3); this.offlineLayout.Controls.Add(this.txtDependencies,1,3);
+            this.offlineLayout.Controls.Add(this.lblPackageSizeKey,0,4); this.offlineLayout.Controls.Add(this.txtPackageSize,1,4);
+            this.offlineLayout.Controls.Add(this.lblPackageStateKey,0,5); this.offlineLayout.Controls.Add(this.cboPackageState,1,5);
+            this.row1.Controls.Add(this.grpRuntime,0,0);
+            this.row1.Controls.Add(this.grpStorage,1,0);
+            this.row1.Controls.Add(this.grpOffline,2,0);
+
+            this.row2.ColumnCount = 3;
+            this.row2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,33F));
+            this.row2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,34F));
+            this.row2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,33F));
+            this.row2.Dock = DockStyle.Fill;
+            this.grpLogging.Dock = DockStyle.Fill;
+            this.grpLogging.Text = "日志与异常设置";
+            this.grpLogging.Controls.Add(this.loggingLayout);
+            this.loggingLayout.ColumnCount = 2;
+            this.loggingLayout.Dock = DockStyle.Fill;
+            this.loggingLayout.RowCount = 5;
+            this.lblLogLevelKey.Text = "日志级别"; this.cboLogLevel.Items.AddRange(new object[] { "DEBUG", "INFO", "WARN", "ERROR" }); this.cboLogLevel.SelectedIndex = 1;
+            this.lblRetentionKey.Text = "保留天数"; this.numRetentionDays.Minimum = 1; this.numRetentionDays.Maximum = 365; this.numRetentionDays.Value = 30;
+            this.lblFileSizeKey.Text = "单文件大小(MB)"; this.numLogFileSize.Minimum = 10; this.numLogFileSize.Maximum = 2048; this.numLogFileSize.Value = 100;
+            this.lblExceptionPolicyKey.Text = "异常策略"; this.cboExceptionPolicy.Items.AddRange(new object[] { "记录并继续运行", "停止当前任务", "停止系统" }); this.cboExceptionPolicy.SelectedIndex = 0;
+            this.lblAlarmKey.Text = "报警"; this.cboAlarm.Items.AddRange(new object[] { "仅记录日志", "弹窗 + 日志", "PLC 报警" }); this.cboAlarm.SelectedIndex = 0;
+            this.loggingLayout.Controls.Add(this.lblLogLevelKey,0,0); this.loggingLayout.Controls.Add(this.cboLogLevel,1,0);
+            this.loggingLayout.Controls.Add(this.lblRetentionKey,0,1); this.loggingLayout.Controls.Add(this.numRetentionDays,1,1);
+            this.loggingLayout.Controls.Add(this.lblFileSizeKey,0,2); this.loggingLayout.Controls.Add(this.numLogFileSize,1,2);
+            this.loggingLayout.Controls.Add(this.lblExceptionPolicyKey,0,3); this.loggingLayout.Controls.Add(this.cboExceptionPolicy,1,3);
+            this.loggingLayout.Controls.Add(this.lblAlarmKey,0,4); this.loggingLayout.Controls.Add(this.cboAlarm,1,4);
+
+            this.grpBackup.Dock = DockStyle.Fill;
+            this.grpBackup.Text = "备份与恢复设置";
+            this.grpBackup.Controls.Add(this.backupLayout);
+            this.backupLayout.ColumnCount = 2;
+            this.backupLayout.Dock = DockStyle.Fill;
+            this.backupLayout.RowCount = 5;
+            this.lblAutoBackupKey.Text = "自动备份"; this.chkAutoBackup.Text = "启用"; this.chkAutoBackup.Checked = true;
+            this.lblBackupTimeKey.Text = "周期"; this.txtBackupTime.Text = "每天 02:00";
+            this.lblBackupCountKey.Text = "保留数量"; this.numBackupCount.Minimum = 1; this.numBackupCount.Maximum = 99; this.numBackupCount.Value = 7;
+            this.lblBackupPathKey.Text = "备份路径"; this.txtBackupPath.Text = "D:\\InspectSys\\Backup";
+            this.lblRestoreKey.Text = "恢复"; this.btnRestore.Text = "选择备份文件";
+            this.backupLayout.Controls.Add(this.lblAutoBackupKey,0,0); this.backupLayout.Controls.Add(this.chkAutoBackup,1,0);
+            this.backupLayout.Controls.Add(this.lblBackupTimeKey,0,1); this.backupLayout.Controls.Add(this.txtBackupTime,1,1);
+            this.backupLayout.Controls.Add(this.lblBackupCountKey,0,2); this.backupLayout.Controls.Add(this.numBackupCount,1,2);
+            this.backupLayout.Controls.Add(this.lblBackupPathKey,0,3); this.backupLayout.Controls.Add(this.txtBackupPath,1,3);
+            this.backupLayout.Controls.Add(this.lblRestoreKey,0,4); this.backupLayout.Controls.Add(this.btnRestore,1,4);
+
+            this.grpRoles.Dock = DockStyle.Fill;
+            this.grpRoles.Text = "权限与用户角色";
+            this.grpRoles.Controls.Add(this.dgvRoles);
+            this.dgvRoles.Dock = DockStyle.Fill;
+            this.dgvRoles.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvRoles.ReadOnly = true;
+            this.dgvRoles.RowHeadersVisible = false;
+            this.dgvRoles.Columns.AddRange(new DataGridViewColumn[] { this.dgvRolesCol1, this.dgvRolesCol2, this.dgvRolesCol3 });
+            this.dgvRolesCol1.HeaderText = "角色"; this.dgvRolesCol2.HeaderText = "用户数"; this.dgvRolesCol3.HeaderText = "主要权限";
+            this.row2.Controls.Add(this.grpLogging,0,0);
+            this.row2.Controls.Add(this.grpBackup,1,0);
+            this.row2.Controls.Add(this.grpRoles,2,0);
+
+            this.row3.ColumnCount = 2;
+            this.row3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,78F));
+            this.row3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,22F));
+            this.row3.Dock = DockStyle.Fill;
+            this.grpAdapters.Dock = DockStyle.Fill;
+            this.grpAdapters.Text = "适配器配置（预留 / 集成）";
+            this.grpAdapters.Controls.Add(this.dgvAdapters);
+            this.dgvAdapters.Dock = DockStyle.Fill;
+            this.dgvAdapters.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvAdapters.ReadOnly = true;
+            this.dgvAdapters.RowHeadersVisible = false;
+            this.dgvAdapters.Columns.AddRange(new DataGridViewColumn[] { this.dgvAdaptersCol1, this.dgvAdaptersCol2, this.dgvAdaptersCol3, this.dgvAdaptersCol4, this.dgvAdaptersCol5 });
+            this.dgvAdaptersCol1.HeaderText = "适配器"; this.dgvAdaptersCol2.HeaderText = "状态"; this.dgvAdaptersCol3.HeaderText = "类型"; this.dgvAdaptersCol4.HeaderText = "地址/路径"; this.dgvAdaptersCol5.HeaderText = "备注";
+            this.grpVersion.Dock = DockStyle.Fill;
+            this.grpVersion.Text = "版本信息";
+            this.grpVersion.Controls.Add(this.versionLayout);
+            this.versionLayout.ColumnCount = 2;
+            this.versionLayout.Dock = DockStyle.Fill;
+            this.versionLayout.RowCount = 6;
+            this.lblSystemVersionKey.Text = "系统版本"; this.lblSystemVersion.Text = "V1.0.0";
+            this.lblBuildVersionKey.Text = "构建版本"; this.lblBuildVersion.Text = "20260808";
+            this.lblDeployStateKey.Text = "部署状态"; this.lblDeployState.Text = "离线就绪";
+            this.lblStorageModeKey.Text = "存储模式"; this.lblStorageMode.Text = "本地";
+            this.lblCurrentUserKey.Text = "当前用户"; this.lblCurrentUser.Text = "admin";
+            this.btnSaveSettings.Text = "保存设置";
+            this.versionLayout.Controls.Add(this.lblSystemVersionKey,0,0); this.versionLayout.Controls.Add(this.lblSystemVersion,1,0);
+            this.versionLayout.Controls.Add(this.lblBuildVersionKey,0,1); this.versionLayout.Controls.Add(this.lblBuildVersion,1,1);
+            this.versionLayout.Controls.Add(this.lblDeployStateKey,0,2); this.versionLayout.Controls.Add(this.lblDeployState,1,2);
+            this.versionLayout.Controls.Add(this.lblStorageModeKey,0,3); this.versionLayout.Controls.Add(this.lblStorageMode,1,3);
+            this.versionLayout.Controls.Add(this.lblCurrentUserKey,0,4); this.versionLayout.Controls.Add(this.lblCurrentUser,1,4);
+            this.versionLayout.Controls.Add(this.btnSaveSettings,1,5);
+            this.row3.Controls.Add(this.grpAdapters,0,0);
+            this.row3.Controls.Add(this.grpVersion,1,0);
+
+            this.rootLayout.Controls.Add(this.row1,0,0);
+            this.rootLayout.Controls.Add(this.row2,0,1);
+            this.rootLayout.Controls.Add(this.row3,0,2);
+            this.AutoScaleDimensions = new SizeF(8F,15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.BackColor = Color.FromArgb(247, 247, 247);
+            this.BackColor = Color.FromArgb(247,247,247);
+            this.Controls.Add(this.rootLayout);
             this.Name = "SystemSettingsPage";
-            this.Size = new Size(1400, 820);
+            this.Padding = new Padding(14,14,4,10);
+            this.Size = new Size(1400,820);
+            ((ISupportInitialize)(this.numRetentionDays)).EndInit();
+            ((ISupportInitialize)(this.numLogFileSize)).EndInit();
+            ((ISupportInitialize)(this.numBackupCount)).EndInit();
+            ((ISupportInitialize)(this.dgvRoles)).EndInit();
+            ((ISupportInitialize)(this.dgvAdapters)).EndInit();
             this.ResumeLayout(false);
-        }
-
-        private void BuildView()
-        {
-            this.SuspendLayout();
-            this.Controls.Clear();
-            this.Dock = DockStyle.Fill;
-            this.BackColor = UiTheme.Page;
-            this.Padding = new Padding(14, 14, 4, 10);
-
-            TableLayoutPanel root = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 3,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 34F));
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 33F));
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 33F));
-
-            root.Controls.Add(BuildFirstRow(), 0, 0);
-            root.Controls.Add(BuildSecondRow(), 0, 1);
-            root.Controls.Add(BuildThirdRow(), 0, 2);
-
-            this.Controls.Add(root);
-            this.ResumeLayout(true);
-        }
-
-        private Control BuildFirstRow()
-        {
-            TableLayoutPanel row = ThreeColumns();
-            row.Controls.Add(UiFactory.Card("运行时与硬件配置", UiFactory.KeyValues(new[,] {
-                { "CPU：", "Intel Core i7-12700K" }, { "GPU：", "NVIDIA RTX 3070 8GB" }, { "HALCON Runtime：", "24.11" },
-                { "ONNX Runtime：", "1.16.3 / CUDA" }, { "Python Runtime：", "3.10.14" }, { "TensorRT：", "8.6.1.6" }
-            }, 42)), 0, 0);
-
-            row.Controls.Add(UiFactory.Card("存储路径配置", UiFactory.KeyValues(new[,] {
-                { "Images：", "D:\\InspectSys\\Data\\Images" }, { "Masks：", "D:\\InspectSys\\Data\\Masks" },
-                { "Models：", "D:\\InspectSys\\Models" }, { "Results：", "D:\\InspectSys\\Results" },
-                { "Logs：", "D:\\InspectSys\\Logs" }, { "Cache：", "D:\\InspectSys\\Cache" }
-            }, 31)), 1, 0);
-
-            row.Controls.Add(UiFactory.Card("离线部署与包状态", UiFactory.KeyValues(new[,] {
-                { "部署包版本：", "v1.3.0" }, { "部署模式：", "单机离线部署" }, { "目标平台：", "Windows 10/11 x64" },
-                { "依赖：", "Python / ONNX / HALCON" }, { "包大小：", "1.26 GB" }, { "状态：", "已就绪" }
-            }, 42)), 2, 0);
-            return row;
-        }
-
-        private Control BuildSecondRow()
-        {
-            TableLayoutPanel row = ThreeColumns();
-            row.Controls.Add(UiFactory.Card("日志与异常设置", UiFactory.KeyValues(new[,] {
-                { "日志级别：", "INFO" }, { "保留天数：", "30 天" }, { "单文件大小：", "100 MB" },
-                { "异常策略：", "记录并继续运行" }, { "报警：", "仅记录日志" }
-            }, 42)), 0, 0);
-
-            row.Controls.Add(UiFactory.Card("备份与恢复设置", UiFactory.KeyValues(new[,] {
-                { "自动备份：", "启用" }, { "周期：", "每天 02:00" }, { "保留数量：", "7 份" },
-                { "备份路径：", "D:\\InspectSys\\Backup" }, { "恢复：", "人工选择备份文件" }
-            }, 42)), 1, 0);
-
-            row.Controls.Add(UiFactory.Card("权限与用户角色", UiFactory.Grid(
-                new[] { "角色", "用户数", "主要权限" },
-                new[] {
-                    new[] { "管理员", "2", "系统配置/全部模块" },
-                    new[] { "工程师", "4", "模型/规则/部分设置" },
-                    new[] { "操作员", "12", "检测/结果/追溯" },
-                    new[] { "访客", "3", "结果查看" }
-                })), 2, 0);
-            return row;
-        }
-
-        private Control BuildThirdRow()
-        {
-            TableLayoutPanel row = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 2,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            row.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 78F));
-            row.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 22F));
-
-            row.Controls.Add(UiFactory.Card("适配器配置（预留 / 集成）", UiFactory.Grid(
-                new[] { "适配器", "状态", "类型", "地址/路径", "备注" },
-                new[] {
-                    new[] { "Camera", "预留", "GigE Vision", "192.168.1.100", "后续相机接入" },
-                    new[] { "PLC", "预留", "Modbus TCP", "192.168.1.200:502", "OK/NG输出" },
-                    new[] { "MES", "预留", "HTTP REST", "192.168.1.210/api", "生产系统" },
-                    new[] { "Result Export", "已配置", "CSV + PNG", "D:\\InspectSys\\Export", "结果导出" }
-                })), 0, 0);
-
-            row.Controls.Add(UiFactory.Card("版本信息", UiFactory.KeyValues(new[,] {
-                { "系统版本：", "V1.0.0" }, { "构建版本：", "20260807" }, { "部署状态：", "离线就绪" },
-                { "存储模式：", "本地" }, { "当前用户：", "admin" }
-            }, 45)), 1, 0);
-            return row;
-        }
-
-        private TableLayoutPanel ThreeColumns()
-        {
-            TableLayoutPanel row = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 3,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            row.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
-            row.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 34F));
-            row.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
-            return row;
         }
     }
 }
