@@ -79,6 +79,7 @@ namespace IAD.Repositories
                     RuleVersion = @RuleVersion,
                     CalibrationVersion = @CalibrationVersion,
                     ThresholdVersion = @ThresholdVersion,
+                    IsActive = @IsActive,
                     UpdatedAtUtc = @UpdatedAtUtc
                     WHERE Id = @Id AND ProductId = @ProductId;";
                 AddParameters(command, recipe);
