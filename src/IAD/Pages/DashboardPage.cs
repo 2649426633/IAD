@@ -7,6 +7,7 @@ namespace IAD.Pages
         public DashboardPage()
         {
             InitializeComponent();
+            BuildView();
             BindEvents();
         }
 
