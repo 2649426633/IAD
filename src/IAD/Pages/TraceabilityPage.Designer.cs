@@ -1,17 +1,83 @@
-using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using IAD.UI;
 
 namespace IAD.Pages
 {
-    public partial class TraceabilityPage
+    partial class TraceabilityPage
     {
         private IContainer components = null;
-        private DataGridView recordGrid;
-        private Panel previewCanvas;
-        private TextBox auditLog;
+        private TableLayoutPanel rootLayout;
+        private GroupBox grpFilters;
+        private TableLayoutPanel filterLayout;
+        private Label lblDateKey;
+        private TextBox txtDateRange;
+        private Label lblStatusKey;
+        private ComboBox cboStatus;
+        private Label lblClassKey;
+        private ComboBox cboClass;
+        private Label lblRecipeKey;
+        private ComboBox cboRecipe;
+        private Label lblKeywordKey;
+        private TextBox txtKeyword;
+        private Button btnQuery;
+        private TableLayoutPanel bodyLayout;
+        private GroupBox grpRecords;
+        private DataGridView dgvRecords;
+        private DataGridViewTextBoxColumn dgvRecordsCol1;
+        private DataGridViewTextBoxColumn dgvRecordsCol2;
+        private DataGridViewTextBoxColumn dgvRecordsCol3;
+        private DataGridViewTextBoxColumn dgvRecordsCol4;
+        private DataGridViewTextBoxColumn dgvRecordsCol5;
+        private DataGridViewTextBoxColumn dgvRecordsCol6;
+        private DataGridViewTextBoxColumn dgvRecordsCol7;
+        private DataGridViewTextBoxColumn dgvRecordsCol8;
+        private DataGridViewTextBoxColumn dgvRecordsCol9;
+        private DataGridViewTextBoxColumn dgvRecordsCol10;
+        private GroupBox grpPreview;
+        private Panel pnlPreview;
+        private Label lblPreview;
+        private GroupBox grpDetails;
+        private TableLayoutPanel detailLayout;
+        private Label lblOriginalKey;
+        private Label lblOriginal;
+        private Label lblProductKey;
+        private Label lblProduct;
+        private Label lblMaskKey;
+        private Label lblMask;
+        private Label lblInstancesKey;
+        private Label lblInstances;
+        private Label lblClassDetailKey;
+        private Label lblClassDetail;
+        private Label lblProbabilityKey;
+        private Label lblProbability;
+        private Label lblStateKey;
+        private Label lblState;
+        private Label lblRecipeDetailKey;
+        private Label lblRecipeDetail;
+        private Label lblModelKey;
+        private Label lblModel;
+        private Label lblOperatorKey;
+        private Label lblOperator;
+        private TableLayoutPanel bottomLayout;
+        private GroupBox grpCurrentDefects;
+        private DataGridView dgvCurrentDefects;
+        private DataGridViewTextBoxColumn dgvCurrentDefectsCol1;
+        private DataGridViewTextBoxColumn dgvCurrentDefectsCol2;
+        private DataGridViewTextBoxColumn dgvCurrentDefectsCol3;
+        private DataGridViewTextBoxColumn dgvCurrentDefectsCol4;
+        private DataGridViewTextBoxColumn dgvCurrentDefectsCol5;
+        private DataGridViewTextBoxColumn dgvCurrentDefectsCol6;
+        private DataGridViewTextBoxColumn dgvCurrentDefectsCol7;
+        private GroupBox grpAudit;
+        private TextBox txtAudit;
+        private GroupBox grpExports;
+        private FlowLayoutPanel exportPanel;
+        private Button btnExportPdf;
+        private Button btnExportCsv;
+        private Button btnExportZip;
+        private Button btnExportBatch;
+        private Button btnPrint;
 
         protected override void Dispose(bool disposing)
         {
@@ -22,143 +88,239 @@ namespace IAD.Pages
         private void InitializeComponent()
         {
             this.components = new Container();
+            this.rootLayout = new TableLayoutPanel();
+            this.grpFilters = new GroupBox();
+            this.filterLayout = new TableLayoutPanel();
+            this.lblDateKey = new Label();
+            this.txtDateRange = new TextBox();
+            this.lblStatusKey = new Label();
+            this.cboStatus = new ComboBox();
+            this.lblClassKey = new Label();
+            this.cboClass = new ComboBox();
+            this.lblRecipeKey = new Label();
+            this.cboRecipe = new ComboBox();
+            this.lblKeywordKey = new Label();
+            this.txtKeyword = new TextBox();
+            this.btnQuery = new Button();
+            this.bodyLayout = new TableLayoutPanel();
+            this.grpRecords = new GroupBox();
+            this.dgvRecords = new DataGridView();
+            this.dgvRecordsCol1 = new DataGridViewTextBoxColumn();
+            this.dgvRecordsCol2 = new DataGridViewTextBoxColumn();
+            this.dgvRecordsCol3 = new DataGridViewTextBoxColumn();
+            this.dgvRecordsCol4 = new DataGridViewTextBoxColumn();
+            this.dgvRecordsCol5 = new DataGridViewTextBoxColumn();
+            this.dgvRecordsCol6 = new DataGridViewTextBoxColumn();
+            this.dgvRecordsCol7 = new DataGridViewTextBoxColumn();
+            this.dgvRecordsCol8 = new DataGridViewTextBoxColumn();
+            this.dgvRecordsCol9 = new DataGridViewTextBoxColumn();
+            this.dgvRecordsCol10 = new DataGridViewTextBoxColumn();
+            this.grpPreview = new GroupBox();
+            this.pnlPreview = new Panel();
+            this.lblPreview = new Label();
+            this.grpDetails = new GroupBox();
+            this.detailLayout = new TableLayoutPanel();
+            this.lblOriginalKey = new Label();
+            this.lblOriginal = new Label();
+            this.lblProductKey = new Label();
+            this.lblProduct = new Label();
+            this.lblMaskKey = new Label();
+            this.lblMask = new Label();
+            this.lblInstancesKey = new Label();
+            this.lblInstances = new Label();
+            this.lblClassDetailKey = new Label();
+            this.lblClassDetail = new Label();
+            this.lblProbabilityKey = new Label();
+            this.lblProbability = new Label();
+            this.lblStateKey = new Label();
+            this.lblState = new Label();
+            this.lblRecipeDetailKey = new Label();
+            this.lblRecipeDetail = new Label();
+            this.lblModelKey = new Label();
+            this.lblModel = new Label();
+            this.lblOperatorKey = new Label();
+            this.lblOperator = new Label();
+            this.bottomLayout = new TableLayoutPanel();
+            this.grpCurrentDefects = new GroupBox();
+            this.dgvCurrentDefects = new DataGridView();
+            this.dgvCurrentDefectsCol1 = new DataGridViewTextBoxColumn();
+            this.dgvCurrentDefectsCol2 = new DataGridViewTextBoxColumn();
+            this.dgvCurrentDefectsCol3 = new DataGridViewTextBoxColumn();
+            this.dgvCurrentDefectsCol4 = new DataGridViewTextBoxColumn();
+            this.dgvCurrentDefectsCol5 = new DataGridViewTextBoxColumn();
+            this.dgvCurrentDefectsCol6 = new DataGridViewTextBoxColumn();
+            this.dgvCurrentDefectsCol7 = new DataGridViewTextBoxColumn();
+            this.grpAudit = new GroupBox();
+            this.txtAudit = new TextBox();
+            this.grpExports = new GroupBox();
+            this.exportPanel = new FlowLayoutPanel();
+            this.btnExportPdf = new Button();
+            this.btnExportCsv = new Button();
+            this.btnExportZip = new Button();
+            this.btnExportBatch = new Button();
+            this.btnPrint = new Button();
+            ((ISupportInitialize)(this.dgvRecords)).BeginInit();
+            ((ISupportInitialize)(this.dgvCurrentDefects)).BeginInit();
             this.SuspendLayout();
-            this.AutoScaleDimensions = new SizeF(8F, 15F);
+
+            this.rootLayout.BackColor = Color.FromArgb(247,247,247);
+            this.rootLayout.ColumnCount = 1;
+            this.rootLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100F));
+            this.rootLayout.Dock = DockStyle.Fill;
+            this.rootLayout.RowCount = 3;
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute,86F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Percent,100F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute,200F));
+
+            this.grpFilters.Dock = DockStyle.Fill;
+            this.grpFilters.Text = "筛选条件";
+            this.grpFilters.Controls.Add(this.filterLayout);
+            this.filterLayout.ColumnCount = 11;
+            this.filterLayout.Dock = DockStyle.Fill;
+            this.filterLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,70F));
+            this.filterLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,26F));
+            this.filterLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,55F));
+            this.filterLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,12F));
+            this.filterLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,55F));
+            this.filterLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,12F));
+            this.filterLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,90F));
+            this.filterLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,14F));
+            this.filterLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,105F));
+            this.filterLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,36F));
+            this.filterLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,90F));
+            this.lblDateKey.Text = "日期范围";
+            this.txtDateRange.Text = "2025-05-15 ~ 2025-05-16";
+            this.lblStatusKey.Text = "状态";
+            this.cboStatus.Items.AddRange(new object[] { "全部", "OK", "NG", "ERROR" });
+            this.cboStatus.SelectedIndex = 0;
+            this.lblClassKey.Text = "类别";
+            this.cboClass.Items.AddRange(new object[] { "全部", "划痕", "脏污", "凹坑" });
+            this.cboClass.SelectedIndex = 0;
+            this.lblRecipeKey.Text = "Recipe Version";
+            this.cboRecipe.Items.AddRange(new object[] { "全部", "V2.1.0", "V2.0.0" });
+            this.cboRecipe.SelectedIndex = 0;
+            this.lblKeywordKey.Text = "图片名 / 批次";
+            this.txtKeyword.Text = "可输入查询";
+            this.btnQuery.Text = "查询";
+            this.filterLayout.Controls.Add(this.lblDateKey,0,0); this.filterLayout.Controls.Add(this.txtDateRange,1,0);
+            this.filterLayout.Controls.Add(this.lblStatusKey,2,0); this.filterLayout.Controls.Add(this.cboStatus,3,0);
+            this.filterLayout.Controls.Add(this.lblClassKey,4,0); this.filterLayout.Controls.Add(this.cboClass,5,0);
+            this.filterLayout.Controls.Add(this.lblRecipeKey,6,0); this.filterLayout.Controls.Add(this.cboRecipe,7,0);
+            this.filterLayout.Controls.Add(this.lblKeywordKey,8,0); this.filterLayout.Controls.Add(this.txtKeyword,9,0);
+            this.filterLayout.Controls.Add(this.btnQuery,10,0);
+
+            this.bodyLayout.ColumnCount = 3;
+            this.bodyLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,43F));
+            this.bodyLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,35F));
+            this.bodyLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,22F));
+            this.bodyLayout.Dock = DockStyle.Fill;
+            this.grpRecords.Dock = DockStyle.Fill;
+            this.grpRecords.Text = "检测记录列表";
+            this.grpRecords.Controls.Add(this.dgvRecords);
+            this.dgvRecords.Dock = DockStyle.Fill;
+            this.dgvRecords.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvRecords.ReadOnly = true;
+            this.dgvRecords.RowHeadersVisible = false;
+            this.dgvRecords.Columns.AddRange(new DataGridViewColumn[] { this.dgvRecordsCol1, this.dgvRecordsCol2, this.dgvRecordsCol3, this.dgvRecordsCol4, this.dgvRecordsCol5, this.dgvRecordsCol6, this.dgvRecordsCol7, this.dgvRecordsCol8, this.dgvRecordsCol9, this.dgvRecordsCol10 });
+            this.dgvRecordsCol1.HeaderText = "序号"; this.dgvRecordsCol2.HeaderText = "图片"; this.dgvRecordsCol3.HeaderText = "时间"; this.dgvRecordsCol4.HeaderText = "批次"; this.dgvRecordsCol5.HeaderText = "产品"; this.dgvRecordsCol6.HeaderText = "OK"; this.dgvRecordsCol7.HeaderText = "NG"; this.dgvRecordsCol8.HeaderText = "ERR"; this.dgvRecordsCol9.HeaderText = "Recipe"; this.dgvRecordsCol10.HeaderText = "状态";
+
+            this.grpPreview.Dock = DockStyle.Fill;
+            this.grpPreview.Text = "选中记录预览";
+            this.grpPreview.Controls.Add(this.pnlPreview);
+            this.pnlPreview.Dock = DockStyle.Fill;
+            this.pnlPreview.BackColor = Color.FromArgb(110,110,110);
+            this.pnlPreview.Controls.Add(this.lblPreview);
+            this.lblPreview.Dock = DockStyle.Fill;
+            this.lblPreview.ForeColor = Color.White;
+            this.lblPreview.Text = "检测结果图像预览\r\n\r\nNG_01  划痕  0.92\r\nNG_02  缺口  0.87";
+            this.lblPreview.TextAlign = ContentAlignment.MiddleCenter;
+
+            this.grpDetails.Dock = DockStyle.Fill;
+            this.grpDetails.Text = "检测详情";
+            this.grpDetails.Controls.Add(this.detailLayout);
+            this.detailLayout.ColumnCount = 2;
+            this.detailLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,42F));
+            this.detailLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,58F));
+            this.detailLayout.Dock = DockStyle.Fill;
+            this.detailLayout.RowCount = 10;
+            this.lblOriginalKey.Text = "原图"; this.lblOriginal.Text = "IMG_20250516_143018.png";
+            this.lblProductKey.Text = "产品实例"; this.lblProduct.Text = "21 / 24";
+            this.lblMaskKey.Text = "Mask"; this.lblMask.Text = "mask_..._21.png";
+            this.lblInstancesKey.Text = "缺陷实例"; this.lblInstances.Text = "2 个";
+            this.lblClassDetailKey.Text = "类别"; this.lblClassDetail.Text = "划伤、缺口";
+            this.lblProbabilityKey.Text = "概率"; this.lblProbability.Text = "0.92、0.87";
+            this.lblStateKey.Text = "最终状态"; this.lblState.Text = "NG";
+            this.lblRecipeDetailKey.Text = "Recipe"; this.lblRecipeDetail.Text = "V2.1.0";
+            this.lblModelKey.Text = "模型版本"; this.lblModel.Text = "Model_A_2.1.2";
+            this.lblOperatorKey.Text = "操作员"; this.lblOperator.Text = "operator_01";
+            this.detailLayout.Controls.Add(this.lblOriginalKey,0,0); this.detailLayout.Controls.Add(this.lblOriginal,1,0);
+            this.detailLayout.Controls.Add(this.lblProductKey,0,1); this.detailLayout.Controls.Add(this.lblProduct,1,1);
+            this.detailLayout.Controls.Add(this.lblMaskKey,0,2); this.detailLayout.Controls.Add(this.lblMask,1,2);
+            this.detailLayout.Controls.Add(this.lblInstancesKey,0,3); this.detailLayout.Controls.Add(this.lblInstances,1,3);
+            this.detailLayout.Controls.Add(this.lblClassDetailKey,0,4); this.detailLayout.Controls.Add(this.lblClassDetail,1,4);
+            this.detailLayout.Controls.Add(this.lblProbabilityKey,0,5); this.detailLayout.Controls.Add(this.lblProbability,1,5);
+            this.detailLayout.Controls.Add(this.lblStateKey,0,6); this.detailLayout.Controls.Add(this.lblState,1,6);
+            this.detailLayout.Controls.Add(this.lblRecipeDetailKey,0,7); this.detailLayout.Controls.Add(this.lblRecipeDetail,1,7);
+            this.detailLayout.Controls.Add(this.lblModelKey,0,8); this.detailLayout.Controls.Add(this.lblModel,1,8);
+            this.detailLayout.Controls.Add(this.lblOperatorKey,0,9); this.detailLayout.Controls.Add(this.lblOperator,1,9);
+            this.bodyLayout.Controls.Add(this.grpRecords,0,0);
+            this.bodyLayout.Controls.Add(this.grpPreview,1,0);
+            this.bodyLayout.Controls.Add(this.grpDetails,2,0);
+
+            this.bottomLayout.ColumnCount = 3;
+            this.bottomLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,38F));
+            this.bottomLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,42F));
+            this.bottomLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,20F));
+            this.bottomLayout.Dock = DockStyle.Fill;
+            this.grpCurrentDefects.Dock = DockStyle.Fill;
+            this.grpCurrentDefects.Text = "当前图片缺陷列表";
+            this.grpCurrentDefects.Controls.Add(this.dgvCurrentDefects);
+            this.dgvCurrentDefects.Dock = DockStyle.Fill;
+            this.dgvCurrentDefects.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvCurrentDefects.ReadOnly = true;
+            this.dgvCurrentDefects.RowHeadersVisible = false;
+            this.dgvCurrentDefects.Columns.AddRange(new DataGridViewColumn[] { this.dgvCurrentDefectsCol1, this.dgvCurrentDefectsCol2, this.dgvCurrentDefectsCol3, this.dgvCurrentDefectsCol4, this.dgvCurrentDefectsCol5, this.dgvCurrentDefectsCol6, this.dgvCurrentDefectsCol7 });
+            this.dgvCurrentDefectsCol1.HeaderText = "序号"; this.dgvCurrentDefectsCol2.HeaderText = "类别"; this.dgvCurrentDefectsCol3.HeaderText = "位置"; this.dgvCurrentDefectsCol4.HeaderText = "尺寸"; this.dgvCurrentDefectsCol5.HeaderText = "概率"; this.dgvCurrentDefectsCol6.HeaderText = "规则"; this.dgvCurrentDefectsCol7.HeaderText = "状态";
+            this.grpAudit.Dock = DockStyle.Fill;
+            this.grpAudit.Text = "追溯日志 / 审计轨迹";
+            this.grpAudit.Controls.Add(this.txtAudit);
+            this.txtAudit.Dock = DockStyle.Fill;
+            this.txtAudit.Multiline = true;
+            this.txtAudit.ReadOnly = true;
+            this.txtAudit.ScrollBars = ScrollBars.Vertical;
+            this.grpExports.Dock = DockStyle.Fill;
+            this.grpExports.Text = "导出与操作";
+            this.grpExports.Controls.Add(this.exportPanel);
+            this.exportPanel.Dock = DockStyle.Fill;
+            this.exportPanel.FlowDirection = FlowDirection.TopDown;
+            this.exportPanel.WrapContents = false;
+            this.btnExportPdf.Text = "导出详情PDF";
+            this.btnExportCsv.Text = "导出记录CSV";
+            this.btnExportZip.Text = "导出缺陷ZIP";
+            this.btnExportBatch.Text = "导出批次CSV";
+            this.btnPrint.Text = "打印当前详情";
+            this.exportPanel.Controls.Add(this.btnExportPdf);
+            this.exportPanel.Controls.Add(this.btnExportCsv);
+            this.exportPanel.Controls.Add(this.btnExportZip);
+            this.exportPanel.Controls.Add(this.btnExportBatch);
+            this.exportPanel.Controls.Add(this.btnPrint);
+            this.bottomLayout.Controls.Add(this.grpCurrentDefects,0,0);
+            this.bottomLayout.Controls.Add(this.grpAudit,1,0);
+            this.bottomLayout.Controls.Add(this.grpExports,2,0);
+
+            this.rootLayout.Controls.Add(this.grpFilters,0,0);
+            this.rootLayout.Controls.Add(this.bodyLayout,0,1);
+            this.rootLayout.Controls.Add(this.bottomLayout,0,2);
+            this.AutoScaleDimensions = new SizeF(8F,15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.BackColor = Color.FromArgb(247, 247, 247);
+            this.BackColor = Color.FromArgb(247,247,247);
+            this.Controls.Add(this.rootLayout);
             this.Name = "TraceabilityPage";
-            this.Size = new Size(1400, 820);
+            this.Padding = new Padding(14,10,4,10);
+            this.Size = new Size(1400,820);
+            ((ISupportInitialize)(this.dgvRecords)).EndInit();
+            ((ISupportInitialize)(this.dgvCurrentDefects)).EndInit();
             this.ResumeLayout(false);
-        }
-
-        private void BuildView()
-        {
-            this.SuspendLayout();
-            this.Controls.Clear();
-            this.Dock = DockStyle.Fill;
-            this.BackColor = UiTheme.Page;
-            this.Padding = new Padding(14, 10, 4, 10);
-
-            TableLayoutPanel root = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 3,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 76F));
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 190F));
-
-            root.Controls.Add(UiFactory.Card("筛选条件", UiFactory.KeyValues(new[,] {
-                { "日期范围：", "2025-05-15 ~ 2025-05-16" }, { "状态：", "全部" }, { "类别：", "全部" },
-                { "Recipe Version：", "全部" }, { "图片名 / 批次：", "可输入查询" }
-            }, 27)), 0, 0);
-            root.Controls.Add(BuildBody(), 0, 1);
-            root.Controls.Add(BuildBottom(), 0, 2);
-
-            this.Controls.Add(root);
-            this.ResumeLayout(true);
-        }
-
-        private Control BuildBody()
-        {
-            TableLayoutPanel body = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 3,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            body.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 43F));
-            body.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 35F));
-            body.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 22F));
-
-            string[][] records = {
-                new[] { "1", "IMG_143212", "14:32:12", "B250516-001", "24", "20", "3", "1", "V2.1.0", "NG" },
-                new[] { "2", "IMG_143018", "14:30:18", "B250516-001", "24", "21", "2", "1", "V2.1.0", "NG" },
-                new[] { "3", "IMG_143005", "14:30:05", "B250516-001", "24", "22", "1", "1", "V2.1.0", "NG" },
-                new[] { "4", "IMG_142859", "14:28:59", "B250516-001", "24", "24", "0", "0", "V2.1.0", "OK" }
-            };
-            recordGrid = UiFactory.Grid(new[] { "序号", "图片", "时间", "批次", "产品", "OK", "NG", "ERR", "Recipe", "状态" }, records);
-            body.Controls.Add(UiFactory.Card("检测记录列表", recordGrid), 0, 0);
-
-            previewCanvas = new Panel
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(115, 115, 115),
-                Margin = new Padding(10)
-            };
-            previewCanvas.Paint += PaintPreview;
-            body.Controls.Add(UiFactory.Card("选中记录预览", previewCanvas), 1, 0);
-
-            body.Controls.Add(UiFactory.Card("检测详情", UiFactory.KeyValues(new[,] {
-                { "原图：", "IMG_20250516_143018.png" }, { "产品实例：", "21 / 24" }, { "Mask：", "mask_..._21.png" },
-                { "缺陷实例：", "2 个" }, { "类别：", "划伤、缺口" }, { "概率：", "0.92、0.87" }, { "最终状态：", "NG" },
-                { "Recipe：", "V2.1.0" }, { "模型版本：", "Model_A_2.1.2" }, { "操作员：", "operator_01" }
-            }, 42)), 2, 0);
-            return body;
-        }
-
-        private void PaintPreview(object sender, PaintEventArgs e)
-        {
-            Panel panel = sender as Panel;
-            if (panel == null) return;
-            int size = Math.Max(80, Math.Min(panel.Width, panel.Height) - 70);
-            Rectangle r = new Rectangle((panel.Width - size) / 2, (panel.Height - size) / 2, size, size);
-            using (Pen p = new Pen(Color.White, 2F)) e.Graphics.DrawEllipse(p, r);
-            using (Pen p = new Pen(Color.Black, 3F))
-            {
-                e.Graphics.DrawRectangle(p, r.X + 25, r.Y + 30, Math.Min(95, Math.Max(30, r.Width / 3)), 60);
-                e.Graphics.DrawRectangle(p, Math.Max(r.X + 30, r.Right - 125), r.Y + 100, Math.Min(90, Math.Max(30, r.Width / 3)), 65);
-            }
-            e.Graphics.DrawString("NG_01 划痕 0.92", UiTheme.Font(8F, true), Brushes.Black, r.X + 28, r.Y + 34);
-            e.Graphics.DrawString("NG_02 缺口 0.87", UiTheme.Font(8F, true), Brushes.Black, Math.Max(r.X + 30, r.Right - 120), r.Y + 104);
-        }
-
-        private Control BuildBottom()
-        {
-            TableLayoutPanel bottom = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 3,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            bottom.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 38F));
-            bottom.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 42F));
-            bottom.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-
-            bottom.Controls.Add(UiFactory.Card("当前图片缺陷列表", UiFactory.Grid(
-                new[] { "序号", "类别", "位置", "尺寸", "概率", "规则", "状态" },
-                new[] {
-                    new[] { "1", "划伤", "842,312", "192×34", "0.92", "Rule_Scratch_v2.1", "NG" },
-                    new[] { "2", "缺口", "1563,1024", "87×91", "0.87", "Rule_Notch_v1.3", "NG" }
-                })), 0, 0);
-
-            auditLog = new TextBox
-            {
-                Dock = DockStyle.Fill,
-                Multiline = true,
-                ReadOnly = true,
-                BorderStyle = BorderStyle.None,
-                Font = UiTheme.Font(8.4F, false),
-                Text = "14:30:18  检测完成  operator_01  结果：NG（2个缺陷）\r\n14:30:20  结果确认  operator_01  确认正确\r\n14:31:05  标记为需复检  qc_lead\r\n14:35:22  人工复检完成  qc_lead  结果：NG\r\n14:36:01  归档  system"
-            };
-            bottom.Controls.Add(UiFactory.Card("追溯日志 / 审计轨迹", auditLog), 1, 0);
-
-            FlowLayoutPanel exports = UiFactory.Toolbar("导出详情PDF", "导出记录CSV", "导出缺陷ZIP", "导出批次CSV", "打印当前详情");
-            exports.FlowDirection = FlowDirection.TopDown;
-            exports.WrapContents = false;
-            exports.Padding = new Padding(12, 8, 0, 0);
-            bottom.Controls.Add(UiFactory.Card("导出与操作", exports), 2, 0);
-            return bottom;
         }
     }
 }
