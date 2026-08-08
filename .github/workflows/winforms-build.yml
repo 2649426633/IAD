@@ -23,4 +23,4 @@ jobs:
         run: msbuild IAD.sln /t:Restore /p:RestorePackagesConfig=true
 
       - name: Build
-        run: msbuild IAD.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /m /v:minimal
+        run: msbuild IAD.sln /t:Rebuild /p:Configuration=Debug /p:Platform=x64 /m /v:minimal
