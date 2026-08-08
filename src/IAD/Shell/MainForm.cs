@@ -19,6 +19,7 @@ namespace IAD.Shell
             ApplyShellStyle();
             RegisterPages();
             BuildNavigation();
+            contentHost.SizeChanged += contentHost_SizeChanged;
             ShowPage("工作台");
         }
 
@@ -107,12 +108,22 @@ namespace IAD.Shell
             contentHost.Controls.Add(page);
             contentHost.ResumeLayout(true);
 
+            ResponsiveLayoutManager.Apply(page, contentHost.ClientSize);
+
             foreach (KeyValuePair<string, Button> pair in navButtons)
             {
                 bool active = pair.Key == pageName;
                 pair.Value.BackColor = active ? UiTheme.Active : Color.Transparent;
                 pair.Value.Font = UiTheme.Font(10.8F, active);
             }
+        }
+
+        private void contentHost_SizeChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(currentPage)) return;
+            if (!pages.ContainsKey(currentPage)) return;
+
+            ResponsiveLayoutManager.Apply(pages[currentPage], contentHost.ClientSize);
         }
 
         private void closeButton_Click(object sender, EventArgs e)
