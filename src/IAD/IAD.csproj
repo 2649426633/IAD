@@ -3,7 +3,7 @@
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
     <ProjectGuid>{1145871D-4176-4AA9-8263-6CEFA0A06689}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>IAD</RootNamespace>
@@ -14,8 +14,8 @@
     <Deterministic>true</Deterministic>
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,8 +23,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <PlatformTarget>x64</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -34,12 +34,42 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="System.Data.SQLite" Version="2.0.3" />
+    <PackageReference Include="SourceGear.sqlite3" Version="3.50.4.5" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+
+    <Compile Include="Models\Product.cs" />
+    <Compile Include="Models\DefectCategory.cs" />
+    <Compile Include="Models\RoiDefinition.cs" />
+    <Compile Include="Models\InspectionRecipe.cs" />
+    <Compile Include="Models\InspectionResult.cs" />
+    <Compile Include="Models\DefectInstance.cs" />
+
+    <Compile Include="Infrastructure\Storage\ProjectStoragePaths.cs" />
+    <Compile Include="Infrastructure\Database\SqliteConnectionFactory.cs" />
+    <Compile Include="Infrastructure\Database\DbConvert.cs" />
+    <Compile Include="Infrastructure\Database\DatabaseInitializer.cs" />
+
+    <Compile Include="Repositories\RepositoryContracts.cs" />
+    <Compile Include="Repositories\ProductRepository.cs" />
+    <Compile Include="Repositories\DefectCategoryRepository.cs" />
+    <Compile Include="Repositories\RoiRepository.cs" />
+    <Compile Include="Repositories\InspectionRecipeRepository.cs" />
+    <Compile Include="Repositories\InspectionResultRepository.cs" />
+
+    <Compile Include="Services\ProductService.cs" />
+    <Compile Include="Services\RecipeService.cs" />
+    <Compile Include="Services\ResultService.cs" />
+    <Compile Include="Services\AppServices.cs" />
+
     <Compile Include="Security\AppSession.cs" />
     <Compile Include="Shell\LoginForm.cs"><SubType>Form</SubType></Compile>
     <Compile Include="Shell\LoginForm.Designer.cs"><DependentUpon>LoginForm.cs</DependentUpon></Compile>
