@@ -12,12 +12,19 @@ namespace IAD.Repositories
         void Update(Product product);
     }
 
+    public interface IProductDefinitionSettingsRepository
+    {
+        ProductDefinitionSettings GetByProduct(long productId);
+        void Upsert(ProductDefinitionSettings settings);
+    }
+
     public interface IDefectCategoryRepository
     {
         IList<DefectCategory> GetByProduct(long productId);
         DefectCategory GetById(long id);
         long Insert(DefectCategory category);
         void Update(DefectCategory category);
+        void Delete(long id, long productId);
     }
 
     public interface IRoiRepository
@@ -26,6 +33,8 @@ namespace IAD.Repositories
         RoiDefinition GetById(long id);
         long Insert(RoiDefinition roi);
         void Update(RoiDefinition roi);
+        void Delete(long id, long productId);
+        void DeleteByProduct(long productId);
     }
 
     public interface IInspectionRecipeRepository
