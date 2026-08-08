@@ -1,5 +1,4 @@
 using System.Windows.Forms;
-using IAD.UI;
 
 namespace IAD.Pages
 {
@@ -16,7 +15,6 @@ namespace IAD.Pages
         {
             if (runtimeInitialized) return;
             runtimeInitialized = true;
-            PageFillLayoutManager.Apply(this);
             LoadSampleData();
             BindEvents();
         }

@@ -14,16 +14,16 @@ namespace IAD.Shell
         private readonly Dictionary<string, UserControl> pages = new Dictionary<string, UserControl>();
         private readonly Dictionary<string, Button> navButtons = new Dictionary<string, Button>();
         private readonly Dictionary<string, Size> lastLayoutSizes = new Dictionary<string, Size>();
-        private readonly Timer layoutTimer = new Timer();
         private Font navFont;
         private Font navActiveFont;
         private string currentPage;
+        private bool layoutInProgress;
 
         public MainForm()
         {
             InitializeComponent();
 
-            // 设计器只需要解析 MainForm.Designer.cs，不应创建九个业务页面。
+            // 设计器只解析壳体，不创建九个业务页面。
             if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
             {
                 return;
@@ -33,8 +33,6 @@ namespace IAD.Shell
             RegisterPageFactories();
             BuildNavigation();
 
-            layoutTimer.Interval = 140;
-            layoutTimer.Tick += layoutTimer_Tick;
             contentHost.SizeChanged += contentHost_SizeChanged;
             FormClosed += MainForm_FormClosed;
 
@@ -136,6 +134,7 @@ namespace IAD.Shell
 
             page = factory();
             page.Dock = DockStyle.Fill;
+            page.Margin = Padding.Empty;
             page.Visible = false;
             contentHost.Controls.Add(page);
             pages.Add(pageName, page);
@@ -175,33 +174,47 @@ namespace IAD.Shell
 
         private void ShowPage(string pageName)
         {
-            if (string.IsNullOrEmpty(pageName)) return;
+            if (string.IsNullOrEmpty(pageName) || layoutInProgress) return;
 
-            UserControl nextPage = GetOrCreatePage(pageName);
-            if (nextPage == null) return;
-
-            if (currentPage == pageName && nextPage.Visible)
-            {
-                return;
-            }
-
+            UserControl nextPage = null;
+            layoutInProgress = true;
             contentHost.SuspendLayout();
+
             try
             {
+                nextPage = GetOrCreatePage(pageName);
+                if (nextPage == null) return;
+
+                if (currentPage == pageName && nextPage.Visible)
+                {
+                    FillPageToHost(nextPage);
+                    ApplyLayoutIfNeeded(pageName, nextPage, false);
+                    return;
+                }
+
                 UserControl previousPage;
                 if (!string.IsNullOrEmpty(currentPage) && pages.TryGetValue(currentPage, out previousPage))
                 {
                     previousPage.Visible = false;
                 }
 
-                ApplyLayoutIfNeeded(pageName, nextPage, false);
+                // 先完成所有 Fill / 响应式计算，再把页面显示出来，避免先出现设计时尺寸再跳到全屏。
+                nextPage.Visible = false;
+                PageFillLayoutManager.Apply(nextPage);
+                FillPageToHost(nextPage);
+                ApplyLayoutIfNeeded(pageName, nextPage, true);
+                FillPageToHost(nextPage);
+
                 nextPage.Visible = true;
                 nextPage.BringToFront();
                 currentPage = pageName;
             }
             finally
             {
-                contentHost.ResumeLayout(false);
+                contentHost.ResumeLayout(true);
+                contentHost.PerformLayout();
+                if (nextPage != null) nextPage.PerformLayout();
+                layoutInProgress = false;
             }
 
             UpdateNavigationSelection(pageName);
@@ -214,6 +227,20 @@ namespace IAD.Shell
                 bool active = pair.Key == pageName;
                 pair.Value.BackColor = active ? UiTheme.Active : Color.Transparent;
                 pair.Value.Font = active ? navActiveFont : navFont;
+            }
+        }
+
+        private void FillPageToHost(UserControl page)
+        {
+            if (page == null) return;
+
+            page.Dock = DockStyle.Fill;
+            page.Margin = Padding.Empty;
+
+            Rectangle target = contentHost.DisplayRectangle;
+            if (target.Width > 0 && target.Height > 0 && page.Bounds != target)
+            {
+                page.Bounds = target;
             }
         }
 
@@ -234,22 +261,31 @@ namespace IAD.Shell
 
         private void contentHost_SizeChanged(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(currentPage)) return;
-
-            // Resize/DPI变化时做防抖，避免连续反射遍历复杂页面。
-            layoutTimer.Stop();
-            layoutTimer.Start();
+            // 当前页面外框和内部布局同步完成，不再等待 Timer，避免“卡一下才铺满”。
+            LayoutCurrentPageNow();
         }
 
-        private void layoutTimer_Tick(object sender, EventArgs e)
+        private void LayoutCurrentPageNow()
         {
-            layoutTimer.Stop();
-            if (string.IsNullOrEmpty(currentPage)) return;
+            if (layoutInProgress || string.IsNullOrEmpty(currentPage)) return;
 
             UserControl page;
-            if (pages.TryGetValue(currentPage, out page))
+            if (!pages.TryGetValue(currentPage, out page)) return;
+
+            layoutInProgress = true;
+            page.SuspendLayout();
+            try
             {
+                PageFillLayoutManager.Apply(page);
+                FillPageToHost(page);
                 ApplyLayoutIfNeeded(currentPage, page, false);
+                FillPageToHost(page);
+            }
+            finally
+            {
+                page.ResumeLayout(true);
+                page.PerformLayout();
+                layoutInProgress = false;
             }
         }
 
@@ -263,9 +299,6 @@ namespace IAD.Shell
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            layoutTimer.Stop();
-            layoutTimer.Dispose();
-
             if (navFont != null) navFont.Dispose();
             if (navActiveFont != null) navActiveFont.Dispose();
         }
