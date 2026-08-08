@@ -1,0 +1,1 @@
+Designer build probe for Windows MSBuild validation.
