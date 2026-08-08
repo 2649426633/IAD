@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using IAD.Pages;
@@ -9,22 +10,42 @@ namespace IAD.Shell
 {
     public partial class MainForm : Form
     {
+        private readonly Dictionary<string, Func<UserControl>> pageFactories = new Dictionary<string, Func<UserControl>>();
         private readonly Dictionary<string, UserControl> pages = new Dictionary<string, UserControl>();
         private readonly Dictionary<string, Button> navButtons = new Dictionary<string, Button>();
+        private readonly Dictionary<string, Size> lastLayoutSizes = new Dictionary<string, Size>();
+        private readonly Timer layoutTimer = new Timer();
+        private Font navFont;
+        private Font navActiveFont;
         private string currentPage;
 
         public MainForm()
         {
             InitializeComponent();
+
+            // 设计器只需要解析 MainForm.Designer.cs，不应创建九个业务页面。
+            if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
+            {
+                return;
+            }
+
             ApplyShellStyle();
-            RegisterPages();
+            RegisterPageFactories();
             BuildNavigation();
+
+            layoutTimer.Interval = 140;
+            layoutTimer.Tick += layoutTimer_Tick;
             contentHost.SizeChanged += contentHost_SizeChanged;
+            FormClosed += MainForm_FormClosed;
+
             ShowPage("工作台");
         }
 
         private void ApplyShellStyle()
         {
+            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
+            UpdateStyles();
+
             BackColor = UiTheme.Page;
             rootLayout.BackColor = UiTheme.Page;
             headerLayout.BackColor = UiTheme.Header;
@@ -43,23 +64,24 @@ namespace IAD.Shell
             closeButton.Font = new Font("Segoe UI", 17F, FontStyle.Regular, GraphicsUnit.Point);
             closeButton.FlatAppearance.BorderSize = 0;
             closeButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(225, 225, 225);
-            SizeChanged += delegate(object sender, EventArgs e)
-            {
-                if (WindowState != FormWindowState.Maximized) WindowState = FormWindowState.Maximized;
-            };
+
+            navFont = UiTheme.Font(10.8F, false);
+            navActiveFont = UiTheme.Font(10.8F, true);
+
+            SizeChanged += MainForm_SizeChanged;
         }
 
-        private void RegisterPages()
+        private void RegisterPageFactories()
         {
-            pages.Add("工作台", new DashboardPage());
-            pages.Add("产品定义", new ProductDefinitionPage());
-            pages.Add("数据集标注", new DatasetAnnotationPage());
-            pages.Add("瑕疵模板识别", new TemplateRecognitionPage());
-            pages.Add("训练与模型", new TrainingModelsPage());
-            pages.Add("规则与Recipe", new RulesRecipePage());
-            pages.Add("在线检测", new OnlineInspectionPage());
-            pages.Add("结果追溯", new TraceabilityPage());
-            pages.Add("系统设置", new SystemSettingsPage());
+            pageFactories.Add("工作台", delegate { return new DashboardPage(); });
+            pageFactories.Add("产品定义", delegate { return new ProductDefinitionPage(); });
+            pageFactories.Add("数据集标注", delegate { return new DatasetAnnotationPage(); });
+            pageFactories.Add("瑕疵模板识别", delegate { return new TemplateRecognitionPage(); });
+            pageFactories.Add("训练与模型", delegate { return new TrainingModelsPage(); });
+            pageFactories.Add("规则与Recipe", delegate { return new RulesRecipePage(); });
+            pageFactories.Add("在线检测", delegate { return new OnlineInspectionPage(); });
+            pageFactories.Add("结果追溯", delegate { return new TraceabilityPage(); });
+            pageFactories.Add("系统设置", delegate { return new SystemSettingsPage(); });
         }
 
         private void BuildNavigation()
@@ -78,7 +100,7 @@ namespace IAD.Shell
                     FlatStyle = FlatStyle.Flat,
                     BackColor = Color.Transparent,
                     ForeColor = UiTheme.Text,
-                    Font = UiTheme.Font(10.8F, false),
+                    Font = navFont,
                     Margin = new Padding(0, 0, 0, 5),
                     TabStop = false,
                     Tag = name
@@ -94,36 +116,158 @@ namespace IAD.Shell
         private void navigationButton_Click(object sender, EventArgs e)
         {
             Button button = sender as Button;
-            if (button != null) ShowPage(button.Tag.ToString());
+            if (button == null || button.Tag == null) return;
+            ShowPage(button.Tag.ToString());
+        }
+
+        private UserControl GetOrCreatePage(string pageName)
+        {
+            UserControl page;
+            if (pages.TryGetValue(pageName, out page))
+            {
+                return page;
+            }
+
+            Func<UserControl> factory;
+            if (!pageFactories.TryGetValue(pageName, out factory))
+            {
+                return null;
+            }
+
+            page = factory();
+            page.Dock = DockStyle.Fill;
+            page.Visible = false;
+            contentHost.Controls.Add(page);
+            pages.Add(pageName, page);
+            InitializePageRuntime(page);
+            return page;
+        }
+
+        private static void InitializePageRuntime(UserControl page)
+        {
+            DashboardPage dashboard = page as DashboardPage;
+            if (dashboard != null) { dashboard.InitializeRuntime(); return; }
+
+            ProductDefinitionPage product = page as ProductDefinitionPage;
+            if (product != null) { product.InitializeRuntime(); return; }
+
+            DatasetAnnotationPage annotation = page as DatasetAnnotationPage;
+            if (annotation != null) { annotation.InitializeRuntime(); return; }
+
+            TemplateRecognitionPage template = page as TemplateRecognitionPage;
+            if (template != null) { template.InitializeRuntime(); return; }
+
+            TrainingModelsPage training = page as TrainingModelsPage;
+            if (training != null) { training.InitializeRuntime(); return; }
+
+            RulesRecipePage rules = page as RulesRecipePage;
+            if (rules != null) { rules.InitializeRuntime(); return; }
+
+            OnlineInspectionPage inspection = page as OnlineInspectionPage;
+            if (inspection != null) { inspection.InitializeRuntime(); return; }
+
+            TraceabilityPage traceability = page as TraceabilityPage;
+            if (traceability != null) { traceability.InitializeRuntime(); return; }
+
+            SystemSettingsPage settings = page as SystemSettingsPage;
+            if (settings != null) settings.InitializeRuntime();
         }
 
         private void ShowPage(string pageName)
         {
-            if (!pages.ContainsKey(pageName)) return;
-            currentPage = pageName;
+            if (string.IsNullOrEmpty(pageName)) return;
+
+            UserControl nextPage = GetOrCreatePage(pageName);
+            if (nextPage == null) return;
+
+            if (currentPage == pageName && nextPage.Visible)
+            {
+                return;
+            }
+
             contentHost.SuspendLayout();
-            contentHost.Controls.Clear();
-            UserControl page = pages[pageName];
-            page.Dock = DockStyle.Fill;
-            contentHost.Controls.Add(page);
-            contentHost.ResumeLayout(true);
+            try
+            {
+                UserControl previousPage;
+                if (!string.IsNullOrEmpty(currentPage) && pages.TryGetValue(currentPage, out previousPage))
+                {
+                    previousPage.Visible = false;
+                }
 
-            ResponsiveLayoutManager.Apply(page, contentHost.ClientSize);
+                ApplyLayoutIfNeeded(pageName, nextPage, false);
+                nextPage.Visible = true;
+                nextPage.BringToFront();
+                currentPage = pageName;
+            }
+            finally
+            {
+                contentHost.ResumeLayout(false);
+            }
 
+            UpdateNavigationSelection(pageName);
+        }
+
+        private void UpdateNavigationSelection(string pageName)
+        {
             foreach (KeyValuePair<string, Button> pair in navButtons)
             {
                 bool active = pair.Key == pageName;
                 pair.Value.BackColor = active ? UiTheme.Active : Color.Transparent;
-                pair.Value.Font = UiTheme.Font(10.8F, active);
+                pair.Value.Font = active ? navActiveFont : navFont;
             }
+        }
+
+        private void ApplyLayoutIfNeeded(string pageName, UserControl page, bool force)
+        {
+            Size size = contentHost.ClientSize;
+            if (size.Width <= 0 || size.Height <= 0) return;
+
+            Size previousSize;
+            if (!force && lastLayoutSizes.TryGetValue(pageName, out previousSize) && previousSize == size)
+            {
+                return;
+            }
+
+            ResponsiveLayoutManager.Apply(page, size);
+            lastLayoutSizes[pageName] = size;
         }
 
         private void contentHost_SizeChanged(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(currentPage)) return;
-            if (!pages.ContainsKey(currentPage)) return;
 
-            ResponsiveLayoutManager.Apply(pages[currentPage], contentHost.ClientSize);
+            // Resize/DPI变化时做防抖，避免连续反射遍历复杂页面。
+            layoutTimer.Stop();
+            layoutTimer.Start();
+        }
+
+        private void layoutTimer_Tick(object sender, EventArgs e)
+        {
+            layoutTimer.Stop();
+            if (string.IsNullOrEmpty(currentPage)) return;
+
+            UserControl page;
+            if (pages.TryGetValue(currentPage, out page))
+            {
+                ApplyLayoutIfNeeded(currentPage, page, false);
+            }
+        }
+
+        private void MainForm_SizeChanged(object sender, EventArgs e)
+        {
+            if (WindowState != FormWindowState.Maximized)
+            {
+                WindowState = FormWindowState.Maximized;
+            }
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            layoutTimer.Stop();
+            layoutTimer.Dispose();
+
+            if (navFont != null) navFont.Dispose();
+            if (navActiveFont != null) navActiveFont.Dispose();
         }
 
         private void closeButton_Click(object sender, EventArgs e)

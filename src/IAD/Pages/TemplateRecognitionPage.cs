@@ -1,18 +1,22 @@
-using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace IAD.Pages
 {
     public partial class TemplateRecognitionPage : UserControl
     {
+        private bool runtimeInitialized;
+
         public TemplateRecognitionPage()
         {
             InitializeComponent();
-            if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
-            {
-                LoadSampleData();
-                BindEvents();
-            }
+        }
+
+        public void InitializeRuntime()
+        {
+            if (runtimeInitialized) return;
+            runtimeInitialized = true;
+            LoadSampleData();
+            BindEvents();
         }
 
         private void BindEvents()
