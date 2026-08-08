@@ -7,6 +7,7 @@ namespace IAD.Pages
         public SystemSettingsPage()
         {
             InitializeComponent();
+            BuildView();
             BindEvents();
         }
 
