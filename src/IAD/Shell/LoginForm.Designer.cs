@@ -17,7 +17,7 @@ namespace IAD.Shell
         private Label lblPassword;
         private TextBox txtPassword;
         private Label lblError;
-        private FlowLayoutPanel buttonPanel;
+        private TableLayoutPanel buttonLayout;
         private Button btnLogin;
         private Button btnCancel;
         private Label lblFooter;
@@ -41,14 +41,14 @@ namespace IAD.Shell
             this.lblPassword = new Label();
             this.txtPassword = new TextBox();
             this.lblError = new Label();
-            this.buttonPanel = new FlowLayoutPanel();
+            this.buttonLayout = new TableLayoutPanel();
             this.btnLogin = new Button();
             this.btnCancel = new Button();
             this.lblFooter = new Label();
             this.rootLayout.SuspendLayout();
             this.loginPanel.SuspendLayout();
             this.loginLayout.SuspendLayout();
-            this.buttonPanel.SuspendLayout();
+            this.buttonLayout.SuspendLayout();
             this.SuspendLayout();
             //
             // rootLayout
@@ -61,17 +61,18 @@ namespace IAD.Shell
             this.rootLayout.Controls.Add(this.loginPanel, 0, 2);
             this.rootLayout.Controls.Add(this.lblFooter, 0, 3);
             this.rootLayout.Dock = DockStyle.Fill;
-            this.rootLayout.Padding = new Padding(42, 28, 42, 20);
+            this.rootLayout.Margin = new Padding(0);
+            this.rootLayout.Padding = new Padding(54, 34, 54, 24);
             this.rootLayout.RowCount = 4;
-            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 48F));
-            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 34F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 58F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 38F));
             this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 34F));
             //
             // lblTitle
             //
             this.lblTitle.Dock = DockStyle.Fill;
-            this.lblTitle.Font = new Font("Microsoft YaHei UI", 16F, FontStyle.Bold, GraphicsUnit.Point);
+            this.lblTitle.Font = new Font("Microsoft YaHei UI", 17F, FontStyle.Bold, GraphicsUnit.Point);
             this.lblTitle.ForeColor = Color.FromArgb(28, 28, 28);
             this.lblTitle.Text = "通用工业瑕疵质检系统";
             this.lblTitle.TextAlign = ContentAlignment.MiddleCenter;
@@ -79,7 +80,7 @@ namespace IAD.Shell
             // lblSubtitle
             //
             this.lblSubtitle.Dock = DockStyle.Fill;
-            this.lblSubtitle.Font = new Font("Microsoft YaHei UI", 9.5F, FontStyle.Regular, GraphicsUnit.Point);
+            this.lblSubtitle.Font = new Font("Microsoft YaHei UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
             this.lblSubtitle.ForeColor = Color.FromArgb(100, 100, 100);
             this.lblSubtitle.Text = "请选择身份并输入密码登录";
             this.lblSubtitle.TextAlign = ContentAlignment.TopCenter;
@@ -90,25 +91,28 @@ namespace IAD.Shell
             this.loginPanel.BorderStyle = BorderStyle.FixedSingle;
             this.loginPanel.Controls.Add(this.loginLayout);
             this.loginPanel.Dock = DockStyle.Fill;
-            this.loginPanel.Margin = new Padding(0, 8, 0, 8);
+            this.loginPanel.Margin = new Padding(16, 10, 16, 10);
+            this.loginPanel.MinimumSize = new Size(430, 270);
             //
             // loginLayout
             //
             this.loginLayout.ColumnCount = 2;
-            this.loginLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 82F));
+            this.loginLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 92F));
             this.loginLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             this.loginLayout.Controls.Add(this.lblRole, 0, 0);
             this.loginLayout.Controls.Add(this.cboRole, 1, 0);
             this.loginLayout.Controls.Add(this.lblPassword, 0, 1);
             this.loginLayout.Controls.Add(this.txtPassword, 1, 1);
             this.loginLayout.Controls.Add(this.lblError, 1, 2);
-            this.loginLayout.Controls.Add(this.buttonPanel, 1, 3);
+            this.loginLayout.Controls.Add(this.buttonLayout, 0, 3);
+            this.loginLayout.SetColumnSpan(this.buttonLayout, 2);
             this.loginLayout.Dock = DockStyle.Fill;
-            this.loginLayout.Padding = new Padding(28, 26, 28, 20);
+            this.loginLayout.Margin = new Padding(0);
+            this.loginLayout.Padding = new Padding(34, 28, 34, 24);
             this.loginLayout.RowCount = 4;
-            this.loginLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 52F));
-            this.loginLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 52F));
-            this.loginLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 34F));
+            this.loginLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 58F));
+            this.loginLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 58F));
+            this.loginLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
             this.loginLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             //
             // lblRole
@@ -123,7 +127,7 @@ namespace IAD.Shell
             //
             this.cboRole.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             this.cboRole.DropDownStyle = ComboBoxStyle.DropDownList;
-            this.cboRole.Font = new Font("Microsoft YaHei UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            this.cboRole.Font = new Font("Microsoft YaHei UI", 10.5F, FontStyle.Regular, GraphicsUnit.Point);
             this.cboRole.FormattingEnabled = true;
             this.cboRole.Items.AddRange(new object[] { "操作员", "工程师", "管理员" });
             this.cboRole.SelectedIndex = 0;
@@ -139,7 +143,7 @@ namespace IAD.Shell
             // txtPassword
             //
             this.txtPassword.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            this.txtPassword.Font = new Font("Microsoft YaHei UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            this.txtPassword.Font = new Font("Microsoft YaHei UI", 10.5F, FontStyle.Regular, GraphicsUnit.Point);
             this.txtPassword.UseSystemPasswordChar = true;
             //
             // lblError
@@ -149,36 +153,45 @@ namespace IAD.Shell
             this.lblError.ForeColor = Color.FromArgb(120, 50, 50);
             this.lblError.TextAlign = ContentAlignment.MiddleLeft;
             //
-            // buttonPanel
+            // buttonLayout
             //
-            this.buttonPanel.Controls.Add(this.btnLogin);
-            this.buttonPanel.Controls.Add(this.btnCancel);
-            this.buttonPanel.Dock = DockStyle.Fill;
-            this.buttonPanel.FlowDirection = FlowDirection.LeftToRight;
-            this.buttonPanel.Padding = new Padding(0, 8, 0, 0);
-            this.buttonPanel.WrapContents = false;
+            this.buttonLayout.ColumnCount = 4;
+            this.buttonLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            this.buttonLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 126F));
+            this.buttonLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 108F));
+            this.buttonLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            this.buttonLayout.Controls.Add(this.btnLogin, 1, 0);
+            this.buttonLayout.Controls.Add(this.btnCancel, 2, 0);
+            this.buttonLayout.Dock = DockStyle.Fill;
+            this.buttonLayout.Margin = new Padding(0);
+            this.buttonLayout.Padding = new Padding(0, 8, 0, 0);
+            this.buttonLayout.RowCount = 1;
+            this.buttonLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             //
             // btnLogin
             //
+            this.btnLogin.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.btnLogin.BackColor = Color.FromArgb(40, 40, 40);
             this.btnLogin.FlatAppearance.BorderSize = 0;
             this.btnLogin.FlatStyle = FlatStyle.Flat;
             this.btnLogin.Font = new Font("Microsoft YaHei UI", 9.5F, FontStyle.Bold, GraphicsUnit.Point);
             this.btnLogin.ForeColor = Color.White;
             this.btnLogin.Margin = new Padding(0, 0, 10, 0);
-            this.btnLogin.Size = new Size(110, 36);
+            this.btnLogin.Height = 40;
             this.btnLogin.Text = "登录";
             this.btnLogin.UseVisualStyleBackColor = false;
             this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
             //
             // btnCancel
             //
+            this.btnCancel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             this.btnCancel.BackColor = Color.White;
             this.btnCancel.FlatAppearance.BorderColor = Color.FromArgb(180, 180, 180);
             this.btnCancel.FlatStyle = FlatStyle.Flat;
             this.btnCancel.Font = new Font("Microsoft YaHei UI", 9.5F, FontStyle.Regular, GraphicsUnit.Point);
             this.btnCancel.ForeColor = Color.FromArgb(45, 45, 45);
-            this.btnCancel.Size = new Size(90, 36);
+            this.btnCancel.Margin = new Padding(0);
+            this.btnCancel.Height = 40;
             this.btnCancel.Text = "退出";
             this.btnCancel.UseVisualStyleBackColor = false;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -194,14 +207,16 @@ namespace IAD.Shell
             // LoginForm
             //
             this.AcceptButton = this.btnLogin;
+            this.AutoScaleDimensions = new SizeF(96F, 96F);
             this.AutoScaleMode = AutoScaleMode.Dpi;
             this.BackColor = Color.FromArgb(244, 244, 244);
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new Size(520, 390);
+            this.ClientSize = new Size(620, 480);
             this.Controls.Add(this.rootLayout);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
+            this.MinimumSize = new Size(636, 519);
             this.Name = "LoginForm";
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Text = "系统登录";
@@ -210,7 +225,7 @@ namespace IAD.Shell
             this.loginPanel.ResumeLayout(false);
             this.loginLayout.ResumeLayout(false);
             this.loginLayout.PerformLayout();
-            this.buttonPanel.ResumeLayout(false);
+            this.buttonLayout.ResumeLayout(false);
             this.ResumeLayout(false);
         }
     }
