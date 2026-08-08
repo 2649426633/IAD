@@ -7,6 +7,7 @@ namespace IAD.Pages
         public OnlineInspectionPage()
         {
             InitializeComponent();
+            BuildView();
             BindEvents();
         }
 
