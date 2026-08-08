@@ -7,6 +7,7 @@ namespace IAD.Pages
         public TrainingModelsPage()
         {
             InitializeComponent();
+            BuildView();
             BindEvents();
         }
 
