@@ -44,15 +44,33 @@
     <Compile Include="Shell\MainForm.Designer.cs"><DependentUpon>MainForm.cs</DependentUpon></Compile>
     <Compile Include="UI\UiTheme.cs" />
     <Compile Include="UI\UiFactory.cs" />
+
     <Compile Include="Pages\DashboardPage.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Include="Pages\DashboardPage.Designer.cs"><DependentUpon>DashboardPage.cs</DependentUpon></Compile>
+
     <Compile Include="Pages\ProductDefinitionPage.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Include="Pages\ProductDefinitionPage.Designer.cs"><DependentUpon>ProductDefinitionPage.cs</DependentUpon></Compile>
+
     <Compile Include="Pages\DatasetAnnotationPage.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Include="Pages\DatasetAnnotationPage.Designer.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
+
     <Compile Include="Pages\TemplateRecognitionPage.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Include="Pages\TemplateRecognitionPage.Designer.cs"><DependentUpon>TemplateRecognitionPage.cs</DependentUpon></Compile>
+
     <Compile Include="Pages\TrainingModelsPage.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Include="Pages\TrainingModelsPage.Designer.cs"><DependentUpon>TrainingModelsPage.cs</DependentUpon></Compile>
+
     <Compile Include="Pages\RulesRecipePage.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Include="Pages\RulesRecipePage.Designer.cs"><DependentUpon>RulesRecipePage.cs</DependentUpon></Compile>
+
     <Compile Include="Pages\OnlineInspectionPage.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Include="Pages\OnlineInspectionPage.Designer.cs"><DependentUpon>OnlineInspectionPage.cs</DependentUpon></Compile>
+
     <Compile Include="Pages\TraceabilityPage.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Include="Pages\TraceabilityPage.Designer.cs"><DependentUpon>TraceabilityPage.cs</DependentUpon></Compile>
+
     <Compile Include="Pages\SystemSettingsPage.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Include="Pages\SystemSettingsPage.Designer.cs"><DependentUpon>SystemSettingsPage.cs</DependentUpon></Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
