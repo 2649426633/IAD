@@ -7,7 +7,7 @@ namespace IAD.UI
 {
     /// <summary>
     /// 统一处理页面在不同分辨率和 DPI 下的布局。
-    /// 设计器仍然保存原生字段控件；这里只在运行时调整 RowStyle / ColumnStyle 和滚动策略。
+    /// 页面控件仍由 WinForms Designer 原生字段保存；这里只在运行时调整尺寸策略。
     /// </summary>
     internal static class ResponsiveLayoutManager
     {
@@ -42,6 +42,11 @@ namespace IAD.UI
                 {
                     root.Margin = Padding.Empty;
                     root.Padding = Padding.Empty;
+                    root.MinimumSize = veryCompact
+                        ? new Size(
+                            Math.Max(1, MinimumContentWidth - page.Padding.Horizontal),
+                            Math.Max(1, MinimumContentHeight - page.Padding.Vertical))
+                        : Size.Empty;
                 }
 
                 ApplyCommonControlRules(page, width);
@@ -178,18 +183,34 @@ namespace IAD.UI
             SetRow(right, 1, SizeType.Percent, compactHeight ? 36F : 32F);
 
             TableLayoutPanel fewShot = Field<TableLayoutPanel>(page, "fewShotLayout");
-            if (fewShot != null && narrow && fewShot.ColumnStyles.Count >= 10)
+            if (fewShot != null && fewShot.ColumnStyles.Count >= 10)
             {
-                SetColumn(fewShot, 0, SizeType.Absolute, 76F);
-                SetColumn(fewShot, 1, SizeType.Percent, 100F);
-                SetColumn(fewShot, 2, SizeType.Absolute, 60F);
-                SetColumn(fewShot, 3, SizeType.Absolute, 55F);
-                SetColumn(fewShot, 4, SizeType.Absolute, 88F);
-                SetColumn(fewShot, 5, SizeType.Absolute, 55F);
-                SetColumn(fewShot, 6, SizeType.Absolute, 82F);
-                SetColumn(fewShot, 7, SizeType.Absolute, 90F);
-                SetColumn(fewShot, 8, SizeType.Absolute, 48F);
-                SetColumn(fewShot, 9, SizeType.Absolute, 65F);
+                if (narrow)
+                {
+                    SetColumn(fewShot, 0, SizeType.Absolute, 76F);
+                    SetColumn(fewShot, 1, SizeType.Percent, 100F);
+                    SetColumn(fewShot, 2, SizeType.Absolute, 60F);
+                    SetColumn(fewShot, 3, SizeType.Absolute, 55F);
+                    SetColumn(fewShot, 4, SizeType.Absolute, 88F);
+                    SetColumn(fewShot, 5, SizeType.Absolute, 55F);
+                    SetColumn(fewShot, 6, SizeType.Absolute, 82F);
+                    SetColumn(fewShot, 7, SizeType.Absolute, 90F);
+                    SetColumn(fewShot, 8, SizeType.Absolute, 48F);
+                    SetColumn(fewShot, 9, SizeType.Absolute, 65F);
+                }
+                else
+                {
+                    SetColumn(fewShot, 0, SizeType.Absolute, 90F);
+                    SetColumn(fewShot, 1, SizeType.Percent, 25F);
+                    SetColumn(fewShot, 2, SizeType.Absolute, 75F);
+                    SetColumn(fewShot, 3, SizeType.Absolute, 70F);
+                    SetColumn(fewShot, 4, SizeType.Absolute, 105F);
+                    SetColumn(fewShot, 5, SizeType.Absolute, 70F);
+                    SetColumn(fewShot, 6, SizeType.Absolute, 95F);
+                    SetColumn(fewShot, 7, SizeType.Absolute, 110F);
+                    SetColumn(fewShot, 8, SizeType.Absolute, 55F);
+                    SetColumn(fewShot, 9, SizeType.Absolute, 80F);
+                }
             }
 
             SetFlowScroll(page, "actionPanel");
@@ -310,24 +331,41 @@ namespace IAD.UI
             }
 
             TableLayoutPanel filter = Field<TableLayoutPanel>(page, "filterLayout");
-            if (filter != null && narrow && filter.ColumnStyles.Count >= 11)
+            if (filter != null && filter.ColumnStyles.Count >= 11)
             {
-                SetColumn(filter, 0, SizeType.Absolute, 60F);
-                SetColumn(filter, 1, SizeType.Percent, 26F);
-                SetColumn(filter, 2, SizeType.Absolute, 46F);
-                SetColumn(filter, 3, SizeType.Percent, 12F);
-                SetColumn(filter, 4, SizeType.Absolute, 46F);
-                SetColumn(filter, 5, SizeType.Percent, 12F);
-                SetColumn(filter, 6, SizeType.Absolute, 76F);
-                SetColumn(filter, 7, SizeType.Percent, 14F);
-                SetColumn(filter, 8, SizeType.Absolute, 88F);
-                SetColumn(filter, 9, SizeType.Percent, 36F);
-                SetColumn(filter, 10, SizeType.Absolute, 74F);
+                if (narrow)
+                {
+                    SetColumn(filter, 0, SizeType.Absolute, 60F);
+                    SetColumn(filter, 1, SizeType.Percent, 26F);
+                    SetColumn(filter, 2, SizeType.Absolute, 46F);
+                    SetColumn(filter, 3, SizeType.Percent, 12F);
+                    SetColumn(filter, 4, SizeType.Absolute, 46F);
+                    SetColumn(filter, 5, SizeType.Percent, 12F);
+                    SetColumn(filter, 6, SizeType.Absolute, 76F);
+                    SetColumn(filter, 7, SizeType.Percent, 14F);
+                    SetColumn(filter, 8, SizeType.Absolute, 88F);
+                    SetColumn(filter, 9, SizeType.Percent, 36F);
+                    SetColumn(filter, 10, SizeType.Absolute, 74F);
+                }
+                else
+                {
+                    SetColumn(filter, 0, SizeType.Absolute, 70F);
+                    SetColumn(filter, 1, SizeType.Percent, 26F);
+                    SetColumn(filter, 2, SizeType.Absolute, 55F);
+                    SetColumn(filter, 3, SizeType.Percent, 12F);
+                    SetColumn(filter, 4, SizeType.Absolute, 55F);
+                    SetColumn(filter, 5, SizeType.Percent, 12F);
+                    SetColumn(filter, 6, SizeType.Absolute, 90F);
+                    SetColumn(filter, 7, SizeType.Percent, 14F);
+                    SetColumn(filter, 8, SizeType.Absolute, 105F);
+                    SetColumn(filter, 9, SizeType.Percent, 36F);
+                    SetColumn(filter, 10, SizeType.Absolute, 90F);
+                }
             }
 
             TableLayoutPanel bottom = Field<TableLayoutPanel>(page, "bottomLayout");
             SetColumn(bottom, 0, SizeType.Percent, narrow ? 36F : 38F);
-            SetColumn(bottom, 1, SizeType.Percent, narrow ? 42F : 42F);
+            SetColumn(bottom, 1, SizeType.Percent, 42F);
             SetColumn(bottom, 2, SizeType.Percent, narrow ? 22F : 20F);
 
             SetFlowScroll(page, "exportPanel");
@@ -348,7 +386,7 @@ namespace IAD.UI
             TableLayoutPanel row2 = Field<TableLayoutPanel>(page, "row2");
             SetColumn(row2, 0, SizeType.Percent, narrow ? 31F : 33F);
             SetColumn(row2, 1, SizeType.Percent, narrow ? 36F : 34F);
-            SetColumn(row2, 2, SizeType.Percent, narrow ? 33F : 33F);
+            SetColumn(row2, 2, SizeType.Percent, 33F);
 
             TableLayoutPanel row3 = Field<TableLayoutPanel>(page, "row3");
             SetColumn(row3, 0, SizeType.Percent, narrow ? 73F : 78F);
@@ -434,6 +472,11 @@ namespace IAD.UI
             }
             else
             {
+                foreach (DataGridViewColumn column in grid.Columns)
+                {
+                    column.MinimumWidth = 5;
+                    column.AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet;
+                }
                 grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             }
         }
