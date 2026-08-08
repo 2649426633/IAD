@@ -10,6 +10,8 @@ namespace IAD.Pages
         private TableLayoutPanel rootLayout;
         private FlowLayoutPanel toolbar;
         private Button btnImportImages;
+        private Button btnImportFolder;
+        private Button btnDeleteImages;
         private Button btnRectangle;
         private Button btnPolygon;
         private Button btnBrush;
@@ -76,6 +78,8 @@ namespace IAD.Pages
             this.rootLayout = new TableLayoutPanel();
             this.toolbar = new FlowLayoutPanel();
             this.btnImportImages = new Button();
+            this.btnImportFolder = new Button();
+            this.btnDeleteImages = new Button();
             this.btnRectangle = new Button();
             this.btnPolygon = new Button();
             this.btnBrush = new Button();
@@ -149,6 +153,8 @@ namespace IAD.Pages
             this.toolbar.Dock = DockStyle.Fill;
             this.toolbar.WrapContents = false;
             this.btnImportImages.Text = "导入图片";
+            this.btnImportFolder.Text = "导入文件夹";
+            this.btnDeleteImages.Text = "删除图片";
             this.btnRectangle.Text = "Rectangle";
             this.btnPolygon.Text = "Polygon";
             this.btnBrush.Text = "Brush";
@@ -162,6 +168,8 @@ namespace IAD.Pages
             this.lblCurrentProduct.Text = "当前产品：未选择 | 请先在产品定义中选择并保存";
             this.lblCurrentProduct.TextAlign = ContentAlignment.MiddleLeft;
             this.toolbar.Controls.Add(this.btnImportImages);
+            this.toolbar.Controls.Add(this.btnImportFolder);
+            this.toolbar.Controls.Add(this.btnDeleteImages);
             this.toolbar.Controls.Add(this.btnRectangle);
             this.toolbar.Controls.Add(this.btnPolygon);
             this.toolbar.Controls.Add(this.btnBrush);

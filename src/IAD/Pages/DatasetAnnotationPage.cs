@@ -23,6 +23,10 @@ namespace IAD.Pages
         private IList<DatasetAnnotation> currentAnnotations = new List<DatasetAnnotation>();
         private Bitmap currentBitmap;
         private string activeTool = "Rectangle";
+        private static readonly HashSet<string> SupportedImageExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff"
+        };
 
         public DatasetAnnotationPage()
         {
@@ -50,7 +54,9 @@ namespace IAD.Pages
 
         private void ConfigureRuntimeUi()
         {
-            btnImportImages.Text = "导入图片";
+            btnImportImages.Text = "导入文件";
+            btnImportFolder.Text = "导入文件夹";
+            btnDeleteImages.Text = "删除图片";
             btnRectangle.Text = "矩形";
             btnPolygon.Text = "多边形";
             btnBrush.Text = "画笔";
@@ -63,7 +69,13 @@ namespace IAD.Pages
             ConfigureGrid(dgvClasses);
             ConfigureGrid(dgvLayers);
             ConfigureGrid(dgvQueue);
+            dgvImages.MultiSelect = true;
             dgvLayers.Cursor = Cursors.Hand;
+
+            AllowDrop = true;
+            dgvImages.AllowDrop = true;
+            pnlCanvas.AllowDrop = true;
+            lblCanvasInfo.AllowDrop = true;
 
             cboCurrentClass.DropDownStyle = ComboBoxStyle.DropDownList;
             cboCurrentClass.Items.Clear();
@@ -95,6 +107,8 @@ namespace IAD.Pages
         private void BindEvents()
         {
             btnImportImages.Click += delegate { ImportImages(); };
+            btnImportFolder.Click += delegate { ImportFolder(); };
+            btnDeleteImages.Click += delegate { DeleteSelectedImages(); };
             btnRectangle.Click += delegate { ActivateDrawingTool("Rectangle"); };
             btnPolygon.Click += delegate { ActivateDrawingTool("Polygon"); };
             btnBrush.Click += delegate { ActivateDrawingTool("Brush"); };
@@ -104,11 +118,21 @@ namespace IAD.Pages
             btnVersion.Click += delegate { PublishVersion(); };
 
             dgvImages.SelectionChanged += delegate { SelectImageFromGrid(); };
+            dgvImages.KeyDown += dgvImages_KeyDown;
             dgvQueue.CellDoubleClick += dgvQueue_CellDoubleClick;
             dgvClasses.SelectionChanged += delegate { SelectClassFromGrid(); };
             cboCurrentClass.SelectedIndexChanged += delegate { ApplySelectedCategoryDefaults(); };
             dgvLayers.CellDoubleClick += dgvLayers_CellDoubleClick;
             AppSession.CurrentProductChanged += AppSession_CurrentProductChanged;
+
+            DragEnter += ImportPath_DragEnter;
+            DragDrop += ImportPath_DragDrop;
+            dgvImages.DragEnter += ImportPath_DragEnter;
+            dgvImages.DragDrop += ImportPath_DragDrop;
+            pnlCanvas.DragEnter += ImportPath_DragEnter;
+            pnlCanvas.DragDrop += ImportPath_DragDrop;
+            lblCanvasInfo.DragEnter += ImportPath_DragEnter;
+            lblCanvasInfo.DragDrop += ImportPath_DragDrop;
 
             BindCanvasEvents();
             pnlCanvas.Resize += delegate { pnlCanvas.Invalidate(); };
@@ -266,7 +290,7 @@ namespace IAD.Pages
             if (dgvImages.Rows.Count == 0)
             {
                 ClearCurrentImage();
-                ShowCanvasMessage("当前产品尚未导入数据集图片。\r\n\r\n点击“导入图片”可一次选择多张 PNG、JPG、BMP 或 TIFF 图片。");
+                ShowCanvasMessage("当前产品尚未导入数据集图片。\r\n\r\n可以导入多个图片文件、选择整个文件夹，或把文件/文件夹拖到此页面。");
                 return;
             }
 
@@ -327,23 +351,53 @@ namespace IAD.Pages
 
         private void ImportImages()
         {
-            if (currentProduct == null || currentProductDefinition == null)
-            {
-                MessageBox.Show(this, "请先在“产品定义”页面选择并保存产品。", "导入图片", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
             using (OpenFileDialog dialog = new OpenFileDialog())
             {
                 dialog.Multiselect = true;
-                dialog.Filter = "图像文件|*.png;*.jpg;*.jpeg;*.bmp;*.tif;*.tiff|所有文件|*.*";
+                dialog.Filter = "支持的图像|*.png;*.jpg;*.jpeg;*.bmp;*.tif;*.tiff|所有文件|*.*";
                 dialog.Title = "选择要导入的数据集图片";
+                dialog.RestoreDirectory = true;
                 if (dialog.ShowDialog(this) != DialogResult.OK) return;
+                ImportPaths(dialog.FileNames, "文件导入");
+            }
+        }
 
-                int imported = 0;
-                long preferredId = 0;
-                List<string> failures = new List<string>();
-                foreach (string fileName in dialog.FileNames)
+        private void ImportFolder()
+        {
+            using (FolderBrowserDialog dialog = new FolderBrowserDialog())
+            {
+                dialog.Description = "选择图片文件夹（将同时扫描其子文件夹）";
+                dialog.ShowNewFolderButton = false;
+                if (dialog.ShowDialog(this) != DialogResult.OK) return;
+                ImportPaths(new[] { dialog.SelectedPath }, "文件夹导入");
+            }
+        }
+
+        private void ImportPaths(IEnumerable<string> paths, string operationName)
+        {
+            if (currentProduct == null || currentProductDefinition == null)
+            {
+                MessageBox.Show(this, "请先在“产品定义”页面选择并保存产品。", operationName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            List<string> discoveryFailures = new List<string>();
+            List<string> files = CollectImagePaths(paths, discoveryFailures);
+            if (files.Count == 0)
+            {
+                string emptyMessage = "没有找到可导入的 PNG、JPG、BMP 或 TIFF 图片。";
+                if (discoveryFailures.Count > 0) emptyMessage += "\r\n\r\n" + discoveryFailures[0];
+                MessageBox.Show(this, emptyMessage, operationName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            int imported = 0;
+            long preferredId = 0;
+            List<string> failures = new List<string>(discoveryFailures);
+            UseWaitCursor = true;
+            try
+            {
+                foreach (string fileName in files)
                 {
                     try
                     {
@@ -356,17 +410,225 @@ namespace IAD.Pages
                         failures.Add(Path.GetFileName(fileName) + "：" + ex.Message);
                     }
                 }
-
-                LoadDataset(preferredId);
-                string message = "成功导入 " + imported + " 张图片。";
-                if (failures.Count > 0)
-                {
-                    message += "\r\n失败 " + failures.Count + " 张：\r\n";
-                    for (int i = 0; i < Math.Min(3, failures.Count); i++) message += failures[i] + "\r\n";
-                }
-                MessageBox.Show(this, message.TrimEnd(), failures.Count == 0 ? "导入完成" : "部分图片未导入",
-                    MessageBoxButtons.OK, failures.Count == 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
             }
+            finally
+            {
+                UseWaitCursor = false;
+            }
+
+            LoadDataset(preferredId);
+            string message = "发现 " + files.Count + " 张图片，成功导入 " + imported + " 张。";
+            if (failures.Count > 0)
+            {
+                message += "\r\n失败或跳过 " + failures.Count + " 项：\r\n";
+                for (int i = 0; i < Math.Min(5, failures.Count); i++) message += failures[i] + "\r\n";
+                if (failures.Count > 5) message += "其余 " + (failures.Count - 5) + " 项未展开。";
+            }
+            MessageBox.Show(this, message.TrimEnd(), failures.Count == 0 ? "导入完成" : "部分图片未导入",
+                MessageBoxButtons.OK, failures.Count == 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+        }
+
+        private static List<string> CollectImagePaths(IEnumerable<string> paths, IList<string> failures)
+        {
+            List<string> files = new List<string>();
+            HashSet<string> uniqueFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (paths == null) return files;
+
+            foreach (string rawPath in paths)
+            {
+                if (string.IsNullOrWhiteSpace(rawPath)) continue;
+                string path;
+                try
+                {
+                    path = Path.GetFullPath(rawPath);
+                }
+                catch (Exception ex)
+                {
+                    failures.Add(rawPath + "：路径无效（" + ex.Message + "）");
+                    continue;
+                }
+
+                if (File.Exists(path))
+                {
+                    if (IsSupportedImagePath(path))
+                    {
+                        if (uniqueFiles.Add(path)) files.Add(path);
+                    }
+                    else
+                    {
+                        failures.Add(Path.GetFileName(path) + "：不支持该文件格式");
+                    }
+                    continue;
+                }
+
+                if (Directory.Exists(path))
+                {
+                    CollectDirectoryImages(path, files, uniqueFiles, failures);
+                    continue;
+                }
+
+                failures.Add(path + "：文件或文件夹不存在");
+            }
+
+            files.Sort(StringComparer.CurrentCultureIgnoreCase);
+            return files;
+        }
+
+        private static void CollectDirectoryImages(string rootPath, IList<string> files, ISet<string> uniqueFiles, IList<string> failures)
+        {
+            Stack<string> pending = new Stack<string>();
+            pending.Push(rootPath);
+            while (pending.Count > 0)
+            {
+                string directory = pending.Pop();
+                try
+                {
+                    foreach (string file in Directory.GetFiles(directory))
+                    {
+                        if (!IsSupportedImagePath(file)) continue;
+                        string fullPath = Path.GetFullPath(file);
+                        if (uniqueFiles.Add(fullPath)) files.Add(fullPath);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    failures.Add(directory + "：读取图片失败（" + ex.Message + "）");
+                }
+
+                try
+                {
+                    foreach (string child in Directory.GetDirectories(directory))
+                    {
+                        FileAttributes attributes = File.GetAttributes(child);
+                        if ((attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint) continue;
+                        pending.Push(child);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    failures.Add(directory + "：读取子文件夹失败（" + ex.Message + "）");
+                }
+            }
+        }
+
+        private static bool IsSupportedImagePath(string path)
+        {
+            return SupportedImageExtensions.Contains(Path.GetExtension(path) ?? string.Empty);
+        }
+
+        private void ImportPath_DragEnter(object sender, DragEventArgs e)
+        {
+            e.Effect = e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop)
+                ? DragDropEffects.Copy
+                : DragDropEffects.None;
+        }
+
+        private void ImportPath_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] paths = e.Data == null ? null : e.Data.GetData(DataFormats.FileDrop) as string[];
+            if (paths == null || paths.Length == 0) return;
+            ImportPaths(paths, "拖拽导入");
+        }
+
+        private void dgvImages_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Delete) return;
+            e.Handled = true;
+            e.SuppressKeyPress = true;
+            DeleteSelectedImages();
+        }
+
+        private void DeleteSelectedImages()
+        {
+            if (currentProduct == null || dgvImages.SelectedRows.Count == 0) return;
+
+            List<DatasetImage> selected = new List<DatasetImage>();
+            HashSet<long> selectedIds = new HashSet<long>();
+            foreach (DataGridViewRow row in dgvImages.SelectedRows)
+            {
+                DatasetImage image = row.Tag as DatasetImage;
+                if (image != null && selectedIds.Add(image.Id)) selected.Add(image);
+            }
+            if (selected.Count == 0) return;
+
+            int annotationCount = 0;
+            try
+            {
+                foreach (DatasetImage image in selected)
+                    annotationCount += AppServices.Datasets.GetAnnotations(image.Id).Count;
+            }
+            catch
+            {
+                annotationCount = -1;
+            }
+
+            string names = string.Empty;
+            for (int i = 0; i < Math.Min(5, selected.Count); i++) names += "\r\n• " + selected[i].FileName;
+            if (selected.Count > 5) names += "\r\n• 其余 " + (selected.Count - 5) + " 张图片";
+            DialogResult answer = MessageBox.Show(this,
+                "确定从当前产品数据集中删除 " + selected.Count + " 张图片吗？" +
+                (annotationCount >= 0 ? "\r\n关联的 " + annotationCount + " 个标注也会删除。" : "\r\n所有关联标注也会一并删除。") + names +
+                "\r\n\r\n已发布的数据集版本不会被修改。",
+                "删除数据集图片", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (answer != DialogResult.Yes) return;
+
+            long preferredId = 0;
+            if (currentImage != null && !selectedIds.Contains(currentImage.Id)) preferredId = currentImage.Id;
+            if (preferredId == 0)
+            {
+                foreach (DatasetImage image in datasetImages)
+                {
+                    if (selectedIds.Contains(image.Id)) continue;
+                    preferredId = image.Id;
+                    break;
+                }
+            }
+            if (currentImage != null && selectedIds.Contains(currentImage.Id)) ClearCurrentImage();
+
+            int deleted = 0;
+            int retainedByVersion = 0;
+            List<string> warnings = new List<string>();
+            List<string> failures = new List<string>();
+            UseWaitCursor = true;
+            try
+            {
+                foreach (DatasetImage image in selected)
+                {
+                    try
+                    {
+                        string notice = AppServices.Datasets.DeleteImage(currentProduct.Id, image.Id);
+                        deleted++;
+                        if (string.IsNullOrWhiteSpace(notice)) continue;
+                        if (notice.IndexOf("已发布版本", StringComparison.Ordinal) >= 0) retainedByVersion++;
+                        else warnings.Add(image.FileName + "：" + notice);
+                    }
+                    catch (Exception ex)
+                    {
+                        failures.Add(image.FileName + "：" + ex.Message);
+                    }
+                }
+            }
+            finally
+            {
+                UseWaitCursor = false;
+            }
+
+            LoadDataset(preferredId);
+            string result = "成功删除 " + deleted + " 张图片及其标注。";
+            if (retainedByVersion > 0)
+                result += "\r\n其中 " + retainedByVersion + " 张的存储文件被历史发布版本引用，已安全保留。";
+            if (warnings.Count > 0)
+            {
+                result += "\r\n存储清理警告 " + warnings.Count + " 项：\r\n";
+                for (int i = 0; i < Math.Min(3, warnings.Count); i++) result += warnings[i] + "\r\n";
+            }
+            if (failures.Count > 0)
+            {
+                result += "\r\n删除失败 " + failures.Count + " 项：\r\n";
+                for (int i = 0; i < Math.Min(3, failures.Count); i++) result += failures[i] + "\r\n";
+            }
+            MessageBox.Show(this, result.TrimEnd(), failures.Count == 0 ? "删除完成" : "部分图片未删除",
+                MessageBoxButtons.OK, failures.Count == 0 && warnings.Count == 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
         }
 
         private void ActivateDrawingTool(string tool)
@@ -586,6 +848,8 @@ namespace IAD.Pages
             bool hasImage = currentImage != null && currentBitmap != null;
             bool hasCategory = GetSelectedCategory() != null;
             btnImportImages.Enabled = hasProduct;
+            btnImportFolder.Enabled = hasProduct;
+            btnDeleteImages.Enabled = hasProduct && dgvImages.SelectedRows.Count > 0;
             btnRectangle.Enabled = hasImage && hasCategory;
             btnPolygon.Enabled = hasImage && hasCategory;
             btnBrush.Enabled = hasImage && hasCategory;

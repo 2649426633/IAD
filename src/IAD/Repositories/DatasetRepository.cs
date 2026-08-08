@@ -76,6 +76,42 @@ namespace IAD.Repositories
             }
         }
 
+        public bool IsImageReferencedByVersion(long imageId)
+        {
+            using (SQLiteConnection connection = connectionFactory.CreateOpenConnection())
+            using (SQLiteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "SELECT EXISTS(SELECT 1 FROM DatasetVersionImages WHERE SourceImageId = @ImageId LIMIT 1);";
+                command.Parameters.AddWithValue("@ImageId", imageId);
+                return Convert.ToInt32(command.ExecuteScalar()) != 0;
+            }
+        }
+
+        public void DeleteImage(long imageId, long productId)
+        {
+            using (SQLiteConnection connection = connectionFactory.CreateOpenConnection())
+            using (SQLiteTransaction transaction = connection.BeginTransaction())
+            {
+                using (SQLiteCommand annotations = new SQLiteCommand(
+                    "DELETE FROM DatasetAnnotations WHERE DatasetImageId = @ImageId;", connection, transaction))
+                {
+                    annotations.Parameters.AddWithValue("@ImageId", imageId);
+                    annotations.ExecuteNonQuery();
+                }
+
+                using (SQLiteCommand image = new SQLiteCommand(
+                    "DELETE FROM DatasetImages WHERE Id = @ImageId AND ProductId = @ProductId;", connection, transaction))
+                {
+                    image.Parameters.AddWithValue("@ImageId", imageId);
+                    image.Parameters.AddWithValue("@ProductId", productId);
+                    if (image.ExecuteNonQuery() == 0)
+                        throw new InvalidOperationException("未找到需要删除的数据集图片。Id=" + imageId);
+                }
+
+                transaction.Commit();
+            }
+        }
+
         public IList<DatasetAnnotation> GetAnnotationsByImage(long imageId)
         {
             List<DatasetAnnotation> items = new List<DatasetAnnotation>();

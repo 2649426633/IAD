@@ -100,6 +100,51 @@ namespace IAD.Services
             return fullPath;
         }
 
+        public string DeleteImage(long productId, long imageId)
+        {
+            EnsureProductExists(productId);
+            DatasetImage image = EnsureImageExists(imageId);
+            if (image.ProductId != productId)
+                throw new InvalidOperationException("所选图片不属于当前产品，已阻止删除。");
+
+            string imagePath = GetImagePath(image);
+            bool retainedByVersion = datasets.IsImageReferencedByVersion(image.Id);
+            string stagedPath = null;
+
+            if (!retainedByVersion && File.Exists(imagePath))
+            {
+                stagedPath = imagePath + ".deleting-" + Guid.NewGuid().ToString("N");
+                File.Move(imagePath, stagedPath);
+            }
+
+            try
+            {
+                datasets.DeleteImage(image.Id, productId);
+            }
+            catch
+            {
+                if (!string.IsNullOrWhiteSpace(stagedPath) && File.Exists(stagedPath) && !File.Exists(imagePath))
+                    File.Move(stagedPath, imagePath);
+                throw;
+            }
+
+            if (retainedByVersion)
+                return "图片已从当前数据集删除；原始文件因被已发布版本引用而保留。";
+
+            if (!string.IsNullOrWhiteSpace(stagedPath) && File.Exists(stagedPath))
+            {
+                try
+                {
+                    File.Delete(stagedPath);
+                }
+                catch (Exception ex)
+                {
+                    return "图片记录和标注已删除，但存储副本清理失败：" + ex.Message;
+                }
+            }
+            return null;
+        }
+
         public IList<DatasetAnnotation> GetAnnotations(long imageId)
         {
             DatasetImage image = EnsureImageExists(imageId);

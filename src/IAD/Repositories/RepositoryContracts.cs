@@ -61,6 +61,8 @@ namespace IAD.Repositories
         DatasetImage GetImageById(long imageId);
         long InsertImage(DatasetImage image);
         void UpdateImageStatus(long imageId, string status, DateTime updatedAtUtc);
+        bool IsImageReferencedByVersion(long imageId);
+        void DeleteImage(long imageId, long productId);
         IList<DatasetAnnotation> GetAnnotationsByImage(long imageId);
         long InsertAnnotation(DatasetAnnotation annotation);
         void UpdateAnnotation(DatasetAnnotation annotation);
