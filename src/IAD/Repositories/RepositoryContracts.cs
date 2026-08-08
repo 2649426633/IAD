@@ -72,4 +72,17 @@ namespace IAD.Repositories
         int CountImages(long productId);
         int CountAnnotations(long productId);
     }
+
+    public interface IDefectRecognitionRepository
+    {
+        DefectRecognitionSettings GetSettings(long productId, long categoryId);
+        void UpsertSettings(DefectRecognitionSettings settings);
+        void ReplacePendingCandidates(long productId, long categoryId, string runCode, IList<DefectRecognitionCandidate> candidates);
+        IList<DefectRecognitionCandidate> GetLatestCandidates(long productId, long categoryId);
+        DefectRecognitionCandidate GetCandidateById(long candidateId);
+        void UpdateCandidate(DefectRecognitionCandidate candidate);
+        IList<DefectHardNegative> GetHardNegatives(long productId, long categoryId);
+        long InsertHardNegative(DefectHardNegative hardNegative);
+        DefectRecognitionSummary GetSummary(long productId, long categoryId);
+    }
 }

@@ -5,7 +5,7 @@ namespace IAD.Infrastructure.Database
 {
     internal static class DatabaseInitializer
     {
-        public const int CurrentSchemaVersion = 5;
+        public const int CurrentSchemaVersion = 6;
 
         public static void Initialize(SqliteConnectionFactory connectionFactory)
         {
@@ -305,7 +305,55 @@ namespace IAD.Infrastructure.Database
                 IsVisible INTEGER NOT NULL,
                 PRIMARY KEY(VersionId, SourceAnnotationId),
                 FOREIGN KEY(VersionId) REFERENCES DatasetVersions(Id) ON DELETE CASCADE
-            );"
+            );",
+
+            @"CREATE TABLE IF NOT EXISTS DefectRecognitionSettings (
+                ProductId INTEGER NOT NULL,
+                CategoryId INTEGER NOT NULL,
+                SimilarityThreshold REAL NOT NULL DEFAULT 0.72,
+                TopK INTEGER NOT NULL DEFAULT 10,
+                UpdatedAtUtc TEXT NOT NULL,
+                PRIMARY KEY(ProductId, CategoryId),
+                FOREIGN KEY(ProductId) REFERENCES Products(Id) ON DELETE CASCADE,
+                FOREIGN KEY(CategoryId) REFERENCES DefectCategories(Id) ON DELETE CASCADE
+            );",
+
+            @"CREATE TABLE IF NOT EXISTS DefectRecognitionCandidates (
+                Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                RunCode TEXT NOT NULL,
+                ProductId INTEGER NOT NULL,
+                CategoryId INTEGER NOT NULL,
+                DatasetImageId INTEGER NOT NULL,
+                Similarity REAL NOT NULL,
+                GeometryData TEXT NOT NULL,
+                Status TEXT NOT NULL DEFAULT '待确认',
+                ConfirmedAnnotationId INTEGER NULL,
+                CreatedAtUtc TEXT NOT NULL,
+                UpdatedAtUtc TEXT NOT NULL,
+                FOREIGN KEY(ProductId) REFERENCES Products(Id) ON DELETE CASCADE,
+                FOREIGN KEY(CategoryId) REFERENCES DefectCategories(Id) ON DELETE CASCADE,
+                FOREIGN KEY(DatasetImageId) REFERENCES DatasetImages(Id) ON DELETE CASCADE,
+                FOREIGN KEY(ConfirmedAnnotationId) REFERENCES DatasetAnnotations(Id) ON DELETE SET NULL
+            );",
+            @"CREATE INDEX IF NOT EXISTS IX_DefectRecognitionCandidates_Category_Run
+              ON DefectRecognitionCandidates(ProductId, CategoryId, RunCode, Id);",
+            @"CREATE INDEX IF NOT EXISTS IX_DefectRecognitionCandidates_Status
+              ON DefectRecognitionCandidates(ProductId, CategoryId, Status);",
+
+            @"CREATE TABLE IF NOT EXISTS DefectHardNegatives (
+                Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                ProductId INTEGER NOT NULL,
+                CategoryId INTEGER NOT NULL,
+                DatasetImageId INTEGER NOT NULL,
+                GeometryData TEXT NOT NULL,
+                Similarity REAL NOT NULL,
+                CreatedAtUtc TEXT NOT NULL,
+                FOREIGN KEY(ProductId) REFERENCES Products(Id) ON DELETE CASCADE,
+                FOREIGN KEY(CategoryId) REFERENCES DefectCategories(Id) ON DELETE CASCADE,
+                FOREIGN KEY(DatasetImageId) REFERENCES DatasetImages(Id) ON DELETE CASCADE
+            );",
+            @"CREATE UNIQUE INDEX IF NOT EXISTS UX_DefectHardNegatives_Category_Region
+              ON DefectHardNegatives(CategoryId, DatasetImageId, GeometryData);"
         };
     }
 }

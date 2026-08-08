@@ -60,6 +60,7 @@
     <Compile Include="Models\DatasetImage.cs" />
     <Compile Include="Models\DatasetAnnotation.cs" />
     <Compile Include="Models\DatasetVersion.cs" />
+    <Compile Include="Models\DefectRecognition.cs" />
 
     <Compile Include="Infrastructure\Storage\ProjectStoragePaths.cs" />
     <Compile Include="Infrastructure\Database\SqliteConnectionFactory.cs" />
@@ -74,11 +75,14 @@
     <Compile Include="Repositories\InspectionRecipeRepository.cs" />
     <Compile Include="Repositories\InspectionResultRepository.cs" />
     <Compile Include="Repositories\DatasetRepository.cs" />
+    <Compile Include="Repositories\DefectRecognitionRepository.cs" />
 
     <Compile Include="Services\ProductService.cs" />
     <Compile Include="Services\DefectCategoryCsv.cs" />
     <Compile Include="Services\AnnotationGeometry.cs" />
     <Compile Include="Services\DatasetService.cs" />
+    <Compile Include="Services\TemplateMatchingEngine.cs" />
+    <Compile Include="Services\DefectRecognitionService.cs" />
     <Compile Include="Services\RecipeService.cs" />
     <Compile Include="Services\ResultService.cs" />
     <Compile Include="Services\AppServices.cs" />
