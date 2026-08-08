@@ -11,6 +11,7 @@ namespace IAD.Models
         public int Width { get; set; }
         public int Height { get; set; }
         public string Status { get; set; }
+        public string ProductDefinitionVersion { get; set; }
         public DateTime CreatedAtUtc { get; set; }
         public DateTime UpdatedAtUtc { get; set; }
     }

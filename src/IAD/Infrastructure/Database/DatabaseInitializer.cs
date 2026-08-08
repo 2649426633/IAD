@@ -5,7 +5,7 @@ namespace IAD.Infrastructure.Database
 {
     internal static class DatabaseInitializer
     {
-        public const int CurrentSchemaVersion = 4;
+        public const int CurrentSchemaVersion = 5;
 
         public static void Initialize(SqliteConnectionFactory connectionFactory)
         {
@@ -33,6 +33,28 @@ namespace IAD.Infrastructure.Database
                     EnsureColumn(connection, transaction, "DefectCategories", "DefaultThreshold", "REAL NOT NULL DEFAULT 0.8");
                     EnsureColumn(connection, transaction, "DefectCategories", "MinArea", "REAL NOT NULL DEFAULT 0");
                     EnsureColumn(connection, transaction, "DefectCategories", "MinLength", "REAL NOT NULL DEFAULT 0");
+                    EnsureColumn(connection, transaction, "DatasetImages", "ProductDefinitionVersion", "TEXT NULL");
+                    EnsureColumn(connection, transaction, "DatasetVersions", "ProductDefinitionVersion", "TEXT NULL");
+                    EnsureColumn(connection, transaction, "DatasetVersionImages", "ProductDefinitionVersion", "TEXT NULL");
+
+                    using (SQLiteCommand backfillCommand = new SQLiteCommand(@"
+                        UPDATE DatasetImages
+                        SET ProductDefinitionVersion = (
+                            SELECT ProductDefinitionVersion FROM ProductDefinitionSettings s WHERE s.ProductId = DatasetImages.ProductId)
+                        WHERE ProductDefinitionVersion IS NULL OR TRIM(ProductDefinitionVersion) = '';
+
+                        UPDATE DatasetVersions
+                        SET ProductDefinitionVersion = (
+                            SELECT ProductDefinitionVersion FROM ProductDefinitionSettings s WHERE s.ProductId = DatasetVersions.ProductId)
+                        WHERE ProductDefinitionVersion IS NULL OR TRIM(ProductDefinitionVersion) = '';
+
+                        UPDATE DatasetVersionImages
+                        SET ProductDefinitionVersion = (
+                            SELECT ProductDefinitionVersion FROM DatasetImages i WHERE i.Id = DatasetVersionImages.SourceImageId)
+                        WHERE ProductDefinitionVersion IS NULL OR TRIM(ProductDefinitionVersion) = '';", connection, transaction))
+                    {
+                        backfillCommand.ExecuteNonQuery();
+                    }
 
                     using (SQLiteCommand versionCommand = new SQLiteCommand(
                         "INSERT OR REPLACE INTO SchemaInfo (Key, Value) VALUES ('SchemaVersion', @Value);",
@@ -217,6 +239,7 @@ namespace IAD.Infrastructure.Database
                 Width INTEGER NOT NULL,
                 Height INTEGER NOT NULL,
                 Status TEXT NOT NULL DEFAULT '未标注',
+                ProductDefinitionVersion TEXT NULL,
                 CreatedAtUtc TEXT NOT NULL,
                 UpdatedAtUtc TEXT NOT NULL,
                 FOREIGN KEY(ProductId) REFERENCES Products(Id) ON DELETE CASCADE
@@ -247,6 +270,7 @@ namespace IAD.Infrastructure.Database
                 Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                 ProductId INTEGER NOT NULL,
                 VersionCode TEXT NOT NULL,
+                ProductDefinitionVersion TEXT NULL,
                 ImageCount INTEGER NOT NULL,
                 AnnotationCount INTEGER NOT NULL,
                 Notes TEXT NULL,
@@ -263,6 +287,7 @@ namespace IAD.Infrastructure.Database
                 Width INTEGER NOT NULL,
                 Height INTEGER NOT NULL,
                 Status TEXT NOT NULL,
+                ProductDefinitionVersion TEXT NULL,
                 PRIMARY KEY(VersionId, SourceImageId),
                 FOREIGN KEY(VersionId) REFERENCES DatasetVersions(Id) ON DELETE CASCADE
             );",

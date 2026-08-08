@@ -98,7 +98,10 @@ namespace IAD.Pages
                         BeginNewProduct();
                         return;
                     }
-                    currentProductId = products[0].Id;
+                    Product selectedProduct = AppSession.CurrentProductId > 0
+                        ? AppServices.Products.GetProduct(AppSession.CurrentProductId)
+                        : null;
+                    currentProductId = selectedProduct == null ? products[0].Id : selectedProduct.Id;
                 }
 
                 LoadProduct(currentProductId);

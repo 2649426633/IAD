@@ -17,11 +17,13 @@ namespace IAD.Pages
         private Button btnMaskEdit;
         private Button btnAutoFix;
         private Button btnVersion;
+        private Label lblCurrentProduct;
         private TableLayoutPanel bodyLayout;
         private GroupBox grpImages;
         private DataGridView dgvImages;
         private DataGridViewTextBoxColumn dgvImagesCol1;
         private DataGridViewTextBoxColumn dgvImagesCol2;
+        private DataGridViewTextBoxColumn dgvImagesCol3;
         private GroupBox grpCanvas;
         private Panel pnlCanvas;
         private Label lblCanvasInfo;
@@ -60,6 +62,7 @@ namespace IAD.Pages
         private DataGridViewTextBoxColumn dgvQueueCol2;
         private DataGridViewTextBoxColumn dgvQueueCol3;
         private DataGridViewTextBoxColumn dgvQueueCol4;
+        private DataGridViewTextBoxColumn dgvQueueCol5;
 
         protected override void Dispose(bool disposing)
         {
@@ -80,11 +83,13 @@ namespace IAD.Pages
             this.btnMaskEdit = new Button();
             this.btnAutoFix = new Button();
             this.btnVersion = new Button();
+            this.lblCurrentProduct = new Label();
             this.bodyLayout = new TableLayoutPanel();
             this.grpImages = new GroupBox();
             this.dgvImages = new DataGridView();
             this.dgvImagesCol1 = new DataGridViewTextBoxColumn();
             this.dgvImagesCol2 = new DataGridViewTextBoxColumn();
+            this.dgvImagesCol3 = new DataGridViewTextBoxColumn();
             this.grpCanvas = new GroupBox();
             this.pnlCanvas = new Panel();
             this.lblCanvasInfo = new Label();
@@ -123,6 +128,7 @@ namespace IAD.Pages
             this.dgvQueueCol2 = new DataGridViewTextBoxColumn();
             this.dgvQueueCol3 = new DataGridViewTextBoxColumn();
             this.dgvQueueCol4 = new DataGridViewTextBoxColumn();
+            this.dgvQueueCol5 = new DataGridViewTextBoxColumn();
             ((ISupportInitialize)(this.dgvImages)).BeginInit();
             ((ISupportInitialize)(this.dgvClasses)).BeginInit();
             ((ISupportInitialize)(this.numLineWidth)).BeginInit();
@@ -150,6 +156,11 @@ namespace IAD.Pages
             this.btnMaskEdit.Text = "Mask修改";
             this.btnAutoFix.Text = "自动修正";
             this.btnVersion.Text = "版本管理";
+            this.lblCurrentProduct.AutoSize = false;
+            this.lblCurrentProduct.Margin = new Padding(18,3,0,3);
+            this.lblCurrentProduct.Size = new Size(500,30);
+            this.lblCurrentProduct.Text = "当前产品：未选择 | 请先在产品定义中选择并保存";
+            this.lblCurrentProduct.TextAlign = ContentAlignment.MiddleLeft;
             this.toolbar.Controls.Add(this.btnImportImages);
             this.toolbar.Controls.Add(this.btnRectangle);
             this.toolbar.Controls.Add(this.btnPolygon);
@@ -158,6 +169,7 @@ namespace IAD.Pages
             this.toolbar.Controls.Add(this.btnMaskEdit);
             this.toolbar.Controls.Add(this.btnAutoFix);
             this.toolbar.Controls.Add(this.btnVersion);
+            this.toolbar.Controls.Add(this.lblCurrentProduct);
 
             this.bodyLayout.ColumnCount = 3;
             this.bodyLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,240F));
@@ -171,9 +183,10 @@ namespace IAD.Pages
             this.dgvImages.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvImages.ReadOnly = true;
             this.dgvImages.RowHeadersVisible = false;
-            this.dgvImages.Columns.AddRange(new DataGridViewColumn[] { this.dgvImagesCol1, this.dgvImagesCol2 });
+            this.dgvImages.Columns.AddRange(new DataGridViewColumn[] { this.dgvImagesCol1, this.dgvImagesCol2, this.dgvImagesCol3 });
             this.dgvImagesCol1.HeaderText = "文件";
             this.dgvImagesCol2.HeaderText = "状态";
+            this.dgvImagesCol3.HeaderText = "产品定义";
 
             this.grpCanvas.Dock = DockStyle.Fill;
             this.grpCanvas.Text = "标注画布  |  2048 × 1536  |  Fit";
@@ -272,8 +285,8 @@ namespace IAD.Pages
             this.dgvQueue.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvQueue.ReadOnly = true;
             this.dgvQueue.RowHeadersVisible = false;
-            this.dgvQueue.Columns.AddRange(new DataGridViewColumn[] { this.dgvQueueCol1, this.dgvQueueCol2, this.dgvQueueCol3, this.dgvQueueCol4 });
-            this.dgvQueueCol1.HeaderText = "序号"; this.dgvQueueCol2.HeaderText = "文件"; this.dgvQueueCol3.HeaderText = "状态"; this.dgvQueueCol4.HeaderText = "类别数";
+            this.dgvQueue.Columns.AddRange(new DataGridViewColumn[] { this.dgvQueueCol1, this.dgvQueueCol2, this.dgvQueueCol3, this.dgvQueueCol4, this.dgvQueueCol5 });
+            this.dgvQueueCol1.HeaderText = "序号"; this.dgvQueueCol2.HeaderText = "文件"; this.dgvQueueCol3.HeaderText = "状态"; this.dgvQueueCol4.HeaderText = "类别数"; this.dgvQueueCol5.HeaderText = "产品定义";
 
             this.rootLayout.Controls.Add(this.toolbar,0,0);
             this.rootLayout.Controls.Add(this.bodyLayout,0,1);

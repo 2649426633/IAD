@@ -21,7 +21,7 @@ namespace IAD.Repositories
             using (SQLiteConnection connection = connectionFactory.CreateOpenConnection())
             using (SQLiteCommand command = connection.CreateCommand())
             {
-                command.CommandText = @"SELECT Id, ProductId, FileName, RelativePath, Width, Height, Status, CreatedAtUtc, UpdatedAtUtc
+                command.CommandText = @"SELECT Id, ProductId, FileName, RelativePath, Width, Height, Status, ProductDefinitionVersion, CreatedAtUtc, UpdatedAtUtc
                                         FROM DatasetImages WHERE ProductId = @ProductId ORDER BY Id;";
                 command.Parameters.AddWithValue("@ProductId", productId);
                 using (SQLiteDataReader reader = command.ExecuteReader())
@@ -37,7 +37,7 @@ namespace IAD.Repositories
             using (SQLiteConnection connection = connectionFactory.CreateOpenConnection())
             using (SQLiteCommand command = connection.CreateCommand())
             {
-                command.CommandText = @"SELECT Id, ProductId, FileName, RelativePath, Width, Height, Status, CreatedAtUtc, UpdatedAtUtc
+                command.CommandText = @"SELECT Id, ProductId, FileName, RelativePath, Width, Height, Status, ProductDefinitionVersion, CreatedAtUtc, UpdatedAtUtc
                                         FROM DatasetImages WHERE Id = @Id LIMIT 1;";
                 command.Parameters.AddWithValue("@Id", imageId);
                 using (SQLiteDataReader reader = command.ExecuteReader())
@@ -52,8 +52,8 @@ namespace IAD.Repositories
                 using (SQLiteCommand command = connection.CreateCommand())
                 {
                     command.CommandText = @"INSERT INTO DatasetImages
-                        (ProductId, FileName, RelativePath, Width, Height, Status, CreatedAtUtc, UpdatedAtUtc)
-                        VALUES (@ProductId, @FileName, @RelativePath, @Width, @Height, @Status, @CreatedAtUtc, @UpdatedAtUtc);";
+                        (ProductId, FileName, RelativePath, Width, Height, Status, ProductDefinitionVersion, CreatedAtUtc, UpdatedAtUtc)
+                        VALUES (@ProductId, @FileName, @RelativePath, @Width, @Height, @Status, @ProductDefinitionVersion, @CreatedAtUtc, @UpdatedAtUtc);";
                     AddImageParameters(command, image);
                     command.ExecuteNonQuery();
                 }
@@ -148,7 +148,7 @@ namespace IAD.Repositories
             using (SQLiteConnection connection = connectionFactory.CreateOpenConnection())
             using (SQLiteCommand command = connection.CreateCommand())
             {
-                command.CommandText = @"SELECT Id, ProductId, VersionCode, ImageCount, AnnotationCount, Notes, CreatedAtUtc
+                command.CommandText = @"SELECT Id, ProductId, VersionCode, ProductDefinitionVersion, ImageCount, AnnotationCount, Notes, CreatedAtUtc
                                         FROM DatasetVersions WHERE ProductId = @ProductId ORDER BY Id DESC LIMIT 1;";
                 command.Parameters.AddWithValue("@ProductId", productId);
                 using (SQLiteDataReader reader = command.ExecuteReader())
@@ -163,11 +163,12 @@ namespace IAD.Repositories
             {
                 long versionId;
                 using (SQLiteCommand command = new SQLiteCommand(@"INSERT INTO DatasetVersions
-                    (ProductId, VersionCode, ImageCount, AnnotationCount, Notes, CreatedAtUtc)
-                    VALUES (@ProductId, @VersionCode, @ImageCount, @AnnotationCount, @Notes, @CreatedAtUtc);", connection, transaction))
+                    (ProductId, VersionCode, ProductDefinitionVersion, ImageCount, AnnotationCount, Notes, CreatedAtUtc)
+                    VALUES (@ProductId, @VersionCode, @ProductDefinitionVersion, @ImageCount, @AnnotationCount, @Notes, @CreatedAtUtc);", connection, transaction))
                 {
                     command.Parameters.AddWithValue("@ProductId", version.ProductId);
                     command.Parameters.AddWithValue("@VersionCode", version.VersionCode);
+                    command.Parameters.AddWithValue("@ProductDefinitionVersion", DbConvert.DbNullIfEmpty(version.ProductDefinitionVersion));
                     command.Parameters.AddWithValue("@ImageCount", version.ImageCount);
                     command.Parameters.AddWithValue("@AnnotationCount", version.AnnotationCount);
                     command.Parameters.AddWithValue("@Notes", DbConvert.DbNullIfEmpty(version.Notes));
@@ -178,8 +179,8 @@ namespace IAD.Repositories
                     versionId = Convert.ToInt64(idCommand.ExecuteScalar());
 
                 using (SQLiteCommand imageSnapshot = new SQLiteCommand(@"INSERT INTO DatasetVersionImages
-                    (VersionId, SourceImageId, FileName, RelativePath, Width, Height, Status)
-                    SELECT @VersionId, Id, FileName, RelativePath, Width, Height, Status
+                    (VersionId, SourceImageId, FileName, RelativePath, Width, Height, Status, ProductDefinitionVersion)
+                    SELECT @VersionId, Id, FileName, RelativePath, Width, Height, Status, ProductDefinitionVersion
                     FROM DatasetImages WHERE ProductId = @ProductId;", connection, transaction))
                 {
                     imageSnapshot.Parameters.AddWithValue("@VersionId", versionId);
@@ -237,6 +238,7 @@ namespace IAD.Repositories
             command.Parameters.AddWithValue("@Width", image.Width);
             command.Parameters.AddWithValue("@Height", image.Height);
             command.Parameters.AddWithValue("@Status", image.Status);
+            command.Parameters.AddWithValue("@ProductDefinitionVersion", DbConvert.DbNullIfEmpty(image.ProductDefinitionVersion));
             command.Parameters.AddWithValue("@CreatedAtUtc", DbConvert.ToUtcText(image.CreatedAtUtc));
             command.Parameters.AddWithValue("@UpdatedAtUtc", DbConvert.ToUtcText(image.UpdatedAtUtc));
         }
@@ -263,7 +265,8 @@ namespace IAD.Repositories
                 Id = DbConvert.GetInt64(reader, "Id"), ProductId = DbConvert.GetInt64(reader, "ProductId"),
                 FileName = DbConvert.GetString(reader, "FileName"), RelativePath = DbConvert.GetString(reader, "RelativePath"),
                 Width = DbConvert.GetInt32(reader, "Width"), Height = DbConvert.GetInt32(reader, "Height"),
-                Status = DbConvert.GetString(reader, "Status"), CreatedAtUtc = DbConvert.GetUtcDateTime(reader, "CreatedAtUtc"),
+                Status = DbConvert.GetString(reader, "Status"), ProductDefinitionVersion = DbConvert.GetString(reader, "ProductDefinitionVersion"),
+                CreatedAtUtc = DbConvert.GetUtcDateTime(reader, "CreatedAtUtc"),
                 UpdatedAtUtc = DbConvert.GetUtcDateTime(reader, "UpdatedAtUtc")
             };
         }
@@ -286,7 +289,8 @@ namespace IAD.Repositories
             return new DatasetVersion
             {
                 Id = DbConvert.GetInt64(reader, "Id"), ProductId = DbConvert.GetInt64(reader, "ProductId"),
-                VersionCode = DbConvert.GetString(reader, "VersionCode"), ImageCount = DbConvert.GetInt32(reader, "ImageCount"),
+                VersionCode = DbConvert.GetString(reader, "VersionCode"), ProductDefinitionVersion = DbConvert.GetString(reader, "ProductDefinitionVersion"),
+                ImageCount = DbConvert.GetInt32(reader, "ImageCount"),
                 AnnotationCount = DbConvert.GetInt32(reader, "AnnotationCount"), Notes = DbConvert.GetString(reader, "Notes"),
                 CreatedAtUtc = DbConvert.GetUtcDateTime(reader, "CreatedAtUtc")
             };

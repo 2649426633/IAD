@@ -16,6 +16,7 @@ namespace IAD.Pages
         private bool runtimeInitialized;
         private bool loadingData;
         private Product currentProduct;
+        private ProductDefinitionSettings currentProductDefinition;
         private DatasetImage currentImage;
         private IList<DatasetImage> datasetImages = new List<DatasetImage>();
         private IList<DefectCategory> defectCategories = new List<DefectCategory>();
@@ -67,6 +68,8 @@ namespace IAD.Pages
             cboCurrentClass.DropDownStyle = ComboBoxStyle.DropDownList;
             cboCurrentClass.Items.Clear();
             numThreshold.Increment = 0.05M;
+            lblCurrentProduct.ForeColor = UiTheme.Text;
+            lblCurrentProduct.Font = UiTheme.Font(9.2F, true);
             lblTotalAnnotations.Text = "0";
             lblBoundaryScore.Text = "-";
             lblQualityScore.Text = "-";
@@ -105,15 +108,23 @@ namespace IAD.Pages
             dgvClasses.SelectionChanged += delegate { SelectClassFromGrid(); };
             cboCurrentClass.SelectedIndexChanged += delegate { ApplySelectedCategoryDefaults(); };
             dgvLayers.CellDoubleClick += dgvLayers_CellDoubleClick;
+            AppSession.CurrentProductChanged += AppSession_CurrentProductChanged;
 
             BindCanvasEvents();
             pnlCanvas.Resize += delegate { pnlCanvas.Invalidate(); };
-            Disposed += delegate { ClearCurrentBitmap(); };
+            Disposed += delegate
+            {
+                AppSession.CurrentProductChanged -= AppSession_CurrentProductChanged;
+                ClearCurrentBitmap();
+            };
         }
 
         public void LoadDataset()
         {
-            LoadDataset(currentImage == null ? 0 : currentImage.Id);
+            long preferredImageId = currentProduct != null && currentProduct.Id == AppSession.CurrentProductId && currentImage != null
+                ? currentImage.Id
+                : 0;
+            LoadDataset(preferredImageId);
         }
 
         private void LoadDataset(long preferredImageId)
@@ -124,28 +135,50 @@ namespace IAD.Pages
             {
                 IList<Product> products = AppServices.Products.GetAllProducts();
                 currentProduct = FindProduct(products, AppSession.CurrentProductId);
-                if (currentProduct == null && products.Count > 0)
-                    currentProduct = products[0];
 
                 if (currentProduct == null)
                 {
-                    AppSession.SelectProduct(0);
+                    if (AppSession.CurrentProductId > 0) AppSession.SelectProduct(0);
+                    currentProductDefinition = null;
                     defectCategories = new List<DefectCategory>();
                     datasetImages = new List<DatasetImage>();
                     FillCategoryControls();
                     FillImageControls(0);
                     ClearCurrentImage();
-                    grpImages.Text = "数据集图片 | 尚未创建产品";
+                    bool hasProducts = products.Count > 0;
+                    grpImages.Text = hasProducts ? "数据集图片 | 尚未选择产品" : "数据集图片 | 尚未创建产品";
                     grpQueue.Text = "标注队列 / 缩略图";
-                    ShowCanvasMessage("请先在“产品定义”页面创建并保存产品。\r\n保存后返回本页即可导入图片。");
+                    lblCurrentProduct.Text = hasProducts
+                        ? "当前产品：未选择 | 请先在产品定义中选择并保存"
+                        : "当前产品：无 | 请先创建并保存产品定义";
+                    ShowCanvasMessage(hasProducts
+                        ? "请先到“产品定义”页面选择并保存一个产品。\r\n返回本页后，将只加载该产品的数据集和标注。"
+                        : "请先在“产品定义”页面创建并保存产品。\r\n保存后返回本页即可导入图片。");
                     UpdateUiAvailability();
                     return;
                 }
 
-                AppSession.SelectProduct(currentProduct.Id);
+                currentProductDefinition = AppServices.Datasets.GetSavedProductDefinition(currentProduct.Id);
+                if (currentProductDefinition == null || string.IsNullOrWhiteSpace(currentProductDefinition.ProductDefinitionVersion))
+                {
+                    defectCategories = new List<DefectCategory>();
+                    datasetImages = new List<DatasetImage>();
+                    FillCategoryControls();
+                    FillImageControls(0);
+                    ClearCurrentImage();
+                    grpImages.Text = "数据集图片 | " + currentProduct.ProductCode + " · " + currentProduct.ProductName;
+                    grpQueue.Text = "标注队列 / 缩略图";
+                    lblCurrentProduct.Text = "当前产品：" + currentProduct.ProductCode + " · " + currentProduct.ProductName + " | 产品定义：未保存";
+                    ShowCanvasMessage("当前产品定义尚未保存。\r\n请先回到“产品定义”页面保存，再进行数据集标注。");
+                    UpdateUiAvailability();
+                    return;
+                }
+
                 defectCategories = AppServices.Products.GetDefectCategories(currentProduct.Id);
                 datasetImages = AppServices.Datasets.GetImages(currentProduct.Id);
                 grpImages.Text = "数据集图片 | " + currentProduct.ProductCode + " · " + currentProduct.ProductName;
+                lblCurrentProduct.Text = "当前产品：" + currentProduct.ProductCode + " · " + currentProduct.ProductName +
+                                         " | 已保存定义：" + currentProductDefinition.ProductDefinitionVersion;
 
                 FillCategoryControls();
                 FillImageControls(preferredImageId);
@@ -174,6 +207,22 @@ namespace IAD.Pages
                 if (product.Id == productId) return product;
             }
             return null;
+        }
+
+        private void AppSession_CurrentProductChanged(object sender, EventArgs e)
+        {
+            if (IsDisposed || Disposing) return;
+            if (InvokeRequired)
+            {
+                BeginInvoke(new MethodInvoker(delegate { AppSession_CurrentProductChanged(sender, e); }));
+                return;
+            }
+            if (Visible) LoadDataset(0);
+        }
+
+        private static string DisplayDefinitionVersion(string version)
+        {
+            return string.IsNullOrWhiteSpace(version) ? "未绑定" : version;
         }
 
         private void FillCategoryControls()
@@ -205,11 +254,11 @@ namespace IAD.Pages
             for (int i = 0; i < datasetImages.Count; i++)
             {
                 DatasetImage image = datasetImages[i];
-                int imageRow = dgvImages.Rows.Add(image.FileName, image.Status);
+                int imageRow = dgvImages.Rows.Add(image.FileName, image.Status, DisplayDefinitionVersion(image.ProductDefinitionVersion));
                 dgvImages.Rows[imageRow].Tag = image;
 
                 int classCount = CountClasses(image.Id);
-                int queueRow = dgvQueue.Rows.Add((i + 1).ToString("0000"), image.FileName, image.Status, classCount.ToString());
+                int queueRow = dgvQueue.Rows.Add((i + 1).ToString("0000"), image.FileName, image.Status, classCount.ToString(), DisplayDefinitionVersion(image.ProductDefinitionVersion));
                 dgvQueue.Rows[queueRow].Tag = image;
                 if (image.Id == preferredImageId) preferredRow = imageRow;
             }
@@ -245,6 +294,11 @@ namespace IAD.Pages
 
         private void LoadImage(DatasetImage image)
         {
+            if (currentProduct == null || image.ProductId != currentProduct.Id)
+            {
+                ShowCanvasMessage("所选图片不属于当前产品，已阻止加载。请重新进入数据集标注页面。");
+                return;
+            }
             CancelWorkingAnnotation();
             ClearCurrentBitmap();
             currentImage = image;
@@ -273,9 +327,9 @@ namespace IAD.Pages
 
         private void ImportImages()
         {
-            if (currentProduct == null)
+            if (currentProduct == null || currentProductDefinition == null)
             {
-                MessageBox.Show(this, "请先在“产品定义”页面创建并保存产品。", "导入图片", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(this, "请先在“产品定义”页面选择并保存产品。", "导入图片", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -492,9 +546,11 @@ namespace IAD.Pages
 
         private void PublishVersion()
         {
-            if (currentProduct == null || datasetImages.Count == 0) return;
+            if (currentProduct == null || currentProductDefinition == null || datasetImages.Count == 0) return;
             DialogResult answer = MessageBox.Show(this,
-                "将以当前图片和标注数量创建一个只读版本记录。是否继续？",
+                "当前产品：" + currentProduct.ProductCode + " · " + currentProduct.ProductName +
+                "\r\n产品定义：" + currentProductDefinition.ProductDefinitionVersion +
+                "\r\n\r\n将以当前图片和标注创建只读数据集版本。是否继续？",
                 "发布数据集版本", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (answer != DialogResult.Yes) return;
 
@@ -503,7 +559,8 @@ namespace IAD.Pages
                 DatasetVersion version = AppServices.Datasets.CreateVersion(currentProduct.Id, "由数据集标注页面发布");
                 UpdateVersionCaption();
                 MessageBox.Show(this,
-                    "已发布 " + version.VersionCode + "\r\n图片：" + version.ImageCount + "\r\n标注：" + version.AnnotationCount,
+                    "已发布 " + version.VersionCode + "\r\n产品定义：" + version.ProductDefinitionVersion +
+                    "\r\n图片：" + version.ImageCount + "\r\n标注：" + version.AnnotationCount,
                     "发布成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
@@ -525,7 +582,7 @@ namespace IAD.Pages
 
         private void UpdateUiAvailability()
         {
-            bool hasProduct = currentProduct != null;
+            bool hasProduct = currentProduct != null && currentProductDefinition != null;
             bool hasImage = currentImage != null && currentBitmap != null;
             bool hasCategory = GetSelectedCategory() != null;
             btnImportImages.Enabled = hasProduct;
@@ -550,7 +607,8 @@ namespace IAD.Pages
                 case "Eraser": instruction = "单击标注区域即可删除"; break;
                 default: instruction = "按住左键拖拽矩形，右键取消"; break;
             }
-            grpCanvas.Text = "标注画布 | " + currentImage.Width + " × " + currentImage.Height + " | Fit | " + instruction;
+            grpCanvas.Text = "标注画布 | " + currentImage.Width + " × " + currentImage.Height +
+                             " | " + DisplayDefinitionVersion(currentImage.ProductDefinitionVersion) + " | Fit | " + instruction;
         }
 
         private void ShowCanvasMessage(string text)

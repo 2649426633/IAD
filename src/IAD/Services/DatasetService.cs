@@ -12,12 +12,18 @@ namespace IAD.Services
     public sealed class DatasetService
     {
         private readonly IProductRepository products;
+        private readonly IProductDefinitionSettingsRepository definitionSettings;
         private readonly IDefectCategoryRepository categories;
         private readonly IDatasetRepository datasets;
 
-        public DatasetService(IProductRepository products, IDefectCategoryRepository categories, IDatasetRepository datasets)
+        public DatasetService(
+            IProductRepository products,
+            IProductDefinitionSettingsRepository definitionSettings,
+            IDefectCategoryRepository categories,
+            IDatasetRepository datasets)
         {
             this.products = products ?? throw new ArgumentNullException("products");
+            this.definitionSettings = definitionSettings ?? throw new ArgumentNullException("definitionSettings");
             this.categories = categories ?? throw new ArgumentNullException("categories");
             this.datasets = datasets ?? throw new ArgumentNullException("datasets");
         }
@@ -28,9 +34,16 @@ namespace IAD.Services
             return datasets.GetImagesByProduct(productId);
         }
 
+        public ProductDefinitionSettings GetSavedProductDefinition(long productId)
+        {
+            EnsureProductExists(productId);
+            return definitionSettings.GetByProduct(productId);
+        }
+
         public DatasetImage ImportImage(long productId, string sourcePath)
         {
             Product product = EnsureProductExists(productId);
+            ProductDefinitionSettings savedDefinition = EnsureSavedProductDefinition(productId);
             if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath))
                 throw new FileNotFoundException("待导入图片不存在。", sourcePath);
 
@@ -63,6 +76,7 @@ namespace IAD.Services
                     Width = width,
                     Height = height,
                     Status = "未标注",
+                    ProductDefinitionVersion = savedDefinition.ProductDefinitionVersion,
                     CreatedAtUtc = now,
                     UpdatedAtUtc = now
                 };
@@ -95,6 +109,8 @@ namespace IAD.Services
         public DatasetAnnotation CreateAnnotation(long imageId, long categoryId, string annotationType, string geometryData, float brushWidth, double confidence)
         {
             DatasetImage image = EnsureImageExists(imageId);
+            if (string.IsNullOrWhiteSpace(image.ProductDefinitionVersion))
+                throw new InvalidOperationException("该图片尚未绑定已保存的产品定义版本，请重新导入图片。");
             DefectCategory category = categories.GetById(categoryId);
             if (category == null || category.ProductId != image.ProductId || !category.IsEnabled)
                 throw new InvalidOperationException("当前瑕疵类别不存在或未启用。");
@@ -177,6 +193,7 @@ namespace IAD.Services
         public DatasetVersion CreateVersion(long productId, string notes)
         {
             EnsureProductExists(productId);
+            ProductDefinitionSettings savedDefinition = EnsureSavedProductDefinition(productId);
             int imageCount = datasets.CountImages(productId);
             if (imageCount == 0)
                 throw new InvalidOperationException("请先导入至少一张数据集图片，再发布版本。");
@@ -186,6 +203,7 @@ namespace IAD.Services
             {
                 ProductId = productId,
                 VersionCode = NextVersion(latest == null ? null : latest.VersionCode),
+                ProductDefinitionVersion = savedDefinition.ProductDefinitionVersion,
                 ImageCount = imageCount,
                 AnnotationCount = datasets.CountAnnotations(productId),
                 Notes = notes,
@@ -206,6 +224,14 @@ namespace IAD.Services
             Product product = productId > 0 ? products.GetById(productId) : null;
             if (product == null) throw new InvalidOperationException("请先在“产品定义”中创建并保存产品。");
             return product;
+        }
+
+        private ProductDefinitionSettings EnsureSavedProductDefinition(long productId)
+        {
+            ProductDefinitionSettings savedDefinition = definitionSettings.GetByProduct(productId);
+            if (savedDefinition == null || string.IsNullOrWhiteSpace(savedDefinition.ProductDefinitionVersion))
+                throw new InvalidOperationException("请先在“产品定义”页面保存当前产品，再进入数据集标注。");
+            return savedDefinition;
         }
 
         private DatasetImage EnsureImageExists(long imageId)

@@ -33,7 +33,7 @@ namespace IAD.Services
             IDatasetRepository datasetRepository = new DatasetRepository(connectionFactory);
 
             Products = new ProductService(productRepository, definitionSettingsRepository, categoryRepository, roiRepository);
-            Datasets = new DatasetService(productRepository, categoryRepository, datasetRepository);
+            Datasets = new DatasetService(productRepository, definitionSettingsRepository, categoryRepository, datasetRepository);
             Recipes = new RecipeService(productRepository, recipeRepository);
             Results = new ResultService(productRepository, resultRepository);
 
