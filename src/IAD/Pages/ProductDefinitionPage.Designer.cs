@@ -1,444 +1,483 @@
-using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using IAD.UI;
 
 namespace IAD.Pages
 {
-    public partial class ProductDefinitionPage
+    partial class ProductDefinitionPage
     {
         private IContainer components = null;
-
+        private TableLayoutPanel rootLayout;
+        private TableLayoutPanel commandLayout;
+        private FlowLayoutPanel commandButtons;
         private Button btnSave;
         private Button btnBuildTemplate;
-        private Button btnTestLocation;
+        private Button btnTestLocalization;
         private Button btnVersion;
+        private Label lblVersion;
+        private GroupBox grpBasicInfo;
+        private TableLayoutPanel basicLayout;
+        private Label lblProductName;
+        private TextBox txtProductName;
+        private Label lblProductCode;
+        private TextBox txtProductCode;
+        private Label lblImageSize;
+        private TextBox txtImageSize;
+        private Label lblProductCount;
+        private TextBox txtProductCount;
+        private Label lblPose;
+        private ComboBox cboPose;
+        private Label lblAcquisition;
+        private TextBox txtAcquisition;
+        private TableLayoutPanel middleLayout;
+        private GroupBox grpTemplate;
+        private TableLayoutPanel templateLayout;
+        private FlowLayoutPanel templateButtons;
         private Button btnImportReference;
         private Button btnRectangleRoi;
         private Button btnClearRoi;
         private Button btnFastMode;
-        private Button btnPreciseMode;
+        private Button btnFineMode;
         private Button btnAutoMode;
-        private Panel templateCanvas;
-        private DataGridView defectGrid;
+        private Panel pnlTemplateCanvas;
+        private Label lblCanvasHint;
+        private TableLayoutPanel templateFooter;
+        private Label lblReferenceFile;
+        private Label lblRoiState;
+        private Label lblTemplateType;
+        private Label lblLastScore;
+        private TableLayoutPanel parameterStack;
+        private GroupBox grpLocalization;
+        private TableLayoutPanel localizationLayout;
+        private Label lblLocalizationMethodKey;
+        private ComboBox cboLocalizationMethod;
+        private Label lblModelTypeKey;
+        private ComboBox cboModelType;
+        private Label lblMinScoreKey;
+        private TextBox txtMinScore;
+        private Label lblAngleRangeKey;
+        private TextBox txtAngleRange;
+        private Label lblScaleRangeKey;
+        private TextBox txtScaleRange;
+        private Label lblMatchCountKey;
+        private TextBox txtMatchCount;
+        private Label lblLastResultKey;
+        private TextBox txtLastResult;
+        private GroupBox grpCalibration;
+        private TableLayoutPanel calibrationLayout;
+        private Label lblPixelXKey;
+        private TextBox txtPixelX;
+        private Label lblPixelYKey;
+        private TextBox txtPixelY;
+        private Label lblLengthUnitKey;
+        private ComboBox cboLengthUnit;
+        private Label lblAreaUnitKey;
+        private ComboBox cboAreaUnit;
+        private Label lblCalibrationVersionKey;
+        private TextBox txtCalibrationVersion;
+        private Label lblCalibrationStateKey;
+        private ComboBox cboCalibrationState;
+        private GroupBox grpDefects;
+        private TableLayoutPanel defectLayout;
+        private FlowLayoutPanel defectButtons;
+        private Button btnAddDefect;
+        private Button btnEditDefect;
+        private Button btnDeleteDefect;
+        private Button btnToggleDefect;
+        private Button btnImportDefects;
+        private Button btnExportDefects;
+        private DataGridView dgvDefects;
+        private DataGridViewTextBoxColumn dgvDefectsCol1;
+        private DataGridViewTextBoxColumn dgvDefectsCol2;
+        private DataGridViewTextBoxColumn dgvDefectsCol3;
+        private DataGridViewTextBoxColumn dgvDefectsCol4;
+        private DataGridViewTextBoxColumn dgvDefectsCol5;
+        private DataGridViewTextBoxColumn dgvDefectsCol6;
+        private DataGridViewTextBoxColumn dgvDefectsCol7;
+        private DataGridViewTextBoxColumn dgvDefectsCol8;
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
+            if (disposing && (components != null)) components.Dispose();
             base.Dispose(disposing);
         }
 
         private void InitializeComponent()
         {
             this.components = new Container();
+            this.rootLayout = new TableLayoutPanel();
+            this.commandLayout = new TableLayoutPanel();
+            this.commandButtons = new FlowLayoutPanel();
+            this.btnSave = new Button();
+            this.btnBuildTemplate = new Button();
+            this.btnTestLocalization = new Button();
+            this.btnVersion = new Button();
+            this.lblVersion = new Label();
+            this.grpBasicInfo = new GroupBox();
+            this.basicLayout = new TableLayoutPanel();
+            this.lblProductName = new Label();
+            this.txtProductName = new TextBox();
+            this.lblProductCode = new Label();
+            this.txtProductCode = new TextBox();
+            this.lblImageSize = new Label();
+            this.txtImageSize = new TextBox();
+            this.lblProductCount = new Label();
+            this.txtProductCount = new TextBox();
+            this.lblPose = new Label();
+            this.cboPose = new ComboBox();
+            this.lblAcquisition = new Label();
+            this.txtAcquisition = new TextBox();
+            this.middleLayout = new TableLayoutPanel();
+            this.grpTemplate = new GroupBox();
+            this.templateLayout = new TableLayoutPanel();
+            this.templateButtons = new FlowLayoutPanel();
+            this.btnImportReference = new Button();
+            this.btnRectangleRoi = new Button();
+            this.btnClearRoi = new Button();
+            this.btnFastMode = new Button();
+            this.btnFineMode = new Button();
+            this.btnAutoMode = new Button();
+            this.pnlTemplateCanvas = new Panel();
+            this.lblCanvasHint = new Label();
+            this.templateFooter = new TableLayoutPanel();
+            this.lblReferenceFile = new Label();
+            this.lblRoiState = new Label();
+            this.lblTemplateType = new Label();
+            this.lblLastScore = new Label();
+            this.parameterStack = new TableLayoutPanel();
+            this.grpLocalization = new GroupBox();
+            this.localizationLayout = new TableLayoutPanel();
+            this.lblLocalizationMethodKey = new Label();
+            this.cboLocalizationMethod = new ComboBox();
+            this.lblModelTypeKey = new Label();
+            this.cboModelType = new ComboBox();
+            this.lblMinScoreKey = new Label();
+            this.txtMinScore = new TextBox();
+            this.lblAngleRangeKey = new Label();
+            this.txtAngleRange = new TextBox();
+            this.lblScaleRangeKey = new Label();
+            this.txtScaleRange = new TextBox();
+            this.lblMatchCountKey = new Label();
+            this.txtMatchCount = new TextBox();
+            this.lblLastResultKey = new Label();
+            this.txtLastResult = new TextBox();
+            this.grpCalibration = new GroupBox();
+            this.calibrationLayout = new TableLayoutPanel();
+            this.lblPixelXKey = new Label();
+            this.txtPixelX = new TextBox();
+            this.lblPixelYKey = new Label();
+            this.txtPixelY = new TextBox();
+            this.lblLengthUnitKey = new Label();
+            this.cboLengthUnit = new ComboBox();
+            this.lblAreaUnitKey = new Label();
+            this.cboAreaUnit = new ComboBox();
+            this.lblCalibrationVersionKey = new Label();
+            this.txtCalibrationVersion = new TextBox();
+            this.lblCalibrationStateKey = new Label();
+            this.cboCalibrationState = new ComboBox();
+            this.grpDefects = new GroupBox();
+            this.defectLayout = new TableLayoutPanel();
+            this.defectButtons = new FlowLayoutPanel();
+            this.btnAddDefect = new Button();
+            this.btnEditDefect = new Button();
+            this.btnDeleteDefect = new Button();
+            this.btnToggleDefect = new Button();
+            this.btnImportDefects = new Button();
+            this.btnExportDefects = new Button();
+            this.dgvDefects = new DataGridView();
+            this.dgvDefectsCol1 = new DataGridViewTextBoxColumn();
+            this.dgvDefectsCol2 = new DataGridViewTextBoxColumn();
+            this.dgvDefectsCol3 = new DataGridViewTextBoxColumn();
+            this.dgvDefectsCol4 = new DataGridViewTextBoxColumn();
+            this.dgvDefectsCol5 = new DataGridViewTextBoxColumn();
+            this.dgvDefectsCol6 = new DataGridViewTextBoxColumn();
+            this.dgvDefectsCol7 = new DataGridViewTextBoxColumn();
+            this.dgvDefectsCol8 = new DataGridViewTextBoxColumn();
+            ((ISupportInitialize)(this.dgvDefects)).BeginInit();
             this.SuspendLayout();
+
+            this.rootLayout.BackColor = Color.FromArgb(247, 247, 247);
+            this.rootLayout.ColumnCount = 1;
+            this.rootLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            this.rootLayout.Dock = DockStyle.Fill;
+            this.rootLayout.Name = "rootLayout";
+            this.rootLayout.RowCount = 4;
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 48F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 126F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 62F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 38F));
+
+            this.commandLayout.ColumnCount = 2;
+            this.commandLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            this.commandLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 400F));
+            this.commandLayout.Dock = DockStyle.Fill;
+            this.commandLayout.Name = "commandLayout";
+            this.commandButtons.Dock = DockStyle.Fill;
+            this.commandButtons.FlowDirection = FlowDirection.LeftToRight;
+            this.commandButtons.Padding = new Padding(0, 5, 0, 5);
+            this.commandButtons.WrapContents = false;
+
+            this.btnSave.Text = "保存产品定义";
+            this.btnSave.Width = 112;
+            this.btnBuildTemplate.Text = "建立 / 更新模板";
+            this.btnBuildTemplate.Width = 128;
+            this.btnTestLocalization.Text = "测试定位";
+            this.btnTestLocalization.Width = 92;
+            this.btnVersion.Text = "版本记录";
+            this.btnVersion.Width = 92;
+            this.commandButtons.Controls.Add(this.btnSave);
+            this.commandButtons.Controls.Add(this.btnBuildTemplate);
+            this.commandButtons.Controls.Add(this.btnTestLocalization);
+            this.commandButtons.Controls.Add(this.btnVersion);
+            this.lblVersion.Dock = DockStyle.Fill;
+            this.lblVersion.ForeColor = Color.DimGray;
+            this.lblVersion.Text = "产品定义版本：PD-1.0.0    模板版本：LT-1.0.0    状态：已配置";
+            this.lblVersion.TextAlign = ContentAlignment.MiddleRight;
+            this.commandLayout.Controls.Add(this.commandButtons, 0, 0);
+            this.commandLayout.Controls.Add(this.lblVersion, 1, 0);
+
+            this.grpBasicInfo.BackColor = Color.White;
+            this.grpBasicInfo.Dock = DockStyle.Fill;
+            this.grpBasicInfo.Font = new Font("Microsoft YaHei UI", 10F, FontStyle.Bold);
+            this.grpBasicInfo.Text = "产品基本信息";
+            this.grpBasicInfo.Controls.Add(this.basicLayout);
+            this.basicLayout.ColumnCount = 6;
+            this.basicLayout.Dock = DockStyle.Fill;
+            this.basicLayout.RowCount = 2;
+            this.basicLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
+            this.basicLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            this.basicLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 18F));
+            this.basicLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 18F));
+            this.basicLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 18F));
+            this.basicLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14F));
+            this.basicLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14F));
+            this.basicLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 18F));
+            this.lblProductName.Text = "产品名称";
+            this.txtProductName.Text = "轴承盖板";
+            this.lblProductCode.Text = "产品编号";
+            this.txtProductCode.Text = "P-20250516-001";
+            this.lblImageSize.Text = "图像尺寸";
+            this.txtImageSize.Text = "2448 × 2048 px";
+            this.lblProductCount.Text = "单图产品数";
+            this.txtProductCount.Text = "1";
+            this.lblPose.Text = "姿态";
+            this.cboPose.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.cboPose.Items.AddRange(new object[] { "固定", "允许旋转" });
+            this.cboPose.SelectedIndex = 1;
+            this.lblAcquisition.Text = "采集条件";
+            this.txtAcquisition.Text = "相机 / 光照 / 背景稳定";
+            this.basicLayout.Controls.Add(this.lblProductName, 0, 0);
+            this.basicLayout.Controls.Add(this.txtProductName, 0, 1);
+            this.basicLayout.Controls.Add(this.lblProductCode, 1, 0);
+            this.basicLayout.Controls.Add(this.txtProductCode, 1, 1);
+            this.basicLayout.Controls.Add(this.lblImageSize, 2, 0);
+            this.basicLayout.Controls.Add(this.txtImageSize, 2, 1);
+            this.basicLayout.Controls.Add(this.lblProductCount, 3, 0);
+            this.basicLayout.Controls.Add(this.txtProductCount, 3, 1);
+            this.basicLayout.Controls.Add(this.lblPose, 4, 0);
+            this.basicLayout.Controls.Add(this.cboPose, 4, 1);
+            this.basicLayout.Controls.Add(this.lblAcquisition, 5, 0);
+            this.basicLayout.Controls.Add(this.txtAcquisition, 5, 1);
+
+            this.middleLayout.ColumnCount = 2;
+            this.middleLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 64F));
+            this.middleLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 36F));
+            this.middleLayout.Dock = DockStyle.Fill;
+            this.grpTemplate.BackColor = Color.White;
+            this.grpTemplate.Dock = DockStyle.Fill;
+            this.grpTemplate.Font = new Font("Microsoft YaHei UI", 10F, FontStyle.Bold);
+            this.grpTemplate.Text = "产品模板与 ROI";
+            this.grpTemplate.Controls.Add(this.templateLayout);
+            this.templateLayout.ColumnCount = 1;
+            this.templateLayout.Dock = DockStyle.Fill;
+            this.templateLayout.RowCount = 3;
+            this.templateLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            this.templateLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            this.templateLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
+            this.templateButtons.Dock = DockStyle.Fill;
+            this.templateButtons.WrapContents = false;
+            this.btnImportReference.Text = "导入基准图";
+            this.btnRectangleRoi.Text = "Rectangle ROI";
+            this.btnClearRoi.Text = "清除 ROI";
+            this.btnFastMode.Text = "快速模式";
+            this.btnFineMode.Text = "精细模式";
+            this.btnAutoMode.Text = "自动模式";
+            this.templateButtons.Controls.Add(this.btnImportReference);
+            this.templateButtons.Controls.Add(this.btnRectangleRoi);
+            this.templateButtons.Controls.Add(this.btnClearRoi);
+            this.templateButtons.Controls.Add(this.btnFastMode);
+            this.templateButtons.Controls.Add(this.btnFineMode);
+            this.templateButtons.Controls.Add(this.btnAutoMode);
+            this.pnlTemplateCanvas.BackColor = Color.FromArgb(40, 40, 40);
+            this.pnlTemplateCanvas.BorderStyle = BorderStyle.FixedSingle;
+            this.pnlTemplateCanvas.Dock = DockStyle.Fill;
+            this.pnlTemplateCanvas.Controls.Add(this.lblCanvasHint);
+            this.lblCanvasHint.Dock = DockStyle.Fill;
+            this.lblCanvasHint.ForeColor = Color.Gainsboro;
+            this.lblCanvasHint.Font = new Font("Microsoft YaHei UI", 10F);
+            this.lblCanvasHint.Text = "基准图预览\r\n\r\n在此显示产品图像与 Template ROI\r\n可在功能代码中接入 HALCON HWindowControl";
+            this.lblCanvasHint.TextAlign = ContentAlignment.MiddleCenter;
+            this.templateFooter.ColumnCount = 4;
+            this.templateFooter.Dock = DockStyle.Fill;
+            this.templateFooter.BackColor = Color.FromArgb(244, 244, 244);
+            this.templateFooter.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            this.templateFooter.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            this.templateFooter.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            this.templateFooter.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            this.lblReferenceFile.Text = "基准图：reference_001.png";
+            this.lblRoiState.Text = "ROI：已定义";
+            this.lblTemplateType.Text = "定位模板：Shape Model";
+            this.lblLastScore.Text = "最近测试：Score 0.92";
+            this.templateFooter.Controls.Add(this.lblReferenceFile, 0, 0);
+            this.templateFooter.Controls.Add(this.lblRoiState, 1, 0);
+            this.templateFooter.Controls.Add(this.lblTemplateType, 2, 0);
+            this.templateFooter.Controls.Add(this.lblLastScore, 3, 0);
+            this.templateLayout.Controls.Add(this.templateButtons, 0, 0);
+            this.templateLayout.Controls.Add(this.pnlTemplateCanvas, 0, 1);
+            this.templateLayout.Controls.Add(this.templateFooter, 0, 2);
+
+            this.parameterStack.ColumnCount = 1;
+            this.parameterStack.Dock = DockStyle.Fill;
+            this.parameterStack.RowCount = 2;
+            this.parameterStack.RowStyles.Add(new RowStyle(SizeType.Percent, 58F));
+            this.parameterStack.RowStyles.Add(new RowStyle(SizeType.Percent, 42F));
+            this.grpLocalization.BackColor = Color.White;
+            this.grpLocalization.Dock = DockStyle.Fill;
+            this.grpLocalization.Text = "定位参数";
+            this.grpLocalization.Controls.Add(this.localizationLayout);
+            this.localizationLayout.ColumnCount = 2;
+            this.localizationLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
+            this.localizationLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60F));
+            this.localizationLayout.Dock = DockStyle.Fill;
+            this.localizationLayout.RowCount = 7;
+            this.lblLocalizationMethodKey.Text = "定位方式";
+            this.cboLocalizationMethod.Items.AddRange(new object[] { "HALCON Shape Matching", "特征匹配" });
+            this.cboLocalizationMethod.SelectedIndex = 0;
+            this.lblModelTypeKey.Text = "模型类型";
+            this.cboModelType.Items.AddRange(new object[] { "Shape Model", "NCC Model" });
+            this.cboModelType.SelectedIndex = 0;
+            this.lblMinScoreKey.Text = "最小匹配分数";
+            this.txtMinScore.Text = "0.60";
+            this.lblAngleRangeKey.Text = "角度范围";
+            this.txtAngleRange.Text = "-30° ~ 30°";
+            this.lblScaleRangeKey.Text = "缩放范围";
+            this.txtScaleRange.Text = "90% ~ 110%";
+            this.lblMatchCountKey.Text = "匹配个数";
+            this.txtMatchCount.Text = "1";
+            this.lblLastResultKey.Text = "最近定位结果";
+            this.txtLastResult.Text = "Row 1024.32 / Col 1226.78 / Angle -1.24° / Score 0.92";
+            this.localizationLayout.Controls.Add(this.lblLocalizationMethodKey, 0, 0);
+            this.localizationLayout.Controls.Add(this.cboLocalizationMethod, 1, 0);
+            this.localizationLayout.Controls.Add(this.lblModelTypeKey, 0, 1);
+            this.localizationLayout.Controls.Add(this.cboModelType, 1, 1);
+            this.localizationLayout.Controls.Add(this.lblMinScoreKey, 0, 2);
+            this.localizationLayout.Controls.Add(this.txtMinScore, 1, 2);
+            this.localizationLayout.Controls.Add(this.lblAngleRangeKey, 0, 3);
+            this.localizationLayout.Controls.Add(this.txtAngleRange, 1, 3);
+            this.localizationLayout.Controls.Add(this.lblScaleRangeKey, 0, 4);
+            this.localizationLayout.Controls.Add(this.txtScaleRange, 1, 4);
+            this.localizationLayout.Controls.Add(this.lblMatchCountKey, 0, 5);
+            this.localizationLayout.Controls.Add(this.txtMatchCount, 1, 5);
+            this.localizationLayout.Controls.Add(this.lblLastResultKey, 0, 6);
+            this.localizationLayout.Controls.Add(this.txtLastResult, 1, 6);
+
+            this.grpCalibration.BackColor = Color.White;
+            this.grpCalibration.Dock = DockStyle.Fill;
+            this.grpCalibration.Text = "尺寸标定";
+            this.grpCalibration.Controls.Add(this.calibrationLayout);
+            this.calibrationLayout.ColumnCount = 2;
+            this.calibrationLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
+            this.calibrationLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60F));
+            this.calibrationLayout.Dock = DockStyle.Fill;
+            this.calibrationLayout.RowCount = 6;
+            this.lblPixelXKey.Text = "像素尺寸 X";
+            this.txtPixelX.Text = "6.5000 μm/px";
+            this.lblPixelYKey.Text = "像素尺寸 Y";
+            this.txtPixelY.Text = "6.5000 μm/px";
+            this.lblLengthUnitKey.Text = "长度单位";
+            this.cboLengthUnit.Items.AddRange(new object[] { "mm", "px" });
+            this.cboLengthUnit.SelectedIndex = 0;
+            this.lblAreaUnitKey.Text = "面积单位";
+            this.cboAreaUnit.Items.AddRange(new object[] { "mm²", "px²" });
+            this.cboAreaUnit.SelectedIndex = 0;
+            this.lblCalibrationVersionKey.Text = "标定版本";
+            this.txtCalibrationVersion.Text = "CV-1.0.2";
+            this.lblCalibrationStateKey.Text = "状态";
+            this.cboCalibrationState.Items.AddRange(new object[] { "有效", "无效" });
+            this.cboCalibrationState.SelectedIndex = 0;
+            this.calibrationLayout.Controls.Add(this.lblPixelXKey, 0, 0);
+            this.calibrationLayout.Controls.Add(this.txtPixelX, 1, 0);
+            this.calibrationLayout.Controls.Add(this.lblPixelYKey, 0, 1);
+            this.calibrationLayout.Controls.Add(this.txtPixelY, 1, 1);
+            this.calibrationLayout.Controls.Add(this.lblLengthUnitKey, 0, 2);
+            this.calibrationLayout.Controls.Add(this.cboLengthUnit, 1, 2);
+            this.calibrationLayout.Controls.Add(this.lblAreaUnitKey, 0, 3);
+            this.calibrationLayout.Controls.Add(this.cboAreaUnit, 1, 3);
+            this.calibrationLayout.Controls.Add(this.lblCalibrationVersionKey, 0, 4);
+            this.calibrationLayout.Controls.Add(this.txtCalibrationVersion, 1, 4);
+            this.calibrationLayout.Controls.Add(this.lblCalibrationStateKey, 0, 5);
+            this.calibrationLayout.Controls.Add(this.cboCalibrationState, 1, 5);
+            this.parameterStack.Controls.Add(this.grpLocalization, 0, 0);
+            this.parameterStack.Controls.Add(this.grpCalibration, 0, 1);
+            this.middleLayout.Controls.Add(this.grpTemplate, 0, 0);
+            this.middleLayout.Controls.Add(this.parameterStack, 1, 0);
+
+            this.grpDefects.BackColor = Color.White;
+            this.grpDefects.Dock = DockStyle.Fill;
+            this.grpDefects.Font = new Font("Microsoft YaHei UI", 10F, FontStyle.Bold);
+            this.grpDefects.Text = "缺陷类别管理";
+            this.grpDefects.Controls.Add(this.defectLayout);
+            this.defectLayout.ColumnCount = 1;
+            this.defectLayout.Dock = DockStyle.Fill;
+            this.defectLayout.RowCount = 2;
+            this.defectLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            this.defectLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            this.defectButtons.Dock = DockStyle.Fill;
+            this.defectButtons.WrapContents = false;
+            this.btnAddDefect.Text = "新增类别";
+            this.btnEditDefect.Text = "编辑类别";
+            this.btnDeleteDefect.Text = "删除类别";
+            this.btnToggleDefect.Text = "启用 / 停用";
+            this.btnImportDefects.Text = "导入配置";
+            this.btnExportDefects.Text = "导出配置";
+            this.defectButtons.Controls.Add(this.btnAddDefect);
+            this.defectButtons.Controls.Add(this.btnEditDefect);
+            this.defectButtons.Controls.Add(this.btnDeleteDefect);
+            this.defectButtons.Controls.Add(this.btnToggleDefect);
+            this.defectButtons.Controls.Add(this.btnImportDefects);
+            this.defectButtons.Controls.Add(this.btnExportDefects);
+            this.dgvDefects.AllowUserToAddRows = false;
+            this.dgvDefects.AllowUserToDeleteRows = false;
+            this.dgvDefects.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvDefects.BackgroundColor = Color.White;
+            this.dgvDefects.Dock = DockStyle.Fill;
+            this.dgvDefects.ReadOnly = true;
+            this.dgvDefects.RowHeadersVisible = false;
+            this.dgvDefects.Columns.AddRange(new DataGridViewColumn[] { this.dgvDefectsCol1, this.dgvDefectsCol2, this.dgvDefectsCol3, this.dgvDefectsCol4, this.dgvDefectsCol5, this.dgvDefectsCol6, this.dgvDefectsCol7, this.dgvDefectsCol8 });
+            this.dgvDefectsCol1.HeaderText = "序号";
+            this.dgvDefectsCol2.HeaderText = "缺陷名称";
+            this.dgvDefectsCol3.HeaderText = "缺陷类型";
+            this.dgvDefectsCol4.HeaderText = "检测策略";
+            this.dgvDefectsCol5.HeaderText = "默认阈值";
+            this.dgvDefectsCol6.HeaderText = "最小面积(px)";
+            this.dgvDefectsCol7.HeaderText = "最小长度(px)";
+            this.dgvDefectsCol8.HeaderText = "状态";
+            this.defectLayout.Controls.Add(this.defectButtons, 0, 0);
+            this.defectLayout.Controls.Add(this.dgvDefects, 0, 1);
+
+            this.rootLayout.Controls.Add(this.commandLayout, 0, 0);
+            this.rootLayout.Controls.Add(this.grpBasicInfo, 0, 1);
+            this.rootLayout.Controls.Add(this.middleLayout, 0, 2);
+            this.rootLayout.Controls.Add(this.grpDefects, 0, 3);
             this.AutoScaleDimensions = new SizeF(8F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.BackColor = Color.FromArgb(247, 247, 247);
+            this.Controls.Add(this.rootLayout);
             this.Name = "ProductDefinitionPage";
-            this.Size = new Size(1400, 820);
-            this.ResumeLayout(false);
-        }
-
-        /// <summary>
-        /// 页面视觉结构。不要在此方法中写业务逻辑。
-        /// 该方法由 ProductDefinitionPage 构造函数在 InitializeComponent 之后调用，
-        /// 从而避免旧式 WinForms CodeDom Designer 解析复杂布局代码。
-        /// </summary>
-        private void BuildView()
-        {
-            this.SuspendLayout();
-            this.Controls.Clear();
-            this.Dock = DockStyle.Fill;
-            this.BackColor = UiTheme.Page;
             this.Padding = new Padding(14, 12, 4, 10);
-
-            TableLayoutPanel root = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 4,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 44F));
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 116F));
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 62F));
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 38F));
-
-            root.Controls.Add(BuildCommandBar(), 0, 0);
-            root.Controls.Add(BuildProductSummary(), 0, 1);
-            root.Controls.Add(BuildTemplateAndParameters(), 0, 2);
-            root.Controls.Add(BuildDefectCategories(), 0, 3);
-
-            this.Controls.Add(root);
-            this.ResumeLayout(true);
-        }
-
-        private Control BuildCommandBar()
-        {
-            TableLayoutPanel bar = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 2,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            bar.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            bar.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 390F));
-
-            FlowLayoutPanel actions = new FlowLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                FlowDirection = FlowDirection.LeftToRight,
-                WrapContents = false,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = new Padding(0, 3, 0, 5)
-            };
-
-            btnSave = UiFactory.Button("保存产品定义", 112);
-            btnBuildTemplate = UiFactory.Button("建立 / 更新模板", 128);
-            btnTestLocation = UiFactory.Button("测试定位", 92);
-            btnVersion = UiFactory.Button("版本记录", 92);
-            actions.Controls.Add(btnSave);
-            actions.Controls.Add(btnBuildTemplate);
-            actions.Controls.Add(btnTestLocation);
-            actions.Controls.Add(btnVersion);
-
-            Label version = new Label
-            {
-                Dock = DockStyle.Fill,
-                Text = "产品定义版本：PD-1.0.0    模板版本：LT-1.0.0    状态：已配置",
-                Font = UiTheme.Font(8.6F, false),
-                ForeColor = UiTheme.Muted,
-                TextAlign = ContentAlignment.MiddleRight,
-                Padding = new Padding(0, 0, 12, 0)
-            };
-
-            bar.Controls.Add(actions, 0, 0);
-            bar.Controls.Add(version, 1, 0);
-            return bar;
-        }
-
-        private Control BuildProductSummary()
-        {
-            TableLayoutPanel summary = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 6,
-                RowCount = 1,
-                BackColor = UiTheme.Surface,
-                Margin = Padding.Empty,
-                Padding = new Padding(12, 8, 12, 8)
-            };
-            summary.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 19F));
-            summary.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 18F));
-            summary.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 18F));
-            summary.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15F));
-            summary.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15F));
-            summary.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15F));
-
-            summary.Controls.Add(BuildSummaryItem("产品名称", "轴承盖板"), 0, 0);
-            summary.Controls.Add(BuildSummaryItem("产品编号", "P-20250516-001"), 1, 0);
-            summary.Controls.Add(BuildSummaryItem("图像尺寸", "2448 × 2048 px"), 2, 0);
-            summary.Controls.Add(BuildSummaryItem("单图产品数", "1"), 3, 0);
-            summary.Controls.Add(BuildSummaryItem("姿态", "允许旋转"), 4, 0);
-            summary.Controls.Add(BuildSummaryItem("采集条件", "相机 / 光照 / 背景稳定"), 5, 0);
-
-            return UiFactory.Card("产品基本信息", summary);
-        }
-
-        private Control BuildSummaryItem(string keyText, string valueText)
-        {
-            TableLayoutPanel item = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 2,
-                BackColor = UiTheme.Surface,
-                Margin = new Padding(6, 0, 10, 0),
-                Padding = new Padding(8, 3, 8, 3)
-            };
-            item.RowStyles.Add(new RowStyle(SizeType.Absolute, 23F));
-            item.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-
-            Label key = UiFactory.Label(keyText, 8.4F, false, ContentAlignment.MiddleLeft);
-            key.ForeColor = UiTheme.Muted;
-            Label value = UiFactory.Label(valueText, 9.5F, true, ContentAlignment.MiddleLeft);
-            value.AutoEllipsis = true;
-
-            item.Controls.Add(key, 0, 0);
-            item.Controls.Add(value, 0, 1);
-            item.Paint += delegate(object sender, PaintEventArgs e)
-            {
-                using (Pen pen = new Pen(UiTheme.SoftBorder))
-                {
-                    e.Graphics.DrawLine(pen, item.Width - 1, 8, item.Width - 1, Math.Max(8, item.Height - 8));
-                }
-            };
-            return item;
-        }
-
-        private Control BuildTemplateAndParameters()
-        {
-            TableLayoutPanel middle = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 2,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            middle.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 64F));
-            middle.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 36F));
-
-            middle.Controls.Add(BuildTemplateWorkspace(), 0, 0);
-            middle.Controls.Add(BuildParameterStack(), 1, 0);
-            return middle;
-        }
-
-        private Control BuildTemplateWorkspace()
-        {
-            TableLayoutPanel body = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 3,
-                BackColor = UiTheme.Surface,
-                Margin = Padding.Empty,
-                Padding = new Padding(10, 2, 10, 8)
-            };
-            body.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
-            body.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            body.RowStyles.Add(new RowStyle(SizeType.Absolute, 34F));
-
-            FlowLayoutPanel tools = new FlowLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                FlowDirection = FlowDirection.LeftToRight,
-                WrapContents = false,
-                BackColor = UiTheme.Surface,
-                Margin = Padding.Empty,
-                Padding = new Padding(0, 5, 0, 4)
-            };
-
-            btnImportReference = UiFactory.Button("导入基准图", 94);
-            btnRectangleRoi = UiFactory.Button("Rectangle ROI", 110);
-            btnClearRoi = UiFactory.Button("清除 ROI", 88);
-            btnFastMode = UiFactory.Button("快速模式", 82);
-            btnPreciseMode = UiFactory.Button("精细模式", 82);
-            btnAutoMode = UiFactory.Button("自动模式", 82);
-
-            tools.Controls.Add(btnImportReference);
-            tools.Controls.Add(btnRectangleRoi);
-            tools.Controls.Add(btnClearRoi);
-            tools.Controls.Add(btnFastMode);
-            tools.Controls.Add(btnPreciseMode);
-            tools.Controls.Add(btnAutoMode);
-
-            templateCanvas = new Panel
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(40, 40, 40),
-                Margin = new Padding(0, 2, 0, 4)
-            };
-            templateCanvas.Paint += PaintTemplateCanvas;
-
-            TableLayoutPanel footer = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 4,
-                RowCount = 1,
-                BackColor = UiTheme.Header,
-                Margin = Padding.Empty,
-                Padding = new Padding(10, 0, 10, 0)
-            };
-            footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            footer.Controls.Add(BuildFooterText("基准图：reference_001.png"), 0, 0);
-            footer.Controls.Add(BuildFooterText("ROI：已定义"), 1, 0);
-            footer.Controls.Add(BuildFooterText("定位模板：Shape Model"), 2, 0);
-            footer.Controls.Add(BuildFooterText("最近测试：Score 0.92"), 3, 0);
-
-            body.Controls.Add(tools, 0, 0);
-            body.Controls.Add(templateCanvas, 0, 1);
-            body.Controls.Add(footer, 0, 2);
-            return UiFactory.Card("产品模板与 ROI", body);
-        }
-
-        private void PaintTemplateCanvas(object sender, PaintEventArgs e)
-        {
-            Panel canvas = sender as Panel;
-            if (canvas == null) return;
-
-            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            int w = Math.Max(420, canvas.Width);
-            int h = Math.Max(260, canvas.Height);
-            int productWidth = Math.Min(410, Math.Max(220, w - 150));
-            int productHeight = Math.Min(240, Math.Max(150, h - 80));
-            int x = (w - productWidth) / 2;
-            int y = (h - productHeight) / 2;
-
-            using (SolidBrush productBrush = new SolidBrush(Color.FromArgb(176, 176, 176)))
-            using (Pen productPen = new Pen(Color.FromArgb(215, 215, 215), 2F))
-            {
-                Rectangle productRect = new Rectangle(x, y, productWidth, productHeight);
-                e.Graphics.FillRectangle(productBrush, productRect);
-                e.Graphics.DrawRectangle(productPen, productRect);
-
-                Rectangle inner = new Rectangle(x + 42, y + 34, Math.Max(30, productWidth - 84), Math.Max(30, productHeight - 68));
-                using (SolidBrush innerBrush = new SolidBrush(Color.FromArgb(112, 112, 112)))
-                {
-                    e.Graphics.FillRectangle(innerBrush, inner);
-                }
-
-                DrawHole(e.Graphics, x + 24, y + 22, 18);
-                DrawHole(e.Graphics, x + productWidth - 42, y + 22, 18);
-                DrawHole(e.Graphics, x + 24, y + productHeight - 40, 18);
-                DrawHole(e.Graphics, x + productWidth - 42, y + productHeight - 40, 18);
-            }
-
-            Rectangle roi = new Rectangle(x + 24, y + 20, Math.Max(30, productWidth - 48), Math.Max(30, productHeight - 40));
-            using (Pen roiPen = new Pen(Color.White, 2F))
-            {
-                roiPen.DashStyle = DashStyle.Dash;
-                e.Graphics.DrawRectangle(roiPen, roi);
-            }
-
-            using (Font font = UiTheme.Font(9.3F, true))
-            using (SolidBrush brush = new SolidBrush(Color.White))
-            {
-                e.Graphics.DrawString("Template ROI", font, brush, roi.X + 8, roi.Y + 7);
-            }
-            using (Font tipFont = UiTheme.Font(8.2F, false))
-            using (SolidBrush tipBrush = new SolidBrush(Color.FromArgb(205, 205, 205)))
-            {
-                e.Graphics.DrawString("基准图预览 · 鼠标框选产品区域作为定位模板", tipFont, tipBrush, 14, 12);
-            }
-        }
-
-        private static void DrawHole(Graphics g, int x, int y, int size)
-        {
-            using (SolidBrush brush = new SolidBrush(Color.FromArgb(55, 55, 55)))
-            {
-                g.FillEllipse(brush, x, y, size, size);
-            }
-        }
-
-        private Label BuildFooterText(string text)
-        {
-            Label label = UiFactory.Label(text, 7.8F, false, ContentAlignment.MiddleLeft);
-            label.ForeColor = UiTheme.Muted;
-            label.AutoEllipsis = true;
-            return label;
-        }
-
-        private Control BuildParameterStack()
-        {
-            TableLayoutPanel stack = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 2,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            stack.RowStyles.Add(new RowStyle(SizeType.Percent, 58F));
-            stack.RowStyles.Add(new RowStyle(SizeType.Percent, 42F));
-            stack.Controls.Add(UiFactory.Card("定位参数", BuildLocalizationParameters()), 0, 0);
-            stack.Controls.Add(UiFactory.Card("尺寸标定", BuildCalibrationParameters()), 0, 1);
-            return stack;
-        }
-
-        private Control BuildLocalizationParameters()
-        {
-            string[,] data =
-            {
-                { "定位方式：", "HALCON Shape Matching" },
-                { "模型类型：", "Shape Model" },
-                { "最小匹配分数：", "0.60" },
-                { "角度范围：", "-30° ~ 30°" },
-                { "缩放范围：", "90% ~ 110%" },
-                { "匹配个数：", "1" },
-                { "最近结果：", "Row 1024.32 / Col 1226.78 / Angle -1.24° / Score 0.92" }
-            };
-            return UiFactory.KeyValues(data, 38);
-        }
-
-        private Control BuildCalibrationParameters()
-        {
-            string[,] data =
-            {
-                { "像素尺寸 X：", "6.5000 μm/px" },
-                { "像素尺寸 Y：", "6.5000 μm/px" },
-                { "长度单位：", "mm" },
-                { "面积单位：", "mm²" },
-                { "标定版本：", "CV-1.0.2" },
-                { "状态：", "有效" }
-            };
-            return UiFactory.KeyValues(data, 42);
-        }
-
-        private Control BuildDefectCategories()
-        {
-            TableLayoutPanel body = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 2,
-                BackColor = UiTheme.Surface,
-                Margin = Padding.Empty,
-                Padding = new Padding(10, 0, 10, 8)
-            };
-            body.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
-            body.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-
-            FlowLayoutPanel tools = new FlowLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                FlowDirection = FlowDirection.LeftToRight,
-                WrapContents = false,
-                BackColor = UiTheme.Surface,
-                Margin = Padding.Empty,
-                Padding = new Padding(0, 5, 0, 5)
-            };
-            tools.Controls.Add(UiFactory.Button("新增类别", 86));
-            tools.Controls.Add(UiFactory.Button("编辑类别", 86));
-            tools.Controls.Add(UiFactory.Button("删除类别", 86));
-            tools.Controls.Add(UiFactory.Button("启用 / 停用", 98));
-            tools.Controls.Add(UiFactory.Button("导入配置", 86));
-            tools.Controls.Add(UiFactory.Button("导出配置", 86));
-
-            string[][] defects =
-            {
-                new[] { "1", "划痕", "表面缺陷", "Multi-label Segmentation", "0.80", "30", "15", "启用" },
-                new[] { "2", "脏污", "表面缺陷", "Multi-label Segmentation", "0.75", "50", "-", "启用" },
-                new[] { "3", "凹坑", "表面缺陷", "Multi-label Segmentation", "0.82", "40", "-", "启用" },
-                new[] { "4", "孔洞", "结构缺陷", "Multi-label Segmentation", "0.90", "20", "-", "启用" },
-                new[] { "5", "缺边", "结构缺陷", "Multi-label Segmentation", "0.90", "-", "25", "启用" },
-                new[] { "6", "异物", "表面缺陷", "Multi-label Segmentation", "0.78", "20", "-", "启用" }
-            };
-
-            defectGrid = UiFactory.Grid(
-                new[] { "序号", "缺陷名称", "缺陷类型", "检测策略", "默认阈值", "最小面积(px)", "最小长度(px)", "状态" },
-                defects);
-
-            body.Controls.Add(tools, 0, 0);
-            body.Controls.Add(defectGrid, 0, 1);
-            return UiFactory.Card("缺陷类别管理", body);
+            this.Size = new Size(1400, 820);
+            ((ISupportInitialize)(this.dgvDefects)).EndInit();
+            this.ResumeLayout(false);
         }
     }
 }
