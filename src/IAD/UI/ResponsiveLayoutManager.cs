@@ -122,9 +122,33 @@ namespace IAD.UI
         {
             TableLayoutPanel root = Field<TableLayoutPanel>(page, "rootLayout");
             SetRow(root, 0, SizeType.Absolute, compactHeight ? 42F : 48F);
-            SetRow(root, 1, SizeType.Absolute, compactHeight ? 104F : 126F);
+            SetRow(root, 1, SizeType.Absolute, compactHeight ? 82F : 96F);
             SetRow(root, 2, SizeType.Percent, 62F);
             SetRow(root, 3, SizeType.Percent, 38F);
+
+            // Keep the field row close to its label row. The designer's taller label
+            // row combined with vertically centered editors left a conspicuous empty
+            // band between the labels and their inputs on high-DPI displays.
+            TableLayoutPanel basic = Field<TableLayoutPanel>(page, "basicLayout");
+            SetRow(basic, 0, SizeType.Absolute, compactHeight ? 22F : 26F);
+            SetRow(basic, 1, SizeType.Percent, 100F);
+
+            string[] basicFieldNames =
+            {
+                "txtProductName",
+                "txtProductCode",
+                "txtImageSize",
+                "txtProductsPerImage",
+                "cboPose",
+                "txtAcquisitionCondition"
+            };
+            foreach (string fieldName in basicFieldNames)
+            {
+                Control field = Field<Control>(page, fieldName);
+                if (field == null) continue;
+                field.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+                field.Margin = new Padding(4, 2, 4, 2);
+            }
 
             TableLayoutPanel command = Field<TableLayoutPanel>(page, "commandLayout");
             SetColumn(command, 0, SizeType.Percent, 100F);
