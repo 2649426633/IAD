@@ -1,224 +1,323 @@
-using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using IAD.UI;
 
 namespace IAD.Pages
 {
-    public partial class DashboardPage
+    partial class DashboardPage
     {
         private IContainer components = null;
+        private TableLayoutPanel rootLayout;
+        private GroupBox grpProcess;
+        private TableLayoutPanel processLayout;
+        private Label step1;
+        private Label arrow1;
+        private Label step2;
+        private Label arrow2;
+        private Label step3;
+        private Label arrow3;
+        private Label step4;
+        private Label arrow4;
+        private Label step5;
+        private Label arrow5;
+        private Label step6;
+        private Label arrow6;
+        private Label step7;
+        private Label arrow7;
+        private Label step8;
+        private TableLayoutPanel statsLayout;
+        private GroupBox grpImages;
+        private Label lblImagesValue;
+        private Label lblImagesTime;
+        private GroupBox grpAnnotated;
+        private Label lblAnnotatedValue;
+        private Label lblAnnotatedTime;
+        private GroupBox grpDefectClasses;
+        private Label lblDefectClassesValue;
+        private Label lblDefectClassesTime;
+        private GroupBox grpDefectInstances;
+        private Label lblDefectInstancesValue;
+        private Label lblDefectInstancesTime;
+        private GroupBox grpCandidates;
+        private Label lblCandidatesValue;
+        private Label lblCandidatesTime;
+        private TableLayoutPanel bottomLayout;
+        private GroupBox grpRecentTraining;
+        private DataGridView dgvTraining;
+        private DataGridViewTextBoxColumn dgvTrainingCol1;
+        private DataGridViewTextBoxColumn dgvTrainingCol2;
+        private DataGridViewTextBoxColumn dgvTrainingCol3;
+        private DataGridViewTextBoxColumn dgvTrainingCol4;
+        private DataGridViewTextBoxColumn dgvTrainingCol5;
+        private DataGridViewTextBoxColumn dgvTrainingCol6;
+        private DataGridViewTextBoxColumn dgvTrainingCol7;
+        private GroupBox grpRecentInspection;
+        private DataGridView dgvInspection;
+        private DataGridViewTextBoxColumn dgvInspectionCol1;
+        private DataGridViewTextBoxColumn dgvInspectionCol2;
+        private DataGridViewTextBoxColumn dgvInspectionCol3;
+        private DataGridViewTextBoxColumn dgvInspectionCol4;
+        private DataGridViewTextBoxColumn dgvInspectionCol5;
+        private DataGridViewTextBoxColumn dgvInspectionCol6;
+        private DataGridViewTextBoxColumn dgvInspectionCol7;
+        private GroupBox grpPending;
+        private TableLayoutPanel pendingLayout;
+        private Label lblPending1;
+        private Label lblPending1Value;
+        private Label lblPending2;
+        private Label lblPending2Value;
+        private Label lblPending3;
+        private Label lblPending3Value;
+        private Label lblPending4;
+        private Label lblPending4Value;
+        private Label lblPending5;
+        private Label lblPending5Value;
+        private Label lblPending6;
+        private Label lblPending6Value;
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
+            if (disposing && (components != null)) components.Dispose();
             base.Dispose(disposing);
         }
 
         private void InitializeComponent()
         {
             this.components = new Container();
+            this.rootLayout = new TableLayoutPanel();
+            this.grpProcess = new GroupBox();
+            this.processLayout = new TableLayoutPanel();
+            this.step1 = new Label();
+            this.arrow1 = new Label();
+            this.step2 = new Label();
+            this.arrow2 = new Label();
+            this.step3 = new Label();
+            this.arrow3 = new Label();
+            this.step4 = new Label();
+            this.arrow4 = new Label();
+            this.step5 = new Label();
+            this.arrow5 = new Label();
+            this.step6 = new Label();
+            this.arrow6 = new Label();
+            this.step7 = new Label();
+            this.arrow7 = new Label();
+            this.step8 = new Label();
+            this.statsLayout = new TableLayoutPanel();
+            this.grpImages = new GroupBox();
+            this.lblImagesValue = new Label();
+            this.lblImagesTime = new Label();
+            this.grpAnnotated = new GroupBox();
+            this.lblAnnotatedValue = new Label();
+            this.lblAnnotatedTime = new Label();
+            this.grpDefectClasses = new GroupBox();
+            this.lblDefectClassesValue = new Label();
+            this.lblDefectClassesTime = new Label();
+            this.grpDefectInstances = new GroupBox();
+            this.lblDefectInstancesValue = new Label();
+            this.lblDefectInstancesTime = new Label();
+            this.grpCandidates = new GroupBox();
+            this.lblCandidatesValue = new Label();
+            this.lblCandidatesTime = new Label();
+            this.bottomLayout = new TableLayoutPanel();
+            this.grpRecentTraining = new GroupBox();
+            this.dgvTraining = new DataGridView();
+            this.dgvTrainingCol1 = new DataGridViewTextBoxColumn();
+            this.dgvTrainingCol2 = new DataGridViewTextBoxColumn();
+            this.dgvTrainingCol3 = new DataGridViewTextBoxColumn();
+            this.dgvTrainingCol4 = new DataGridViewTextBoxColumn();
+            this.dgvTrainingCol5 = new DataGridViewTextBoxColumn();
+            this.dgvTrainingCol6 = new DataGridViewTextBoxColumn();
+            this.dgvTrainingCol7 = new DataGridViewTextBoxColumn();
+            this.grpRecentInspection = new GroupBox();
+            this.dgvInspection = new DataGridView();
+            this.dgvInspectionCol1 = new DataGridViewTextBoxColumn();
+            this.dgvInspectionCol2 = new DataGridViewTextBoxColumn();
+            this.dgvInspectionCol3 = new DataGridViewTextBoxColumn();
+            this.dgvInspectionCol4 = new DataGridViewTextBoxColumn();
+            this.dgvInspectionCol5 = new DataGridViewTextBoxColumn();
+            this.dgvInspectionCol6 = new DataGridViewTextBoxColumn();
+            this.dgvInspectionCol7 = new DataGridViewTextBoxColumn();
+            this.grpPending = new GroupBox();
+            this.pendingLayout = new TableLayoutPanel();
+            this.lblPending1 = new Label();
+            this.lblPending1Value = new Label();
+            this.lblPending2 = new Label();
+            this.lblPending2Value = new Label();
+            this.lblPending3 = new Label();
+            this.lblPending3Value = new Label();
+            this.lblPending4 = new Label();
+            this.lblPending4Value = new Label();
+            this.lblPending5 = new Label();
+            this.lblPending5Value = new Label();
+            this.lblPending6 = new Label();
+            this.lblPending6Value = new Label();
+            ((ISupportInitialize)(this.dgvTraining)).BeginInit();
+            ((ISupportInitialize)(this.dgvInspection)).BeginInit();
             this.SuspendLayout();
+
+            this.rootLayout.BackColor = Color.FromArgb(247, 247, 247);
+            this.rootLayout.ColumnCount = 1;
+            this.rootLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            this.rootLayout.Dock = DockStyle.Fill;
+            this.rootLayout.Name = "rootLayout";
+            this.rootLayout.RowCount = 3;
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 170F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 132F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+
+            this.grpProcess.BackColor = Color.White;
+            this.grpProcess.Dock = DockStyle.Fill;
+            this.grpProcess.Font = new Font("Microsoft YaHei UI", 10.5F, FontStyle.Bold);
+            this.grpProcess.Text = "产线流程进度";
+            this.grpProcess.Controls.Add(this.processLayout);
+            this.processLayout.ColumnCount = 15;
+            this.processLayout.Dock = DockStyle.Fill;
+            this.processLayout.RowCount = 1;
+            this.processLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 11F));
+            this.processLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 2F));
+            this.processLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 11F));
+            this.processLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 2F));
+            this.processLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 11F));
+            this.processLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 2F));
+            this.processLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 11F));
+            this.processLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 2F));
+            this.processLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 11F));
+            this.processLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 2F));
+            this.processLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 11F));
+            this.processLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 2F));
+            this.processLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 11F));
+            this.processLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 2F));
+            this.processLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 11F));
+            this.step1.Text = "1\r\n产品模板建立\r\n已完成\r\n2025-03-01";
+            this.step2.Text = "2\r\n标注\r\n已完成\r\n2025-03-02";
+            this.step3.Text = "3\r\n少样本扩标\r\n已完成\r\n2025-03-03";
+            this.step4.Text = "4\r\n数据质检\r\n已完成\r\n2025-03-04";
+            this.step5.Text = "5\r\n训练\r\n进行中\r\n当前阶段";
+            this.step6.Text = "6\r\n验收\r\n待开始";
+            this.step7.Text = "7\r\n发布\r\n待开始";
+            this.step8.Text = "8\r\n检测\r\n待开始";
+            this.step1.BorderStyle = this.step2.BorderStyle = this.step3.BorderStyle = this.step4.BorderStyle = this.step5.BorderStyle = this.step6.BorderStyle = this.step7.BorderStyle = this.step8.BorderStyle = BorderStyle.FixedSingle;
+            this.step1.Dock = this.step2.Dock = this.step3.Dock = this.step4.Dock = this.step5.Dock = this.step6.Dock = this.step7.Dock = this.step8.Dock = DockStyle.Fill;
+            this.step1.TextAlign = this.step2.TextAlign = this.step3.TextAlign = this.step4.TextAlign = this.step5.TextAlign = this.step6.TextAlign = this.step7.TextAlign = this.step8.TextAlign = ContentAlignment.MiddleCenter;
+            this.step5.BackColor = Color.FromArgb(242, 242, 242);
+            this.step5.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Bold);
+            this.arrow1.Text = this.arrow2.Text = this.arrow3.Text = this.arrow4.Text = this.arrow5.Text = this.arrow6.Text = this.arrow7.Text = "→";
+            this.arrow1.Dock = this.arrow2.Dock = this.arrow3.Dock = this.arrow4.Dock = this.arrow5.Dock = this.arrow6.Dock = this.arrow7.Dock = DockStyle.Fill;
+            this.arrow1.TextAlign = this.arrow2.TextAlign = this.arrow3.TextAlign = this.arrow4.TextAlign = this.arrow5.TextAlign = this.arrow6.TextAlign = this.arrow7.TextAlign = ContentAlignment.MiddleCenter;
+            this.processLayout.Controls.Add(this.step1, 0, 0);
+            this.processLayout.Controls.Add(this.arrow1, 1, 0);
+            this.processLayout.Controls.Add(this.step2, 2, 0);
+            this.processLayout.Controls.Add(this.arrow2, 3, 0);
+            this.processLayout.Controls.Add(this.step3, 4, 0);
+            this.processLayout.Controls.Add(this.arrow3, 5, 0);
+            this.processLayout.Controls.Add(this.step4, 6, 0);
+            this.processLayout.Controls.Add(this.arrow4, 7, 0);
+            this.processLayout.Controls.Add(this.step5, 8, 0);
+            this.processLayout.Controls.Add(this.arrow5, 9, 0);
+            this.processLayout.Controls.Add(this.step6, 10, 0);
+            this.processLayout.Controls.Add(this.arrow6, 11, 0);
+            this.processLayout.Controls.Add(this.step7, 12, 0);
+            this.processLayout.Controls.Add(this.arrow7, 13, 0);
+            this.processLayout.Controls.Add(this.step8, 14, 0);
+
+            this.statsLayout.ColumnCount = 5;
+            this.statsLayout.Dock = DockStyle.Fill;
+            this.statsLayout.RowCount = 1;
+            this.statsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            this.statsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            this.statsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            this.statsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            this.statsLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            this.grpImages.Text = "图片总数";
+            this.grpAnnotated.Text = "已标注图片";
+            this.grpDefectClasses.Text = "缺陷类别数";
+            this.grpDefectInstances.Text = "缺陷实例数";
+            this.grpCandidates.Text = "待确认候选数";
+            this.grpImages.Dock = this.grpAnnotated.Dock = this.grpDefectClasses.Dock = this.grpDefectInstances.Dock = this.grpCandidates.Dock = DockStyle.Fill;
+            this.lblImagesValue.Text = "128,560";
+            this.lblAnnotatedValue.Text = "98,732";
+            this.lblDefectClassesValue.Text = "42";
+            this.lblDefectInstancesValue.Text = "256,731";
+            this.lblCandidatesValue.Text = "5,362";
+            this.lblImagesValue.Dock = this.lblAnnotatedValue.Dock = this.lblDefectClassesValue.Dock = this.lblDefectInstancesValue.Dock = this.lblCandidatesValue.Dock = DockStyle.Fill;
+            this.lblImagesValue.TextAlign = this.lblAnnotatedValue.TextAlign = this.lblDefectClassesValue.TextAlign = this.lblDefectInstancesValue.TextAlign = this.lblCandidatesValue.TextAlign = ContentAlignment.MiddleCenter;
+            this.lblImagesValue.Font = this.lblAnnotatedValue.Font = this.lblDefectClassesValue.Font = this.lblDefectInstancesValue.Font = this.lblCandidatesValue.Font = new Font("Microsoft YaHei UI", 18F);
+            this.lblImagesTime.Text = this.lblAnnotatedTime.Text = this.lblDefectClassesTime.Text = this.lblDefectInstancesTime.Text = this.lblCandidatesTime.Text = "数据截止：2025-05-16 24:00";
+            this.lblImagesTime.Dock = this.lblAnnotatedTime.Dock = this.lblDefectClassesTime.Dock = this.lblDefectInstancesTime.Dock = this.lblCandidatesTime.Dock = DockStyle.Bottom;
+            this.lblImagesTime.Height = this.lblAnnotatedTime.Height = this.lblDefectClassesTime.Height = this.lblDefectInstancesTime.Height = this.lblCandidatesTime.Height = 24;
+            this.grpImages.Controls.Add(this.lblImagesValue); this.grpImages.Controls.Add(this.lblImagesTime);
+            this.grpAnnotated.Controls.Add(this.lblAnnotatedValue); this.grpAnnotated.Controls.Add(this.lblAnnotatedTime);
+            this.grpDefectClasses.Controls.Add(this.lblDefectClassesValue); this.grpDefectClasses.Controls.Add(this.lblDefectClassesTime);
+            this.grpDefectInstances.Controls.Add(this.lblDefectInstancesValue); this.grpDefectInstances.Controls.Add(this.lblDefectInstancesTime);
+            this.grpCandidates.Controls.Add(this.lblCandidatesValue); this.grpCandidates.Controls.Add(this.lblCandidatesTime);
+            this.statsLayout.Controls.Add(this.grpImages, 0, 0);
+            this.statsLayout.Controls.Add(this.grpAnnotated, 1, 0);
+            this.statsLayout.Controls.Add(this.grpDefectClasses, 2, 0);
+            this.statsLayout.Controls.Add(this.grpDefectInstances, 3, 0);
+            this.statsLayout.Controls.Add(this.grpCandidates, 4, 0);
+
+            this.bottomLayout.ColumnCount = 3;
+            this.bottomLayout.Dock = DockStyle.Fill;
+            this.bottomLayout.RowCount = 1;
+            this.bottomLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 38F));
+            this.bottomLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 38F));
+            this.bottomLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 24F));
+            this.grpRecentTraining.Text = "最近训练";
+            this.grpRecentTraining.Dock = DockStyle.Fill;
+            this.grpRecentTraining.Controls.Add(this.dgvTraining);
+            this.dgvTraining.Dock = DockStyle.Fill;
+            this.dgvTraining.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvTraining.ReadOnly = true;
+            this.dgvTraining.RowHeadersVisible = false;
+            this.dgvTraining.Columns.AddRange(new DataGridViewColumn[] { this.dgvTrainingCol1, this.dgvTrainingCol2, this.dgvTrainingCol3, this.dgvTrainingCol4, this.dgvTrainingCol5, this.dgvTrainingCol6, this.dgvTrainingCol7 });
+            this.dgvTrainingCol1.HeaderText = "训练批次"; this.dgvTrainingCol2.HeaderText = "模型"; this.dgvTrainingCol3.HeaderText = "数据集"; this.dgvTrainingCol4.HeaderText = "状态"; this.dgvTrainingCol5.HeaderText = "F1"; this.dgvTrainingCol6.HeaderText = "召回率"; this.dgvTrainingCol7.HeaderText = "日期";
+            this.grpRecentInspection.Text = "最近检测";
+            this.grpRecentInspection.Dock = DockStyle.Fill;
+            this.grpRecentInspection.Controls.Add(this.dgvInspection);
+            this.dgvInspection.Dock = DockStyle.Fill;
+            this.dgvInspection.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvInspection.ReadOnly = true;
+            this.dgvInspection.RowHeadersVisible = false;
+            this.dgvInspection.Columns.AddRange(new DataGridViewColumn[] { this.dgvInspectionCol1, this.dgvInspectionCol2, this.dgvInspectionCol3, this.dgvInspectionCol4, this.dgvInspectionCol5, this.dgvInspectionCol6, this.dgvInspectionCol7 });
+            this.dgvInspectionCol1.HeaderText = "检测批次"; this.dgvInspectionCol2.HeaderText = "产品批次"; this.dgvInspectionCol3.HeaderText = "工位"; this.dgvInspectionCol4.HeaderText = "检测数"; this.dgvInspectionCol5.HeaderText = "NG数"; this.dgvInspectionCol6.HeaderText = "NG率"; this.dgvInspectionCol7.HeaderText = "时间";
+            this.grpPending.Text = "待处理事项";
+            this.grpPending.Dock = DockStyle.Fill;
+            this.grpPending.Controls.Add(this.pendingLayout);
+            this.pendingLayout.ColumnCount = 2;
+            this.pendingLayout.Dock = DockStyle.Fill;
+            this.pendingLayout.RowCount = 6;
+            this.pendingLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 72F));
+            this.pendingLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 28F));
+            this.lblPending1.Text = "待确认候选"; this.lblPending1Value.Text = "5,362";
+            this.lblPending2.Text = "待人工确认标注"; this.lblPending2Value.Text = "3,128";
+            this.lblPending3.Text = "待验收模型"; this.lblPending3Value.Text = "2";
+            this.lblPending4.Text = "待复核检测结果"; this.lblPending4Value.Text = "7,812";
+            this.lblPending5.Text = "待发布模型"; this.lblPending5Value.Text = "1";
+            this.lblPending6.Text = "异常检测告警"; this.lblPending6Value.Text = "3";
+            this.lblPending1.Dock = this.lblPending1Value.Dock = this.lblPending2.Dock = this.lblPending2Value.Dock = this.lblPending3.Dock = this.lblPending3Value.Dock = this.lblPending4.Dock = this.lblPending4Value.Dock = this.lblPending5.Dock = this.lblPending5Value.Dock = this.lblPending6.Dock = this.lblPending6Value.Dock = DockStyle.Fill;
+            this.pendingLayout.Controls.Add(this.lblPending1, 0, 0); this.pendingLayout.Controls.Add(this.lblPending1Value, 1, 0);
+            this.pendingLayout.Controls.Add(this.lblPending2, 0, 1); this.pendingLayout.Controls.Add(this.lblPending2Value, 1, 1);
+            this.pendingLayout.Controls.Add(this.lblPending3, 0, 2); this.pendingLayout.Controls.Add(this.lblPending3Value, 1, 2);
+            this.pendingLayout.Controls.Add(this.lblPending4, 0, 3); this.pendingLayout.Controls.Add(this.lblPending4Value, 1, 3);
+            this.pendingLayout.Controls.Add(this.lblPending5, 0, 4); this.pendingLayout.Controls.Add(this.lblPending5Value, 1, 4);
+            this.pendingLayout.Controls.Add(this.lblPending6, 0, 5); this.pendingLayout.Controls.Add(this.lblPending6Value, 1, 5);
+            this.bottomLayout.Controls.Add(this.grpRecentTraining, 0, 0);
+            this.bottomLayout.Controls.Add(this.grpRecentInspection, 1, 0);
+            this.bottomLayout.Controls.Add(this.grpPending, 2, 0);
+
+            this.rootLayout.Controls.Add(this.grpProcess, 0, 0);
+            this.rootLayout.Controls.Add(this.statsLayout, 0, 1);
+            this.rootLayout.Controls.Add(this.bottomLayout, 0, 2);
             this.AutoScaleDimensions = new SizeF(8F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.BackColor = Color.FromArgb(247, 247, 247);
+            this.Controls.Add(this.rootLayout);
             this.Name = "DashboardPage";
-            this.Size = new Size(1400, 820);
-            this.ResumeLayout(false);
-        }
-
-        private void BuildView()
-        {
-            this.SuspendLayout();
-            this.Controls.Clear();
-            this.Dock = DockStyle.Fill;
-            this.BackColor = UiTheme.Page;
             this.Padding = new Padding(14, 14, 4, 10);
-
-            TableLayoutPanel root = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 3,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 168F));
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 132F));
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            root.Controls.Add(UiFactory.Card("产线流程进度", BuildProcess()), 0, 0);
-            root.Controls.Add(BuildStats(), 0, 1);
-            root.Controls.Add(BuildBottom(), 0, 2);
-            this.Controls.Add(root);
-            this.ResumeLayout(true);
-        }
-
-        private Control BuildProcess()
-        {
-            FlowLayoutPanel flow = new FlowLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                FlowDirection = FlowDirection.LeftToRight,
-                WrapContents = false,
-                AutoScroll = false,
-                BackColor = UiTheme.Surface,
-                Padding = new Padding(12, 12, 0, 8),
-                Margin = Padding.Empty
-            };
-
-            string[] names = { "产品模板建立", "标注", "少样本扩标", "数据质检", "训练", "验收", "发布", "检测" };
-            string[] states = { "已完成", "已完成", "已完成", "已完成", "进行中", "待开始", "待开始", "待开始" };
-            string[] dates = { "2025-03-01", "2025-03-02", "2025-03-03", "2025-03-04", "当前阶段", "", "", "" };
-
-            for (int i = 0; i < names.Length; i++)
-            {
-                int index = i;
-                bool active = index == 4;
-                bool pending = index > 4;
-                Panel step = new Panel
-                {
-                    Width = 112,
-                    Height = 102,
-                    BackColor = active ? Color.FromArgb(242, 242, 242) : UiTheme.Surface,
-                    Margin = Padding.Empty,
-                    Padding = Padding.Empty
-                };
-                step.Paint += delegate(object sender, PaintEventArgs e)
-                {
-                    Panel p = sender as Panel;
-                    if (p == null) return;
-                    using (Pen pen = new Pen(active ? Color.FromArgb(90, 90, 90) : Color.FromArgb(172, 172, 172), active ? 1.5F : 1F))
-                    {
-                        if (pending) pen.DashStyle = DashStyle.Dash;
-                        e.Graphics.DrawRectangle(pen, 0, 0, p.Width - 1, 66);
-                    }
-                };
-
-                Label number = UiFactory.Label((index + 1).ToString(), 10.5F, false, ContentAlignment.MiddleCenter);
-                number.Height = 25;
-                number.Dock = DockStyle.Top;
-                number.ForeColor = pending ? UiTheme.Muted : UiTheme.Text;
-
-                Label name = UiFactory.Label(names[index], 8.8F, active, ContentAlignment.MiddleCenter);
-                name.Height = 41;
-                name.Dock = DockStyle.Top;
-                name.ForeColor = pending ? UiTheme.Muted : UiTheme.Text;
-
-                TableLayoutPanel stateArea = new TableLayoutPanel
-                {
-                    Dock = DockStyle.Fill,
-                    ColumnCount = 1,
-                    RowCount = 2,
-                    BackColor = Color.Transparent,
-                    Margin = Padding.Empty,
-                    Padding = Padding.Empty
-                };
-                stateArea.RowStyles.Add(new RowStyle(SizeType.Percent, 52F));
-                stateArea.RowStyles.Add(new RowStyle(SizeType.Percent, 48F));
-
-                Label state = UiFactory.Label(states[index], 8.2F, active, ContentAlignment.BottomCenter);
-                state.ForeColor = pending ? UiTheme.Muted : UiTheme.Text;
-                Label date = UiFactory.Label(dates[index], 7.5F, false, ContentAlignment.TopCenter);
-                date.ForeColor = UiTheme.Muted;
-
-                stateArea.Controls.Add(state, 0, 0);
-                stateArea.Controls.Add(date, 0, 1);
-                step.Controls.Add(stateArea);
-                step.Controls.Add(name);
-                step.Controls.Add(number);
-                flow.Controls.Add(step);
-
-                if (index < names.Length - 1)
-                {
-                    Label arrow = UiFactory.Label("→", 14F, false, ContentAlignment.MiddleCenter);
-                    arrow.Width = 28;
-                    arrow.Height = 68;
-                    arrow.Margin = Padding.Empty;
-                    flow.Controls.Add(arrow);
-                }
-            }
-            return flow;
-        }
-
-        private Control BuildStats()
-        {
-            TableLayoutPanel stats = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 5,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            stats.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            stats.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            stats.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            stats.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            stats.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            stats.Controls.Add(UiFactory.Stat("图片总数", "128,560"), 0, 0);
-            stats.Controls.Add(UiFactory.Stat("已标注图片", "98,732"), 1, 0);
-            stats.Controls.Add(UiFactory.Stat("缺陷类别数", "42"), 2, 0);
-            stats.Controls.Add(UiFactory.Stat("缺陷实例数", "256,731"), 3, 0);
-            stats.Controls.Add(UiFactory.Stat("待确认候选数", "5,362"), 4, 0);
-            return stats;
-        }
-
-        private Control BuildBottom()
-        {
-            TableLayoutPanel bottom = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 3,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            bottom.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 38F));
-            bottom.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 38F));
-            bottom.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 24F));
-
-            string[][] training =
-            {
-                new[] { "TRN-20250516-001", "Model_A_1.3.2", "V2.1.0", "完成", "0.956", "0.872", "2025-05-16" },
-                new[] { "TRN-20250515-002", "Model_A_1.2.2", "V2.0.9", "完成", "0.948", "0.861", "2025-05-15" },
-                new[] { "TRN-20250514-001", "Model_A_1.2.1", "V2.0.8", "完成", "0.939", "0.842", "2025-05-14" },
-                new[] { "TRN-20250513-001", "Model_A_1.2.0", "V2.0.7", "完成", "0.932", "0.831", "2025-05-13" }
-            };
-            string[][] inspection =
-            {
-                new[] { "IMG-143210", "20/3/1", "工位5", "12,412", "236", "1.90%", "14:32:12" },
-                new[] { "IMG-141305", "21/2/1", "工位3", "12,080", "218", "1.80%", "14:13:08" },
-                new[] { "IMG-140210", "22/1/1", "工位2", "11,948", "205", "1.71%", "14:03:05" },
-                new[] { "IMG-142856", "24/0/0", "工位0", "12,603", "249", "1.98%", "14:28:59" }
-            };
-
-            bottom.Controls.Add(UiFactory.Card("最近训练", UiFactory.Grid(new[] { "训练批次", "模型", "数据集", "状态", "F1", "召回率", "日期" }, training)), 0, 0);
-            bottom.Controls.Add(UiFactory.Card("最近检测", UiFactory.Grid(new[] { "检测批次", "产品批次", "工位", "检测数", "NG数", "NG率", "时间" }, inspection)), 1, 0);
-
-            FlowLayoutPanel pending = new FlowLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                FlowDirection = FlowDirection.TopDown,
-                WrapContents = false,
-                BackColor = UiTheme.Surface,
-                Padding = new Padding(10, 6, 10, 4)
-            };
-            pending.Controls.Add(UiFactory.PendingRow("待确认候选", "5,362"));
-            pending.Controls.Add(UiFactory.PendingRow("待人工确认标注", "3,128"));
-            pending.Controls.Add(UiFactory.PendingRow("待验收模型", "2"));
-            pending.Controls.Add(UiFactory.PendingRow("待复核检测结果", "7,812"));
-            pending.Controls.Add(UiFactory.PendingRow("待发布模型", "1"));
-            pending.Controls.Add(UiFactory.PendingRow("异常检测告警", "3"));
-            bottom.Controls.Add(UiFactory.Card("待处理事项", pending), 2, 0);
-            return bottom;
+            this.Size = new Size(1400, 820);
+            ((ISupportInitialize)(this.dgvTraining)).EndInit();
+            ((ISupportInitialize)(this.dgvInspection)).EndInit();
+            this.ResumeLayout(false);
         }
     }
 }
