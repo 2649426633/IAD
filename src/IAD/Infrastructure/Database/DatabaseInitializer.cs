@@ -5,7 +5,7 @@ namespace IAD.Infrastructure.Database
 {
     internal static class DatabaseInitializer
     {
-        public const int CurrentSchemaVersion = 1;
+        public const int CurrentSchemaVersion = 2;
 
         public static void Initialize(SqliteConnectionFactory connectionFactory)
         {
@@ -61,6 +61,32 @@ namespace IAD.Infrastructure.Database
                 UpdatedAtUtc TEXT NOT NULL
             );",
             @"CREATE UNIQUE INDEX IF NOT EXISTS UX_Products_ProductCode ON Products(ProductCode);",
+
+            @"CREATE TABLE IF NOT EXISTS ProductDefinitionSettings (
+                ProductId INTEGER NOT NULL PRIMARY KEY,
+                ImageSize TEXT NULL,
+                ProductCount INTEGER NOT NULL DEFAULT 1,
+                Pose TEXT NULL,
+                AcquisitionCondition TEXT NULL,
+                ReferenceImagePath TEXT NULL,
+                TemplateType TEXT NULL,
+                LocalizationMethod TEXT NULL,
+                ModelType TEXT NULL,
+                MinScore REAL NOT NULL DEFAULT 0.8,
+                AngleRange TEXT NULL,
+                ScaleRange TEXT NULL,
+                MatchCount INTEGER NOT NULL DEFAULT 1,
+                PixelX REAL NOT NULL DEFAULT 1,
+                PixelY REAL NOT NULL DEFAULT 1,
+                LengthUnit TEXT NULL,
+                AreaUnit TEXT NULL,
+                CalibrationVersion TEXT NULL,
+                CalibrationState TEXT NULL,
+                ProductDefinitionVersion TEXT NULL,
+                TemplateVersion TEXT NULL,
+                UpdatedAtUtc TEXT NOT NULL,
+                FOREIGN KEY(ProductId) REFERENCES Products(Id) ON DELETE CASCADE
+            );",
 
             @"CREATE TABLE IF NOT EXISTS DefectCategories (
                 Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
