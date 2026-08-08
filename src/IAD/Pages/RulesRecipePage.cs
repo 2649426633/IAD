@@ -7,6 +7,7 @@ namespace IAD.Pages
         public RulesRecipePage()
         {
             InitializeComponent();
+            BuildView();
             BindEvents();
         }
 
