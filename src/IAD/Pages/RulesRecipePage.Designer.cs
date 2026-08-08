@@ -1,16 +1,84 @@
-using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using IAD.UI;
 
 namespace IAD.Pages
 {
-    public partial class RulesRecipePage
+    partial class RulesRecipePage
     {
         private IContainer components = null;
-        private DataGridView ruleGrid;
-        private Panel zoneCanvas;
+        private TableLayoutPanel rootLayout;
+        private TableLayoutPanel topLayout;
+        private GroupBox grpRules;
+        private DataGridView dgvRules;
+        private DataGridViewTextBoxColumn dgvRulesCol1;
+        private DataGridViewTextBoxColumn dgvRulesCol2;
+        private DataGridViewTextBoxColumn dgvRulesCol3;
+        private DataGridViewTextBoxColumn dgvRulesCol4;
+        private DataGridViewTextBoxColumn dgvRulesCol5;
+        private DataGridViewTextBoxColumn dgvRulesCol6;
+        private DataGridViewTextBoxColumn dgvRulesCol7;
+        private DataGridViewTextBoxColumn dgvRulesCol8;
+        private GroupBox grpZones;
+        private TableLayoutPanel zoneLayout;
+        private Panel pnlProductZone;
+        private Panel pnlCriticalZone;
+        private Label lblCriticalZone;
+        private Panel pnlNormalZone;
+        private Label lblNormalZone;
+        private Label lblIgnoreZone;
+        private TableLayoutPanel middleLayout;
+        private GroupBox grpThresholds;
+        private DataGridView dgvThresholds;
+        private DataGridViewTextBoxColumn dgvThresholdsCol1;
+        private DataGridViewTextBoxColumn dgvThresholdsCol2;
+        private DataGridViewTextBoxColumn dgvThresholdsCol3;
+        private DataGridViewTextBoxColumn dgvThresholdsCol4;
+        private DataGridViewTextBoxColumn dgvThresholdsCol5;
+        private DataGridViewTextBoxColumn dgvThresholdsCol6;
+        private GroupBox grpRecipe;
+        private TableLayoutPanel recipeLayout;
+        private Label lblDatasetVersionKey;
+        private TextBox txtDatasetVersion;
+        private Label lblLocalizationVersionKey;
+        private TextBox txtLocalizationVersion;
+        private Label lblModelVersionKey;
+        private TextBox txtModelVersion;
+        private Label lblRuleVersionKey;
+        private TextBox txtRuleVersion;
+        private Label lblCalibrationVersionKey;
+        private TextBox txtCalibrationVersion;
+        private Label lblThresholdVersionKey;
+        private TextBox txtThresholdVersion;
+        private Label lblRecipeNameKey;
+        private TextBox txtRecipeName;
+        private GroupBox grpRecipeVersions;
+        private DataGridView dgvRecipeVersions;
+        private DataGridViewTextBoxColumn dgvRecipeVersionsCol1;
+        private DataGridViewTextBoxColumn dgvRecipeVersionsCol2;
+        private DataGridViewTextBoxColumn dgvRecipeVersionsCol3;
+        private DataGridViewTextBoxColumn dgvRecipeVersionsCol4;
+        private TableLayoutPanel bottomLayout;
+        private GroupBox grpAcceptance;
+        private TableLayoutPanel acceptanceLayout;
+        private Label lblStrategyKey;
+        private ComboBox cboStrategy;
+        private Label lblFnrTargetKey;
+        private TextBox txtFnrTarget;
+        private Label lblFprTargetKey;
+        private TextBox txtFprTarget;
+        private Label lblCostWeightKey;
+        private TextBox txtCostWeight;
+        private GroupBox grpEstimate;
+        private TableLayoutPanel estimateLayout;
+        private Label lblEstimatedFnrKey;
+        private Label lblEstimatedFnr;
+        private Label lblEstimatedFprKey;
+        private Label lblEstimatedFpr;
+        private Label lblCostKey;
+        private Label lblCost;
+        private Label lblSamplesKey;
+        private Label lblSamples;
 
         protected override void Dispose(bool disposing)
         {
@@ -21,165 +89,243 @@ namespace IAD.Pages
         private void InitializeComponent()
         {
             this.components = new Container();
+            this.rootLayout = new TableLayoutPanel();
+            this.topLayout = new TableLayoutPanel();
+            this.grpRules = new GroupBox();
+            this.dgvRules = new DataGridView();
+            this.dgvRulesCol1 = new DataGridViewTextBoxColumn();
+            this.dgvRulesCol2 = new DataGridViewTextBoxColumn();
+            this.dgvRulesCol3 = new DataGridViewTextBoxColumn();
+            this.dgvRulesCol4 = new DataGridViewTextBoxColumn();
+            this.dgvRulesCol5 = new DataGridViewTextBoxColumn();
+            this.dgvRulesCol6 = new DataGridViewTextBoxColumn();
+            this.dgvRulesCol7 = new DataGridViewTextBoxColumn();
+            this.dgvRulesCol8 = new DataGridViewTextBoxColumn();
+            this.grpZones = new GroupBox();
+            this.zoneLayout = new TableLayoutPanel();
+            this.pnlProductZone = new Panel();
+            this.pnlCriticalZone = new Panel();
+            this.lblCriticalZone = new Label();
+            this.pnlNormalZone = new Panel();
+            this.lblNormalZone = new Label();
+            this.lblIgnoreZone = new Label();
+            this.middleLayout = new TableLayoutPanel();
+            this.grpThresholds = new GroupBox();
+            this.dgvThresholds = new DataGridView();
+            this.dgvThresholdsCol1 = new DataGridViewTextBoxColumn();
+            this.dgvThresholdsCol2 = new DataGridViewTextBoxColumn();
+            this.dgvThresholdsCol3 = new DataGridViewTextBoxColumn();
+            this.dgvThresholdsCol4 = new DataGridViewTextBoxColumn();
+            this.dgvThresholdsCol5 = new DataGridViewTextBoxColumn();
+            this.dgvThresholdsCol6 = new DataGridViewTextBoxColumn();
+            this.grpRecipe = new GroupBox();
+            this.recipeLayout = new TableLayoutPanel();
+            this.lblDatasetVersionKey = new Label();
+            this.txtDatasetVersion = new TextBox();
+            this.lblLocalizationVersionKey = new Label();
+            this.txtLocalizationVersion = new TextBox();
+            this.lblModelVersionKey = new Label();
+            this.txtModelVersion = new TextBox();
+            this.lblRuleVersionKey = new Label();
+            this.txtRuleVersion = new TextBox();
+            this.lblCalibrationVersionKey = new Label();
+            this.txtCalibrationVersion = new TextBox();
+            this.lblThresholdVersionKey = new Label();
+            this.txtThresholdVersion = new TextBox();
+            this.lblRecipeNameKey = new Label();
+            this.txtRecipeName = new TextBox();
+            this.grpRecipeVersions = new GroupBox();
+            this.dgvRecipeVersions = new DataGridView();
+            this.dgvRecipeVersionsCol1 = new DataGridViewTextBoxColumn();
+            this.dgvRecipeVersionsCol2 = new DataGridViewTextBoxColumn();
+            this.dgvRecipeVersionsCol3 = new DataGridViewTextBoxColumn();
+            this.dgvRecipeVersionsCol4 = new DataGridViewTextBoxColumn();
+            this.bottomLayout = new TableLayoutPanel();
+            this.grpAcceptance = new GroupBox();
+            this.acceptanceLayout = new TableLayoutPanel();
+            this.lblStrategyKey = new Label();
+            this.cboStrategy = new ComboBox();
+            this.lblFnrTargetKey = new Label();
+            this.txtFnrTarget = new TextBox();
+            this.lblFprTargetKey = new Label();
+            this.txtFprTarget = new TextBox();
+            this.lblCostWeightKey = new Label();
+            this.txtCostWeight = new TextBox();
+            this.grpEstimate = new GroupBox();
+            this.estimateLayout = new TableLayoutPanel();
+            this.lblEstimatedFnrKey = new Label();
+            this.lblEstimatedFnr = new Label();
+            this.lblEstimatedFprKey = new Label();
+            this.lblEstimatedFpr = new Label();
+            this.lblCostKey = new Label();
+            this.lblCost = new Label();
+            this.lblSamplesKey = new Label();
+            this.lblSamples = new Label();
+            ((ISupportInitialize)(this.dgvRules)).BeginInit();
+            ((ISupportInitialize)(this.dgvThresholds)).BeginInit();
+            ((ISupportInitialize)(this.dgvRecipeVersions)).BeginInit();
             this.SuspendLayout();
-            this.AutoScaleDimensions = new SizeF(8F, 15F);
+
+            this.rootLayout.BackColor = Color.FromArgb(247,247,247);
+            this.rootLayout.ColumnCount = 1;
+            this.rootLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100F));
+            this.rootLayout.Dock = DockStyle.Fill;
+            this.rootLayout.RowCount = 3;
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute,295F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Percent,100F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute,175F));
+
+            this.topLayout.ColumnCount = 2;
+            this.topLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,58F));
+            this.topLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,42F));
+            this.topLayout.Dock = DockStyle.Fill;
+            this.grpRules.Dock = DockStyle.Fill;
+            this.grpRules.Text = "质量规则编辑（按缺陷类别）";
+            this.grpRules.Controls.Add(this.dgvRules);
+            this.dgvRules.Dock = DockStyle.Fill;
+            this.dgvRules.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvRules.ReadOnly = true;
+            this.dgvRules.RowHeadersVisible = false;
+            this.dgvRules.Columns.AddRange(new DataGridViewColumn[] { this.dgvRulesCol1, this.dgvRulesCol2, this.dgvRulesCol3, this.dgvRulesCol4, this.dgvRulesCol5, this.dgvRulesCol6, this.dgvRulesCol7, this.dgvRulesCol8 });
+            this.dgvRulesCol1.HeaderText = "缺陷"; this.dgvRulesCol2.HeaderText = "区域"; this.dgvRulesCol3.HeaderText = "Confidence"; this.dgvRulesCol4.HeaderText = "Area(mm²)"; this.dgvRulesCol5.HeaderText = "Length(mm)"; this.dgvRulesCol6.HeaderText = "Width(mm)"; this.dgvRulesCol7.HeaderText = "Count"; this.dgvRulesCol8.HeaderText = "结果";
+            this.grpZones.Dock = DockStyle.Fill;
+            this.grpZones.Text = "检测区域定义";
+            this.grpZones.Controls.Add(this.zoneLayout);
+            this.zoneLayout.ColumnCount = 1;
+            this.zoneLayout.Dock = DockStyle.Fill;
+            this.zoneLayout.RowCount = 2;
+            this.zoneLayout.RowStyles.Add(new RowStyle(SizeType.Percent,88F));
+            this.zoneLayout.RowStyles.Add(new RowStyle(SizeType.Percent,12F));
+            this.pnlProductZone.Dock = DockStyle.Fill;
+            this.pnlProductZone.BackColor = Color.FromArgb(215,215,215);
+            this.pnlProductZone.Controls.Add(this.pnlCriticalZone);
+            this.pnlProductZone.Controls.Add(this.pnlNormalZone);
+            this.pnlCriticalZone.Location = new Point(45,35);
+            this.pnlCriticalZone.Size = new Size(240,130);
+            this.pnlCriticalZone.BorderStyle = BorderStyle.FixedSingle;
+            this.pnlCriticalZone.BackColor = Color.FromArgb(180,180,180);
+            this.pnlCriticalZone.Controls.Add(this.lblCriticalZone);
+            this.lblCriticalZone.Dock = DockStyle.Fill;
+            this.lblCriticalZone.Text = "Critical Zone";
+            this.lblCriticalZone.TextAlign = ContentAlignment.MiddleCenter;
+            this.pnlNormalZone.Location = new Point(325,55);
+            this.pnlNormalZone.Size = new Size(140,90);
+            this.pnlNormalZone.BorderStyle = BorderStyle.FixedSingle;
+            this.pnlNormalZone.BackColor = Color.FromArgb(235,235,235);
+            this.pnlNormalZone.Controls.Add(this.lblNormalZone);
+            this.lblNormalZone.Dock = DockStyle.Fill;
+            this.lblNormalZone.Text = "Normal Zone";
+            this.lblNormalZone.TextAlign = ContentAlignment.MiddleCenter;
+            this.lblIgnoreZone.Text = "Ignore Zone：边缘区域";
+            this.zoneLayout.Controls.Add(this.pnlProductZone,0,0);
+            this.zoneLayout.Controls.Add(this.lblIgnoreZone,0,1);
+            this.topLayout.Controls.Add(this.grpRules,0,0);
+            this.topLayout.Controls.Add(this.grpZones,1,0);
+
+            this.middleLayout.ColumnCount = 3;
+            this.middleLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,38F));
+            this.middleLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,34F));
+            this.middleLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,28F));
+            this.middleLayout.Dock = DockStyle.Fill;
+            this.grpThresholds.Dock = DockStyle.Fill;
+            this.grpThresholds.Text = "分级阈值配置（Critical Zone）";
+            this.grpThresholds.Controls.Add(this.dgvThresholds);
+            this.dgvThresholds.Dock = DockStyle.Fill;
+            this.dgvThresholds.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvThresholds.ReadOnly = true;
+            this.dgvThresholds.RowHeadersVisible = false;
+            this.dgvThresholds.Columns.AddRange(new DataGridViewColumn[] { this.dgvThresholdsCol1, this.dgvThresholdsCol2, this.dgvThresholdsCol3, this.dgvThresholdsCol4, this.dgvThresholdsCol5, this.dgvThresholdsCol6 });
+            this.dgvThresholdsCol1.HeaderText = "缺陷"; this.dgvThresholdsCol2.HeaderText = "Confidence"; this.dgvThresholdsCol3.HeaderText = "Area"; this.dgvThresholdsCol4.HeaderText = "Length"; this.dgvThresholdsCol5.HeaderText = "Width"; this.dgvThresholdsCol6.HeaderText = "Count";
+
+            this.grpRecipe.Dock = DockStyle.Fill;
+            this.grpRecipe.Text = "检测配方（Recipe）组成";
+            this.grpRecipe.Controls.Add(this.recipeLayout);
+            this.recipeLayout.ColumnCount = 2;
+            this.recipeLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,42F));
+            this.recipeLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,58F));
+            this.recipeLayout.Dock = DockStyle.Fill;
+            this.recipeLayout.RowCount = 7;
+            this.lblDatasetVersionKey.Text = "DatasetVersion"; this.txtDatasetVersion.Text = "DSV_2025-05-10_v1.2.0";
+            this.lblLocalizationVersionKey.Text = "LocalizationTemplate"; this.txtLocalizationVersion.Text = "LT_2025-05-06_v2.0.1";
+            this.lblModelVersionKey.Text = "ModelVersion"; this.txtModelVersion.Text = "MV_2025-05-14_v1.3.0";
+            this.lblRuleVersionKey.Text = "RuleVersion"; this.txtRuleVersion.Text = "RV_2025-05-16_v1.1.0";
+            this.lblCalibrationVersionKey.Text = "CalibrationVersion"; this.txtCalibrationVersion.Text = "CV_2025-05-01_v1.0.2";
+            this.lblThresholdVersionKey.Text = "ThresholdVersion"; this.txtThresholdVersion.Text = "TV_2025-05-16_v1.0.0";
+            this.lblRecipeNameKey.Text = "Recipe名称"; this.txtRecipeName.Text = "Recipe_2025-05-16_001";
+            this.recipeLayout.Controls.Add(this.lblDatasetVersionKey,0,0); this.recipeLayout.Controls.Add(this.txtDatasetVersion,1,0);
+            this.recipeLayout.Controls.Add(this.lblLocalizationVersionKey,0,1); this.recipeLayout.Controls.Add(this.txtLocalizationVersion,1,1);
+            this.recipeLayout.Controls.Add(this.lblModelVersionKey,0,2); this.recipeLayout.Controls.Add(this.txtModelVersion,1,2);
+            this.recipeLayout.Controls.Add(this.lblRuleVersionKey,0,3); this.recipeLayout.Controls.Add(this.txtRuleVersion,1,3);
+            this.recipeLayout.Controls.Add(this.lblCalibrationVersionKey,0,4); this.recipeLayout.Controls.Add(this.txtCalibrationVersion,1,4);
+            this.recipeLayout.Controls.Add(this.lblThresholdVersionKey,0,5); this.recipeLayout.Controls.Add(this.txtThresholdVersion,1,5);
+            this.recipeLayout.Controls.Add(this.lblRecipeNameKey,0,6); this.recipeLayout.Controls.Add(this.txtRecipeName,1,6);
+
+            this.grpRecipeVersions.Dock = DockStyle.Fill;
+            this.grpRecipeVersions.Text = "Inspection Recipe 版本";
+            this.grpRecipeVersions.Controls.Add(this.dgvRecipeVersions);
+            this.dgvRecipeVersions.Dock = DockStyle.Fill;
+            this.dgvRecipeVersions.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvRecipeVersions.ReadOnly = true;
+            this.dgvRecipeVersions.RowHeadersVisible = false;
+            this.dgvRecipeVersions.Columns.AddRange(new DataGridViewColumn[] { this.dgvRecipeVersionsCol1, this.dgvRecipeVersionsCol2, this.dgvRecipeVersionsCol3, this.dgvRecipeVersionsCol4 });
+            this.dgvRecipeVersionsCol1.HeaderText = "版本"; this.dgvRecipeVersionsCol2.HeaderText = "状态"; this.dgvRecipeVersionsCol3.HeaderText = "创建时间"; this.dgvRecipeVersionsCol4.HeaderText = "创建人";
+            this.middleLayout.Controls.Add(this.grpThresholds,0,0);
+            this.middleLayout.Controls.Add(this.grpRecipe,1,0);
+            this.middleLayout.Controls.Add(this.grpRecipeVersions,2,0);
+
+            this.bottomLayout.ColumnCount = 2;
+            this.bottomLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,58F));
+            this.bottomLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,42F));
+            this.bottomLayout.Dock = DockStyle.Fill;
+            this.grpAcceptance.Dock = DockStyle.Fill;
+            this.grpAcceptance.Text = "接受策略（Acceptance Strategy）";
+            this.grpAcceptance.Controls.Add(this.acceptanceLayout);
+            this.acceptanceLayout.ColumnCount = 2;
+            this.acceptanceLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,38F));
+            this.acceptanceLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,62F));
+            this.acceptanceLayout.Dock = DockStyle.Fill;
+            this.acceptanceLayout.RowCount = 4;
+            this.lblStrategyKey.Text = "当前策略";
+            this.cboStrategy.Items.AddRange(new object[] { "漏检优先", "均衡", "误检优先", "自定义" });
+            this.cboStrategy.SelectedIndex = 1;
+            this.lblFnrTargetKey.Text = "目标漏检率(FNR)"; this.txtFnrTarget.Text = "≤ 2.00%";
+            this.lblFprTargetKey.Text = "目标误检率(FPR)"; this.txtFprTarget.Text = "≤ 5.00%";
+            this.lblCostWeightKey.Text = "代价权重"; this.txtCostWeight.Text = "漏检 3 : 误检 1";
+            this.acceptanceLayout.Controls.Add(this.lblStrategyKey,0,0); this.acceptanceLayout.Controls.Add(this.cboStrategy,1,0);
+            this.acceptanceLayout.Controls.Add(this.lblFnrTargetKey,0,1); this.acceptanceLayout.Controls.Add(this.txtFnrTarget,1,1);
+            this.acceptanceLayout.Controls.Add(this.lblFprTargetKey,0,2); this.acceptanceLayout.Controls.Add(this.txtFprTarget,1,2);
+            this.acceptanceLayout.Controls.Add(this.lblCostWeightKey,0,3); this.acceptanceLayout.Controls.Add(this.txtCostWeight,1,3);
+            this.grpEstimate.Dock = DockStyle.Fill;
+            this.grpEstimate.Text = "策略预估（验证集）";
+            this.grpEstimate.Controls.Add(this.estimateLayout);
+            this.estimateLayout.ColumnCount = 2;
+            this.estimateLayout.Dock = DockStyle.Fill;
+            this.estimateLayout.RowCount = 4;
+            this.lblEstimatedFnrKey.Text = "预计FNR"; this.lblEstimatedFnr.Text = "1.68% / 达标";
+            this.lblEstimatedFprKey.Text = "预计FPR"; this.lblEstimatedFpr.Text = "3.72% / 达标";
+            this.lblCostKey.Text = "综合代价"; this.lblCost.Text = "0.86 / 较优";
+            this.lblSamplesKey.Text = "评估样本"; this.lblSamples.Text = "18,732";
+            this.estimateLayout.Controls.Add(this.lblEstimatedFnrKey,0,0); this.estimateLayout.Controls.Add(this.lblEstimatedFnr,1,0);
+            this.estimateLayout.Controls.Add(this.lblEstimatedFprKey,0,1); this.estimateLayout.Controls.Add(this.lblEstimatedFpr,1,1);
+            this.estimateLayout.Controls.Add(this.lblCostKey,0,2); this.estimateLayout.Controls.Add(this.lblCost,1,2);
+            this.estimateLayout.Controls.Add(this.lblSamplesKey,0,3); this.estimateLayout.Controls.Add(this.lblSamples,1,3);
+            this.bottomLayout.Controls.Add(this.grpAcceptance,0,0);
+            this.bottomLayout.Controls.Add(this.grpEstimate,1,0);
+
+            this.rootLayout.Controls.Add(this.topLayout,0,0);
+            this.rootLayout.Controls.Add(this.middleLayout,0,1);
+            this.rootLayout.Controls.Add(this.bottomLayout,0,2);
+            this.AutoScaleDimensions = new SizeF(8F,15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.BackColor = Color.FromArgb(247, 247, 247);
+            this.BackColor = Color.FromArgb(247,247,247);
+            this.Controls.Add(this.rootLayout);
             this.Name = "RulesRecipePage";
-            this.Size = new Size(1400, 820);
+            this.Padding = new Padding(14,14,4,10);
+            this.Size = new Size(1400,820);
+            ((ISupportInitialize)(this.dgvRules)).EndInit();
+            ((ISupportInitialize)(this.dgvThresholds)).EndInit();
+            ((ISupportInitialize)(this.dgvRecipeVersions)).EndInit();
             this.ResumeLayout(false);
-        }
-
-        private void BuildView()
-        {
-            this.SuspendLayout();
-            this.Controls.Clear();
-            this.Dock = DockStyle.Fill;
-            this.BackColor = UiTheme.Page;
-            this.Padding = new Padding(14, 14, 4, 10);
-
-            TableLayoutPanel root = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 3,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 290F));
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 165F));
-            root.Controls.Add(BuildTop(), 0, 0);
-            root.Controls.Add(BuildMiddle(), 0, 1);
-            root.Controls.Add(BuildBottom(), 0, 2);
-
-            this.Controls.Add(root);
-            this.ResumeLayout(true);
-        }
-
-        private Control BuildTop()
-        {
-            TableLayoutPanel top = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 2,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            top.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 58F));
-            top.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 42F));
-
-            string[][] rules =
-            {
-                new[] { "划痕", "全局", "≥0.90", "≥8.00", "≥3.00", "≥0.20", "≤0", "NG" },
-                new[] { "刮伤", "全局", "≥0.85", "≥5.00", "≥2.00", "≥0.20", "≤1", "NG" },
-                new[] { "凹坑", "全局", "≥0.90", "≥4.00", "≥1.50", "≥0.20", "≤2", "NG" },
-                new[] { "脏污", "全局", "≥0.80", "≥12.00", "≥4.00", "≥0.20", "≤2", "NG" },
-                new[] { "气泡", "全局", "≥0.85", "≥2.00", "≥1.00", "≥0.20", "≤5", "NG" },
-                new[] { "缺角", "全局", "≥0.90", "≥6.00", "≥2.00", "≥0.20", "≤1", "NG" }
-            };
-            ruleGrid = UiFactory.Grid(new[] { "缺陷", "区域", "Confidence", "Area(mm²)", "Length(mm)", "Width(mm)", "Count", "结果" }, rules);
-            top.Controls.Add(UiFactory.Card("质量规则编辑（按缺陷类别）", ruleGrid), 0, 0);
-
-            zoneCanvas = new Panel
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(205, 205, 205),
-                Margin = new Padding(12)
-            };
-            zoneCanvas.Paint += PaintZones;
-            top.Controls.Add(UiFactory.Card("检测区域定义", zoneCanvas), 1, 0);
-            return top;
-        }
-
-        private void PaintZones(object sender, PaintEventArgs e)
-        {
-            Panel panel = sender as Panel;
-            if (panel == null) return;
-            Rectangle all = new Rectangle(35, 25, Math.Max(80, panel.Width - 70), Math.Max(80, panel.Height - 60));
-            using (Pen p = new Pen(Color.Black, 2)) e.Graphics.DrawRectangle(p, all);
-
-            Rectangle critical = new Rectangle(all.X + 55, all.Y + 30, Math.Max(60, all.Width / 2), Math.Max(40, all.Height - 60));
-            using (Pen p = new Pen(Color.FromArgb(70, 70, 70), 3)) e.Graphics.DrawRectangle(p, critical);
-
-            Rectangle normal = new Rectangle(all.Right - all.Width / 4 - 20, all.Y + 30, Math.Max(40, all.Width / 5), Math.Max(40, all.Height - 60));
-            using (Pen p = new Pen(Color.FromArgb(125, 125, 125), 2)) e.Graphics.DrawRectangle(p, normal);
-
-            e.Graphics.DrawString("Critical Zone", UiTheme.Font(9F, true), Brushes.Black, critical.X + 8, critical.Y + 8);
-            e.Graphics.DrawString("Normal Zone", UiTheme.Font(9F, true), Brushes.Black, normal.X + 5, normal.Y + 8);
-            e.Graphics.DrawString("Ignore Zone: 边缘区域", UiTheme.Font(8F, false), Brushes.Black, all.X + 5, all.Bottom + 8);
-        }
-
-        private Control BuildMiddle()
-        {
-            TableLayoutPanel middle = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 3,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            middle.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 38F));
-            middle.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 34F));
-            middle.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 28F));
-
-            middle.Controls.Add(UiFactory.Card("分级阈值配置（Critical Zone）", UiFactory.Grid(
-                new[] { "缺陷", "Confidence", "Area", "Length", "Width", "Count" },
-                new[] {
-                    new[] { "划痕", "≥0.95", "≥10", "≥4", "≥0.20", "≤0" },
-                    new[] { "刮伤", "≥0.90", "≥6", "≥2.5", "≥0.20", "≤1" },
-                    new[] { "凹坑", "≥0.95", "≥5", "≥2", "≥0.20", "≤2" },
-                    new[] { "脏污", "≥0.85", "≥15", "≥5", "≥0.20", "≤2" }
-                })), 0, 0);
-
-            middle.Controls.Add(UiFactory.Card("检测配方（Recipe）组成", UiFactory.KeyValues(new[,] {
-                { "DatasetVersion：", "DSV_2025-05-10_v1.2.0" },
-                { "LocalizationTemplate：", "LT_2025-05-06_v2.0.1" },
-                { "ModelVersion：", "MV_2025-05-14_v1.3.0" },
-                { "RuleVersion：", "RV_2025-05-16_v1.1.0" },
-                { "CalibrationVersion：", "CV_2025-05-01_v1.0.2" },
-                { "ThresholdVersion：", "TV_2025-05-16_v1.0.0" },
-                { "Recipe名称：", "Recipe_2025-05-16_001" }
-            }, 42)), 1, 0);
-
-            middle.Controls.Add(UiFactory.Card("Inspection Recipe 版本", UiFactory.Grid(
-                new[] { "版本", "状态", "创建时间", "创建人" },
-                new[] {
-                    new[] { "1.0.0", "当前", "05-16 14:35", "Admin" },
-                    new[] { "0.9.2", "已发布", "05-14 10:21", "Admin" },
-                    new[] { "0.9.1", "已发布", "05-12 16:42", "Admin" },
-                    new[] { "0.9.0", "已发布", "05-10 11:07", "Admin" }
-                })), 2, 0);
-            return middle;
-        }
-
-        private Control BuildBottom()
-        {
-            TableLayoutPanel bottom = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 2,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            bottom.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 58F));
-            bottom.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 42F));
-
-            bottom.Controls.Add(UiFactory.Card("接受策略（Acceptance Strategy）", UiFactory.KeyValues(new[,] {
-                { "当前策略：", "均衡" }, { "目标漏检率(FNR)：", "≤ 2.00%" }, { "目标误检率(FPR)：", "≤ 5.00%" }, { "代价权重：", "漏检 3 : 误检 1" }
-            }, 38)), 0, 0);
-
-            bottom.Controls.Add(UiFactory.Card("策略预估（验证集）", UiFactory.KeyValues(new[,] {
-                { "预计FNR：", "1.68% / 达标" }, { "预计FPR：", "3.72% / 达标" }, { "综合代价：", "0.86 / 较优" }, { "评估样本：", "18,732" }
-            }, 40)), 1, 0);
-            return bottom;
         }
     }
 }
