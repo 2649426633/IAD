@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using IAD.Security;
 using IAD.Shell;
 
 namespace IAD
@@ -20,7 +21,17 @@ namespace IAD
                 }
             }
 
-            Application.Run(new MainForm());
+            using (MainForm mainForm = new MainForm())
+            {
+                if (!mainForm.ApplyAuthenticatedSession())
+                {
+                    return;
+                }
+
+                Application.Run(mainForm);
+            }
+
+            AppSession.SignOut();
         }
     }
 }
