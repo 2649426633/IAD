@@ -1,17 +1,67 @@
-using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using IAD.UI;
 
 namespace IAD.Pages
 {
-    public partial class TemplateRecognitionPage
+    partial class TemplateRecognitionPage
     {
         private IContainer components = null;
-        private DataGridView candidateGrid;
-        private Panel queryCanvas;
-        private Panel heatmapCanvas;
+        private TableLayoutPanel rootLayout;
+        private GroupBox grpFewShot;
+        private TableLayoutPanel fewShotLayout;
+        private Label lblDefectClassKey;
+        private ComboBox cboDefectClass;
+        private Label lblPositiveKey;
+        private Label lblPositiveCount;
+        private Label lblHardNegativeKey;
+        private Label lblHardNegativeCount;
+        private Label lblSimilarityKey;
+        private NumericUpDown numSimilarity;
+        private Label lblTopKKey;
+        private NumericUpDown numTopK;
+        private TableLayoutPanel bodyLayout;
+        private TableLayoutPanel leftLayout;
+        private GroupBox grpPositive;
+        private DataGridView dgvPositive;
+        private DataGridViewTextBoxColumn dgvPositiveCol1;
+        private DataGridViewTextBoxColumn dgvPositiveCol2;
+        private GroupBox grpHardNegative;
+        private DataGridView dgvHardNegative;
+        private DataGridViewTextBoxColumn dgvHardNegativeCol1;
+        private DataGridViewTextBoxColumn dgvHardNegativeCol2;
+        private DataGridViewTextBoxColumn dgvHardNegativeCol3;
+        private TableLayoutPanel centerLayout;
+        private TableLayoutPanel analysisLayout;
+        private GroupBox grpQuery;
+        private Panel pnlQuery;
+        private Label lblQuery;
+        private GroupBox grpHeatmap;
+        private Panel pnlHeatmap;
+        private Label lblHeatmap;
+        private GroupBox grpCandidates;
+        private DataGridView dgvCandidates;
+        private DataGridViewTextBoxColumn dgvCandidatesCol1;
+        private DataGridViewTextBoxColumn dgvCandidatesCol2;
+        private DataGridViewTextBoxColumn dgvCandidatesCol3;
+        private DataGridViewTextBoxColumn dgvCandidatesCol4;
+        private TableLayoutPanel rightLayout;
+        private GroupBox grpCandidateList;
+        private DataGridView dgvCandidateList;
+        private DataGridViewTextBoxColumn dgvCandidateListCol1;
+        private DataGridViewTextBoxColumn dgvCandidateListCol2;
+        private DataGridViewTextBoxColumn dgvCandidateListCol3;
+        private DataGridViewTextBoxColumn dgvCandidateListCol4;
+        private GroupBox grpCandidateActions;
+        private FlowLayoutPanel actionPanel;
+        private Button btnMaskRefine;
+        private Button btnConfirm;
+        private Button btnReject;
+        private Button btnAddHardNegative;
+        private GroupBox grpLoop;
+        private TableLayoutPanel loopLayout;
+        private Label lblLoopSteps;
+        private Label lblLoopSummary;
 
         protected override void Dispose(bool disposing)
         {
@@ -22,187 +72,259 @@ namespace IAD.Pages
         private void InitializeComponent()
         {
             this.components = new Container();
+            this.rootLayout = new TableLayoutPanel();
+            this.grpFewShot = new GroupBox();
+            this.fewShotLayout = new TableLayoutPanel();
+            this.lblDefectClassKey = new Label();
+            this.cboDefectClass = new ComboBox();
+            this.lblPositiveKey = new Label();
+            this.lblPositiveCount = new Label();
+            this.lblHardNegativeKey = new Label();
+            this.lblHardNegativeCount = new Label();
+            this.lblSimilarityKey = new Label();
+            this.numSimilarity = new NumericUpDown();
+            this.lblTopKKey = new Label();
+            this.numTopK = new NumericUpDown();
+            this.bodyLayout = new TableLayoutPanel();
+            this.leftLayout = new TableLayoutPanel();
+            this.grpPositive = new GroupBox();
+            this.dgvPositive = new DataGridView();
+            this.dgvPositiveCol1 = new DataGridViewTextBoxColumn();
+            this.dgvPositiveCol2 = new DataGridViewTextBoxColumn();
+            this.grpHardNegative = new GroupBox();
+            this.dgvHardNegative = new DataGridView();
+            this.dgvHardNegativeCol1 = new DataGridViewTextBoxColumn();
+            this.dgvHardNegativeCol2 = new DataGridViewTextBoxColumn();
+            this.dgvHardNegativeCol3 = new DataGridViewTextBoxColumn();
+            this.centerLayout = new TableLayoutPanel();
+            this.analysisLayout = new TableLayoutPanel();
+            this.grpQuery = new GroupBox();
+            this.pnlQuery = new Panel();
+            this.lblQuery = new Label();
+            this.grpHeatmap = new GroupBox();
+            this.pnlHeatmap = new Panel();
+            this.lblHeatmap = new Label();
+            this.grpCandidates = new GroupBox();
+            this.dgvCandidates = new DataGridView();
+            this.dgvCandidatesCol1 = new DataGridViewTextBoxColumn();
+            this.dgvCandidatesCol2 = new DataGridViewTextBoxColumn();
+            this.dgvCandidatesCol3 = new DataGridViewTextBoxColumn();
+            this.dgvCandidatesCol4 = new DataGridViewTextBoxColumn();
+            this.rightLayout = new TableLayoutPanel();
+            this.grpCandidateList = new GroupBox();
+            this.dgvCandidateList = new DataGridView();
+            this.dgvCandidateListCol1 = new DataGridViewTextBoxColumn();
+            this.dgvCandidateListCol2 = new DataGridViewTextBoxColumn();
+            this.dgvCandidateListCol3 = new DataGridViewTextBoxColumn();
+            this.dgvCandidateListCol4 = new DataGridViewTextBoxColumn();
+            this.grpCandidateActions = new GroupBox();
+            this.actionPanel = new FlowLayoutPanel();
+            this.btnMaskRefine = new Button();
+            this.btnConfirm = new Button();
+            this.btnReject = new Button();
+            this.btnAddHardNegative = new Button();
+            this.grpLoop = new GroupBox();
+            this.loopLayout = new TableLayoutPanel();
+            this.lblLoopSteps = new Label();
+            this.lblLoopSummary = new Label();
+            ((ISupportInitialize)(this.numSimilarity)).BeginInit();
+            ((ISupportInitialize)(this.numTopK)).BeginInit();
+            ((ISupportInitialize)(this.dgvPositive)).BeginInit();
+            ((ISupportInitialize)(this.dgvHardNegative)).BeginInit();
+            ((ISupportInitialize)(this.dgvCandidates)).BeginInit();
+            ((ISupportInitialize)(this.dgvCandidateList)).BeginInit();
             this.SuspendLayout();
-            this.AutoScaleDimensions = new SizeF(8F, 15F);
+
+            this.rootLayout.BackColor = Color.FromArgb(247,247,247);
+            this.rootLayout.ColumnCount = 1;
+            this.rootLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100F));
+            this.rootLayout.Dock = DockStyle.Fill;
+            this.rootLayout.RowCount = 3;
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute,84F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Percent,100F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute,110F));
+
+            this.grpFewShot.Dock = DockStyle.Fill;
+            this.grpFewShot.Text = "Few-shot 控制";
+            this.grpFewShot.Controls.Add(this.fewShotLayout);
+            this.fewShotLayout.ColumnCount = 10;
+            this.fewShotLayout.Dock = DockStyle.Fill;
+            this.fewShotLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,90F));
+            this.fewShotLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,25F));
+            this.fewShotLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,75F));
+            this.fewShotLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,70F));
+            this.fewShotLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,105F));
+            this.fewShotLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,70F));
+            this.fewShotLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,95F));
+            this.fewShotLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,110F));
+            this.fewShotLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,55F));
+            this.fewShotLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,80F));
+            this.lblDefectClassKey.Text = "瑕疵类别";
+            this.cboDefectClass.Items.AddRange(new object[] { "划痕 Scratches", "脏污 Stain", "凹坑 Pit" });
+            this.cboDefectClass.SelectedIndex = 0;
+            this.lblPositiveKey.Text = "正样本";
+            this.lblPositiveCount.Text = "32";
+            this.lblHardNegativeKey.Text = "Hard Negative";
+            this.lblHardNegativeCount.Text = "128";
+            this.lblSimilarityKey.Text = "相似度阈值";
+            this.numSimilarity.DecimalPlaces = 2;
+            this.numSimilarity.Maximum = 1;
+            this.numSimilarity.Value = 0.72M;
+            this.lblTopKKey.Text = "Top-K";
+            this.numTopK.Minimum = 1;
+            this.numTopK.Maximum = 100;
+            this.numTopK.Value = 10;
+            this.fewShotLayout.Controls.Add(this.lblDefectClassKey,0,0);
+            this.fewShotLayout.Controls.Add(this.cboDefectClass,1,0);
+            this.fewShotLayout.Controls.Add(this.lblPositiveKey,2,0);
+            this.fewShotLayout.Controls.Add(this.lblPositiveCount,3,0);
+            this.fewShotLayout.Controls.Add(this.lblHardNegativeKey,4,0);
+            this.fewShotLayout.Controls.Add(this.lblHardNegativeCount,5,0);
+            this.fewShotLayout.Controls.Add(this.lblSimilarityKey,6,0);
+            this.fewShotLayout.Controls.Add(this.numSimilarity,7,0);
+            this.fewShotLayout.Controls.Add(this.lblTopKKey,8,0);
+            this.fewShotLayout.Controls.Add(this.numTopK,9,0);
+
+            this.bodyLayout.ColumnCount = 3;
+            this.bodyLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,275F));
+            this.bodyLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100F));
+            this.bodyLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,325F));
+            this.bodyLayout.Dock = DockStyle.Fill;
+            this.leftLayout.ColumnCount = 1;
+            this.leftLayout.Dock = DockStyle.Fill;
+            this.leftLayout.RowCount = 2;
+            this.leftLayout.RowStyles.Add(new RowStyle(SizeType.Percent,48F));
+            this.leftLayout.RowStyles.Add(new RowStyle(SizeType.Percent,52F));
+            this.grpPositive.Dock = DockStyle.Fill;
+            this.grpPositive.Text = "原型样本（正样本）";
+            this.grpPositive.Controls.Add(this.dgvPositive);
+            this.dgvPositive.Dock = DockStyle.Fill;
+            this.dgvPositive.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvPositive.ReadOnly = true;
+            this.dgvPositive.RowHeadersVisible = false;
+            this.dgvPositive.Columns.AddRange(new DataGridViewColumn[] { this.dgvPositiveCol1, this.dgvPositiveCol2 });
+            this.dgvPositiveCol1.HeaderText = "ID"; this.dgvPositiveCol2.HeaderText = "相似度";
+            this.grpHardNegative.Dock = DockStyle.Fill;
+            this.grpHardNegative.Text = "Hard Negative";
+            this.grpHardNegative.Controls.Add(this.dgvHardNegative);
+            this.dgvHardNegative.Dock = DockStyle.Fill;
+            this.dgvHardNegative.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvHardNegative.ReadOnly = true;
+            this.dgvHardNegative.RowHeadersVisible = false;
+            this.dgvHardNegative.Columns.AddRange(new DataGridViewColumn[] { this.dgvHardNegativeCol1, this.dgvHardNegativeCol2, this.dgvHardNegativeCol3 });
+            this.dgvHardNegativeCol1.HeaderText = "ID"; this.dgvHardNegativeCol2.HeaderText = "来源"; this.dgvHardNegativeCol3.HeaderText = "相似度";
+            this.leftLayout.Controls.Add(this.grpPositive,0,0);
+            this.leftLayout.Controls.Add(this.grpHardNegative,0,1);
+
+            this.centerLayout.ColumnCount = 1;
+            this.centerLayout.Dock = DockStyle.Fill;
+            this.centerLayout.RowCount = 2;
+            this.centerLayout.RowStyles.Add(new RowStyle(SizeType.Absolute,245F));
+            this.centerLayout.RowStyles.Add(new RowStyle(SizeType.Percent,100F));
+            this.analysisLayout.ColumnCount = 2;
+            this.analysisLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,50F));
+            this.analysisLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,50F));
+            this.analysisLayout.Dock = DockStyle.Fill;
+            this.grpQuery.Dock = DockStyle.Fill;
+            this.grpQuery.Text = "查询瑕疵（待标注）";
+            this.grpQuery.Controls.Add(this.pnlQuery);
+            this.pnlQuery.Dock = DockStyle.Fill;
+            this.pnlQuery.BackColor = Color.FromArgb(190,190,190);
+            this.pnlQuery.Controls.Add(this.lblQuery);
+            this.lblQuery.Dock = DockStyle.Fill;
+            this.lblQuery.Text = "查询瑕疵图像预览";
+            this.lblQuery.TextAlign = ContentAlignment.MiddleCenter;
+            this.grpHeatmap.Dock = DockStyle.Fill;
+            this.grpHeatmap.Text = "相似度热力图";
+            this.grpHeatmap.Controls.Add(this.pnlHeatmap);
+            this.pnlHeatmap.Dock = DockStyle.Fill;
+            this.pnlHeatmap.BackColor = Color.FromArgb(155,155,155);
+            this.pnlHeatmap.Controls.Add(this.lblHeatmap);
+            this.lblHeatmap.Dock = DockStyle.Fill;
+            this.lblHeatmap.Text = "Similarity Heatmap";
+            this.lblHeatmap.TextAlign = ContentAlignment.MiddleCenter;
+            this.analysisLayout.Controls.Add(this.grpQuery,0,0);
+            this.analysisLayout.Controls.Add(this.grpHeatmap,1,0);
+            this.grpCandidates.Dock = DockStyle.Fill;
+            this.grpCandidates.Text = "候选区域（Top-K）";
+            this.grpCandidates.Controls.Add(this.dgvCandidates);
+            this.dgvCandidates.Dock = DockStyle.Fill;
+            this.dgvCandidates.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvCandidates.ReadOnly = true;
+            this.dgvCandidates.RowHeadersVisible = false;
+            this.dgvCandidates.Columns.AddRange(new DataGridViewColumn[] { this.dgvCandidatesCol1, this.dgvCandidatesCol2, this.dgvCandidatesCol3, this.dgvCandidatesCol4 });
+            this.dgvCandidatesCol1.HeaderText = "排名"; this.dgvCandidatesCol2.HeaderText = "相似度"; this.dgvCandidatesCol3.HeaderText = "来源图像"; this.dgvCandidatesCol4.HeaderText = "状态";
+            this.centerLayout.Controls.Add(this.analysisLayout,0,0);
+            this.centerLayout.Controls.Add(this.grpCandidates,0,1);
+
+            this.rightLayout.ColumnCount = 1;
+            this.rightLayout.Dock = DockStyle.Fill;
+            this.rightLayout.RowCount = 2;
+            this.rightLayout.RowStyles.Add(new RowStyle(SizeType.Percent,68F));
+            this.rightLayout.RowStyles.Add(new RowStyle(SizeType.Percent,32F));
+            this.grpCandidateList.Dock = DockStyle.Fill;
+            this.grpCandidateList.Text = "候选列表";
+            this.grpCandidateList.Controls.Add(this.dgvCandidateList);
+            this.dgvCandidateList.Dock = DockStyle.Fill;
+            this.dgvCandidateList.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvCandidateList.ReadOnly = true;
+            this.dgvCandidateList.RowHeadersVisible = false;
+            this.dgvCandidateList.Columns.AddRange(new DataGridViewColumn[] { this.dgvCandidateListCol1, this.dgvCandidateListCol2, this.dgvCandidateListCol3, this.dgvCandidateListCol4 });
+            this.dgvCandidateListCol1.HeaderText = "排名"; this.dgvCandidateListCol2.HeaderText = "相似度"; this.dgvCandidateListCol3.HeaderText = "来源"; this.dgvCandidateListCol4.HeaderText = "状态";
+            this.grpCandidateActions.Dock = DockStyle.Fill;
+            this.grpCandidateActions.Text = "候选处理";
+            this.grpCandidateActions.Controls.Add(this.actionPanel);
+            this.actionPanel.Dock = DockStyle.Fill;
+            this.actionPanel.FlowDirection = FlowDirection.TopDown;
+            this.actionPanel.WrapContents = false;
+            this.btnMaskRefine.Text = "AI Mask精修";
+            this.btnConfirm.Text = "人工确认";
+            this.btnReject.Text = "人工拒绝";
+            this.btnAddHardNegative.Text = "加入Hard Negative";
+            this.actionPanel.Controls.Add(this.btnMaskRefine);
+            this.actionPanel.Controls.Add(this.btnConfirm);
+            this.actionPanel.Controls.Add(this.btnReject);
+            this.actionPanel.Controls.Add(this.btnAddHardNegative);
+            this.rightLayout.Controls.Add(this.grpCandidateList,0,0);
+            this.rightLayout.Controls.Add(this.grpCandidateActions,0,1);
+            this.bodyLayout.Controls.Add(this.leftLayout,0,0);
+            this.bodyLayout.Controls.Add(this.centerLayout,1,0);
+            this.bodyLayout.Controls.Add(this.rightLayout,2,0);
+
+            this.grpLoop.Dock = DockStyle.Fill;
+            this.grpLoop.Text = "学习循环进度";
+            this.grpLoop.Controls.Add(this.loopLayout);
+            this.loopLayout.ColumnCount = 1;
+            this.loopLayout.Dock = DockStyle.Fill;
+            this.loopLayout.RowCount = 2;
+            this.loopLayout.RowStyles.Add(new RowStyle(SizeType.Percent,60F));
+            this.loopLayout.RowStyles.Add(new RowStyle(SizeType.Percent,40F));
+            this.lblLoopSteps.Dock = DockStyle.Fill;
+            this.lblLoopSteps.Text = "1 人工标注    →    2 相似搜索    →    3 候选生成    →    4 Mask Refinement    →    5 人工确认";
+            this.lblLoopSteps.TextAlign = ContentAlignment.MiddleCenter;
+            this.lblLoopSummary.Dock = DockStyle.Fill;
+            this.lblLoopSummary.Text = "本轮：已确认 126  /  已拒绝 34  /  待处理 28";
+            this.lblLoopSummary.TextAlign = ContentAlignment.MiddleCenter;
+            this.loopLayout.Controls.Add(this.lblLoopSteps,0,0);
+            this.loopLayout.Controls.Add(this.lblLoopSummary,0,1);
+
+            this.rootLayout.Controls.Add(this.grpFewShot,0,0);
+            this.rootLayout.Controls.Add(this.bodyLayout,0,1);
+            this.rootLayout.Controls.Add(this.grpLoop,0,2);
+            this.AutoScaleDimensions = new SizeF(8F,15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.BackColor = Color.FromArgb(247, 247, 247);
+            this.BackColor = Color.FromArgb(247,247,247);
+            this.Controls.Add(this.rootLayout);
             this.Name = "TemplateRecognitionPage";
-            this.Size = new Size(1400, 820);
+            this.Padding = new Padding(14,10,4,10);
+            this.Size = new Size(1400,820);
+            ((ISupportInitialize)(this.numSimilarity)).EndInit();
+            ((ISupportInitialize)(this.numTopK)).EndInit();
+            ((ISupportInitialize)(this.dgvPositive)).EndInit();
+            ((ISupportInitialize)(this.dgvHardNegative)).EndInit();
+            ((ISupportInitialize)(this.dgvCandidates)).EndInit();
+            ((ISupportInitialize)(this.dgvCandidateList)).EndInit();
             this.ResumeLayout(false);
-        }
-
-        private void BuildView()
-        {
-            this.SuspendLayout();
-            this.Controls.Clear();
-            this.Dock = DockStyle.Fill;
-            this.BackColor = UiTheme.Page;
-            this.Padding = new Padding(14, 10, 4, 10);
-
-            TableLayoutPanel root = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 3,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 70F));
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 105F));
-
-            root.Controls.Add(UiFactory.Card("Few-shot 控制", UiFactory.KeyValues(new[,] {
-                { "瑕疵类别：", "划痕 Scratches" }, { "正样本：", "32" }, { "Hard Negative：", "128" }, { "相似度阈值：", "0.72" }, { "Top-K：", "10" }
-            }, 36)), 0, 0);
-            root.Controls.Add(BuildBody(), 0, 1);
-            root.Controls.Add(UiFactory.Card("学习循环进度  |  本轮：已确认126 / 已拒绝34 / 待处理28", BuildLoop()), 0, 2);
-
-            this.Controls.Add(root);
-            this.ResumeLayout(true);
-        }
-
-        private Control BuildBody()
-        {
-            TableLayoutPanel body = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 3,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            body.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 270F));
-            body.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            body.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 320F));
-
-            body.Controls.Add(BuildSamplePanel(), 0, 0);
-            body.Controls.Add(BuildCenterPanel(), 1, 0);
-            body.Controls.Add(BuildCandidatePanel(), 2, 0);
-            return body;
-        }
-
-        private Control BuildSamplePanel()
-        {
-            TableLayoutPanel left = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 2,
-                BackColor = UiTheme.Page
-            };
-            left.RowStyles.Add(new RowStyle(SizeType.Percent, 48F));
-            left.RowStyles.Add(new RowStyle(SizeType.Percent, 52F));
-
-            string[][] samples = {
-                new[] { "P-0001", "0.96" }, new[] { "P-0002", "0.94" }, new[] { "P-0003", "0.93" }, new[] { "P-0004", "0.91" }, new[] { "P-0005", "0.90" }
-            };
-            string[][] hardNegatives = {
-                new[] { "HN-0128", "IMG_142310", "0.68" }, new[] { "HN-0127", "IMG_143105", "0.66" }, new[] { "HN-0126", "IMG_142856", "0.65" }, new[] { "HN-0125", "IMG_142725", "0.64" }
-            };
-            left.Controls.Add(UiFactory.Card("原型样本（正样本）", UiFactory.Grid(new[] { "ID", "相似度" }, samples)), 0, 0);
-            left.Controls.Add(UiFactory.Card("Hard Negative", UiFactory.Grid(new[] { "ID", "来源", "相似度" }, hardNegatives)), 0, 1);
-            return left;
-        }
-
-        private Control BuildCenterPanel()
-        {
-            TableLayoutPanel center = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 2,
-                BackColor = UiTheme.Page
-            };
-            center.RowStyles.Add(new RowStyle(SizeType.Absolute, 235F));
-            center.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-
-            TableLayoutPanel analysis = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 2,
-                RowCount = 1,
-                BackColor = UiTheme.Page
-            };
-            analysis.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            analysis.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-
-            queryCanvas = new Panel { Dock = DockStyle.Fill, BackColor = Color.FromArgb(170, 170, 170), Margin = new Padding(10) };
-            queryCanvas.Paint += delegate(object sender, PaintEventArgs e)
-            {
-                Panel p = sender as Panel;
-                if (p == null) return;
-                using (Pen pen = new Pen(Color.Black, 2)) e.Graphics.DrawLine(pen, 50, Math.Max(30, p.Height - 45), Math.Max(60, p.Width - 55), 45);
-                e.Graphics.DrawString("查询瑕疵", UiTheme.Font(9F, true), Brushes.Black, 12, 12);
-            };
-
-            heatmapCanvas = new Panel { Dock = DockStyle.Fill, BackColor = Color.FromArgb(140, 140, 140), Margin = new Padding(10) };
-            heatmapCanvas.Paint += delegate(object sender, PaintEventArgs e)
-            {
-                Panel p = sender as Panel;
-                if (p == null) return;
-                using (Brush b = new SolidBrush(Color.FromArgb(80, 80, 80))) e.Graphics.FillEllipse(b, p.Width / 3, p.Height / 4, Math.Max(40, p.Width / 3), Math.Max(40, p.Height / 2));
-                e.Graphics.DrawString("相似度热力图", UiTheme.Font(9F, true), Brushes.Black, 12, 12);
-            };
-
-            analysis.Controls.Add(UiFactory.Card("查询瑕疵（待标注）", queryCanvas), 0, 0);
-            analysis.Controls.Add(UiFactory.Card("相似度热力图", heatmapCanvas), 1, 0);
-            center.Controls.Add(analysis, 0, 0);
-
-            candidateGrid = UiFactory.Grid(new[] { "排名", "相似度", "来源图像", "状态" }, CandidateRows());
-            center.Controls.Add(UiFactory.Card("候选区域（Top-K）", candidateGrid), 0, 1);
-            return center;
-        }
-
-        private Control BuildCandidatePanel()
-        {
-            TableLayoutPanel right = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 2,
-                BackColor = UiTheme.Page
-            };
-            right.RowStyles.Add(new RowStyle(SizeType.Percent, 70F));
-            right.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
-            right.Controls.Add(UiFactory.Card("候选列表", UiFactory.Grid(new[] { "排名", "相似度", "来源", "状态" }, CandidateRows())), 0, 0);
-            FlowLayoutPanel actions = UiFactory.Toolbar("AI Mask精修", "人工确认", "人工拒绝", "加入Hard Negative");
-            actions.FlowDirection = FlowDirection.TopDown;
-            actions.WrapContents = false;
-            actions.Padding = new Padding(12, 8, 0, 0);
-            right.Controls.Add(UiFactory.Card("候选处理", actions), 0, 1);
-            return right;
-        }
-
-        private static string[][] CandidateRows()
-        {
-            return new[] {
-                new[] { "1", "0.93", "IMG_142310", "待确认" }, new[] { "2", "0.91", "IMG_143105", "待确认" },
-                new[] { "3", "0.89", "IMG_142856", "待确认" }, new[] { "4", "0.87", "IMG_142725", "待确认" },
-                new[] { "5", "0.86", "IMG_143015", "待确认" }, new[] { "6", "0.84", "IMG_142910", "待确认" }
-            };
-        }
-
-        private Control BuildLoop()
-        {
-            FlowLayoutPanel loop = new FlowLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                FlowDirection = FlowDirection.LeftToRight,
-                WrapContents = false,
-                BackColor = UiTheme.Surface,
-                Padding = new Padding(18, 18, 0, 0)
-            };
-            string[] steps = { "1 人工标注", "→", "2 相似搜索", "→", "3 候选生成", "→", "4 Mask Refinement", "→", "5 人工确认" };
-            for (int i = 0; i < steps.Length; i++)
-            {
-                Label label = UiFactory.Label(steps[i], 9F, i % 2 == 0, ContentAlignment.MiddleCenter);
-                label.Width = i % 2 == 0 ? 120 : 28;
-                label.Height = 45;
-                loop.Controls.Add(label);
-            }
-            return loop;
         }
     }
 }
