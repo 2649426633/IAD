@@ -4,14 +4,20 @@ using System.Windows.Forms;
 namespace IAD.UI
 {
     /// <summary>
-    /// 为需要高密度参数展示的页面补充明确的 TableLayoutPanel 行定义。
-    /// 具体布局规则集中在 UI 层，页面功能代码只负责触发一次初始化。
+    /// 统一保证所有页面根容器立即填满宿主区域；
+    /// 对高密度页面再补充明确的 TableLayoutPanel 行定义。
     /// </summary>
     internal static class PageFillLayoutManager
     {
         public static void Apply(UserControl page)
         {
             if (page == null) return;
+
+            page.Dock = DockStyle.Fill;
+            page.Margin = Padding.Empty;
+            page.AutoSize = false;
+
+            FillRoot(Field<TableLayoutPanel>(page, "rootLayout"));
 
             string pageName = page.GetType().Name;
             if (pageName == "TrainingModelsPage")
@@ -26,9 +32,6 @@ namespace IAD.UI
 
         private static void ApplyTrainingModels(UserControl page)
         {
-            page.Padding = new Padding(10);
-
-            FillRoot(Field<TableLayoutPanel>(page, "rootLayout"));
             FillSingleRow(Field<TableLayoutPanel>(page, "topLayout"));
             FillSingleRow(Field<TableLayoutPanel>(page, "middleLayout"));
             FillSingleRow(Field<TableLayoutPanel>(page, "bottomLayout"));
@@ -39,9 +42,6 @@ namespace IAD.UI
 
         private static void ApplySystemSettings(UserControl page)
         {
-            page.Padding = new Padding(10);
-
-            FillRoot(Field<TableLayoutPanel>(page, "rootLayout"));
             FillSingleRow(Field<TableLayoutPanel>(page, "row1"));
             FillSingleRow(Field<TableLayoutPanel>(page, "row2"));
             FillSingleRow(Field<TableLayoutPanel>(page, "row3"));
