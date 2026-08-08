@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using IAD.Security;
 using IAD.Shell;
 
 namespace IAD
@@ -11,7 +12,26 @@ namespace IAD
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+
+            using (LoginForm loginForm = new LoginForm())
+            {
+                if (loginForm.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+            }
+
+            using (MainForm mainForm = new MainForm())
+            {
+                if (!mainForm.ApplyAuthenticatedSession())
+                {
+                    return;
+                }
+
+                Application.Run(mainForm);
+            }
+
+            AppSession.SignOut();
         }
     }
 }
