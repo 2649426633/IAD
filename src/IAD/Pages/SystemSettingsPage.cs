@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace IAD.Pages
@@ -7,19 +8,34 @@ namespace IAD.Pages
         public SystemSettingsPage()
         {
             InitializeComponent();
-            BuildView();
-            BindEvents();
+            if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+            {
+                LoadSampleData();
+                BindEvents();
+            }
         }
 
         private void BindEvents()
         {
-            // 系统设置页功能事件统一放在此处。
-            // 后续接入：运行时检测、路径设置、离线部署、日志、备份恢复、权限与适配器配置。
+            btnSaveSettings.Click += delegate { SaveSettings(); };
+        }
+
+        private void LoadSampleData()
+        {
+            dgvRoles.Rows.Add("管理员", "2", "系统配置 / 全部模块");
+            dgvRoles.Rows.Add("工程师", "4", "模型 / 规则 / 部分设置");
+            dgvRoles.Rows.Add("操作员", "12", "检测 / 结果 / 追溯");
+            dgvRoles.Rows.Add("访客", "3", "结果查看");
+
+            dgvAdapters.Rows.Add("Camera", "预留", "GigE Vision", "192.168.1.100", "后续相机接入");
+            dgvAdapters.Rows.Add("PLC", "预留", "Modbus TCP", "192.168.1.200:502", "OK/NG输出");
+            dgvAdapters.Rows.Add("MES", "预留", "HTTP REST", "192.168.1.210/api", "生产系统");
+            dgvAdapters.Rows.Add("Result Export", "已配置", "CSV + PNG", @"D:\InspectSys\Export", "结果导出");
         }
 
         public void LoadSettings()
         {
-            // TODO: 从配置服务加载系统设置。
+            // TODO: 从配置服务加载运行环境、路径、备份、权限和适配器设置。
         }
 
         public void SaveSettings()
