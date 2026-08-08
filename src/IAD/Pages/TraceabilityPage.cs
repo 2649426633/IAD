@@ -7,6 +7,7 @@ namespace IAD.Pages
         public TraceabilityPage()
         {
             InitializeComponent();
+            BuildView();
             BindEvents();
         }
 
