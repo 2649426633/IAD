@@ -44,6 +44,7 @@
     <Compile Include="Shell\MainForm.Designer.cs"><DependentUpon>MainForm.cs</DependentUpon></Compile>
     <Compile Include="UI\UiTheme.cs" />
     <Compile Include="UI\UiFactory.cs" />
+    <Compile Include="UI\ResponsiveLayoutManager.cs" />
 
     <Compile Include="Pages\DashboardPage.cs"><SubType>UserControl</SubType></Compile>
     <Compile Include="Pages\DashboardPage.Designer.cs"><DependentUpon>DashboardPage.cs</DependentUpon></Compile>
