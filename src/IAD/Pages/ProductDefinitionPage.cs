@@ -19,6 +19,8 @@ namespace IAD.Pages
         private Product currentProduct;
         private ProductDefinitionSettings currentSettings;
         private string referencePreviewMessage;
+        private bool loadingDefectGrid;
+        private bool savingDefectGrid;
 
         public ProductDefinitionPage()
         {
@@ -41,7 +43,7 @@ namespace IAD.Pages
             btnVersion.Text = "切换 / 新建产品";
             btnRectangleRoi.Text = "管理 ROI";
             btnClearRoi.Text = "清空 ROI";
-            btnEditDefect.Text = "保存选中";
+            btnEditDefect.Text = "保存当前类别";
             btnBuildTemplate.Text = "校验模板配置";
             btnTestLocalization.Text = "测试定位（待接）";
             btnTestLocalization.Enabled = false;
@@ -79,6 +81,7 @@ namespace IAD.Pages
             btnToggleDefect.Click += delegate { ToggleSelectedDefectCategory(); };
             btnImportDefects.Click += delegate { ImportDefectCategories(); };
             btnExportDefects.Click += delegate { ExportDefectCategories(); };
+            dgvDefects.CellValueChanged += dgvDefects_CellValueChanged;
             btnFastMode.Click += delegate { ApplyLocalizationPreset("快速模式"); };
             btnFineMode.Click += delegate { ApplyLocalizationPreset("精细模式"); };
             btnAutoMode.Click += delegate { ApplyLocalizationPreset("自动模式"); };
@@ -184,6 +187,7 @@ namespace IAD.Pages
             txtCalibrationVersion.Text = "CAL-1.0.0";
             SelectComboValue(cboCalibrationState, "未标定", "未标定");
             dgvDefects.Rows.Clear();
+            grpDefects.Text = "缺陷类别管理 | 请先保存产品";
             lblReferenceFile.Text = "基准图：未导入";
             lblRoiState.Text = "ROI：0 个";
             lblTemplateType.Text = "定位模板：Shape Model";
@@ -203,6 +207,7 @@ namespace IAD.Pages
 
                 // 先完成页面参数解析和校验，避免产品主记录已创建、扩展配置却保存失败。
                 ProductDefinitionSettings value = BuildSettingsFromPage(currentProductId);
+                if (!isNewProduct) SaveAllDefectCategoriesFromGrid();
 
                 if (isNewProduct)
                 {
@@ -383,23 +388,83 @@ namespace IAD.Pages
             if (!EnsureSavedProduct() || dgvDefects.CurrentRow == null || dgvDefects.CurrentRow.Tag == null) return;
             try
             {
+                savingDefectGrid = true;
                 dgvDefects.EndEdit();
-                DefectCategory category = dgvDefects.CurrentRow.Tag as DefectCategory;
-                if (category == null) return;
-                DataGridViewRow row = dgvDefects.CurrentRow;
-                category.CategoryName = RequireText(CellText(row, 1), "缺陷名称");
-                category.DefectType = RequireText(CellText(row, 2), "缺陷类型");
-                category.DetectionStrategy = RequireText(CellText(row, 3), "检测策略");
-                category.DefaultThreshold = ParseRangeDouble(CellText(row, 4), "默认阈值", 0, 1);
-                category.MinArea = ParseOptionalNonNegativeDouble(CellText(row, 5), "最小面积");
-                category.MinLength = ParseOptionalNonNegativeDouble(CellText(row, 6), "最小长度");
-                category.IsEnabled = !string.Equals(CellText(row, 7), "停用", StringComparison.OrdinalIgnoreCase);
-                AppServices.Products.SaveDefectCategory(category);
+                DefectCategory category = SaveDefectCategoryRow(dgvDefects.CurrentRow);
                 RefreshDefectGrid(category.Id);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(this, ex.Message, "保存缺陷类别失败", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            finally
+            {
+                savingDefectGrid = false;
+            }
+        }
+
+        private void dgvDefects_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (loadingDefectGrid || savingDefectGrid || currentProductId <= 0 || e.RowIndex < 0) return;
+            DataGridViewRow row = dgvDefects.Rows[e.RowIndex];
+            DefectCategory category = row.Tag as DefectCategory;
+            if (category == null) return;
+
+            try
+            {
+                savingDefectGrid = true;
+                SaveDefectCategoryRow(row);
+                grpDefects.Text = "缺陷类别管理 | 已自动保存：“" + category.CategoryName + "”";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this,
+                    ex.Message + "\r\n\r\n本次编辑未保存，列表将恢复数据库中的值。",
+                    "缺陷类别保存失败", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                long categoryId = category.Id;
+                BeginInvoke(new MethodInvoker(delegate
+                {
+                    if (!IsDisposed && !Disposing) RefreshDefectGrid(categoryId);
+                }));
+            }
+            finally
+            {
+                savingDefectGrid = false;
+            }
+        }
+
+        private DefectCategory SaveDefectCategoryRow(DataGridViewRow row)
+        {
+            if (row == null) throw new ArgumentNullException("row");
+            DefectCategory category = row.Tag as DefectCategory;
+            if (category == null) throw new InvalidOperationException("当前行未关联有效的缺陷类别。");
+            if (category.ProductId != currentProductId)
+                throw new InvalidOperationException("当前类别不属于所选产品，已阻止保存。");
+
+            category.CategoryName = RequireText(CellText(row, 1), "缺陷名称");
+            category.DefectType = RequireText(CellText(row, 2), "缺陷类型");
+            category.DetectionStrategy = RequireText(CellText(row, 3), "检测策略");
+            category.DefaultThreshold = ParseRangeDouble(CellText(row, 4), "默认阈值", 0, 1);
+            category.MinArea = ParseOptionalNonNegativeDouble(CellText(row, 5), "最小面积");
+            category.MinLength = ParseOptionalNonNegativeDouble(CellText(row, 6), "最小长度");
+            category.IsEnabled = !string.Equals(CellText(row, 7), "停用", StringComparison.OrdinalIgnoreCase);
+            return AppServices.Products.SaveDefectCategory(category);
+        }
+
+        private void SaveAllDefectCategoriesFromGrid()
+        {
+            if (currentProductId <= 0 || dgvDefects.Rows.Count == 0) return;
+            bool previousSaving = savingDefectGrid;
+            savingDefectGrid = true;
+            try
+            {
+                dgvDefects.EndEdit();
+                foreach (DataGridViewRow row in dgvDefects.Rows)
+                    SaveDefectCategoryRow(row);
+            }
+            finally
+            {
+                savingDefectGrid = previousSaving;
             }
         }
 
@@ -440,24 +505,37 @@ namespace IAD.Pages
 
         private void RefreshDefectGrid(long selectId = 0)
         {
-            dgvDefects.Rows.Clear();
-            if (currentProductId <= 0) return;
-
-            IList<DefectCategory> categories = AppServices.Products.GetDefectCategories(currentProductId);
-            foreach (DefectCategory category in categories)
+            loadingDefectGrid = true;
+            try
             {
-                int rowIndex = dgvDefects.Rows.Add(
-                    category.DisplayOrder.ToString(CultureInfo.InvariantCulture),
-                    category.CategoryName,
-                    category.DefectType,
-                    category.DetectionStrategy,
-                    category.DefaultThreshold.ToString("0.###", CultureInfo.InvariantCulture),
-                    category.MinArea <= 0 ? "-" : category.MinArea.ToString("0.###", CultureInfo.InvariantCulture),
-                    category.MinLength <= 0 ? "-" : category.MinLength.ToString("0.###", CultureInfo.InvariantCulture),
-                    category.IsEnabled ? "启用" : "停用");
-                dgvDefects.Rows[rowIndex].Tag = category;
-                if (category.Id == selectId)
-                    dgvDefects.CurrentCell = dgvDefects.Rows[rowIndex].Cells[1];
+                dgvDefects.Rows.Clear();
+                if (currentProductId <= 0)
+                {
+                    grpDefects.Text = "缺陷类别管理 | 尚未选择产品";
+                    return;
+                }
+
+                IList<DefectCategory> categories = AppServices.Products.GetDefectCategories(currentProductId);
+                foreach (DefectCategory category in categories)
+                {
+                    int rowIndex = dgvDefects.Rows.Add(
+                        category.DisplayOrder.ToString(CultureInfo.InvariantCulture),
+                        category.CategoryName,
+                        category.DefectType,
+                        category.DetectionStrategy,
+                        category.DefaultThreshold.ToString("0.###", CultureInfo.InvariantCulture),
+                        category.MinArea <= 0 ? "-" : category.MinArea.ToString("0.###", CultureInfo.InvariantCulture),
+                        category.MinLength <= 0 ? "-" : category.MinLength.ToString("0.###", CultureInfo.InvariantCulture),
+                        category.IsEnabled ? "启用" : "停用");
+                    dgvDefects.Rows[rowIndex].Tag = category;
+                    if (category.Id == selectId)
+                        dgvDefects.CurrentCell = dgvDefects.Rows[rowIndex].Cells[1];
+                }
+                grpDefects.Text = "缺陷类别管理 | 当前产品共 " + categories.Count + " 类（编辑后自动保存）";
+            }
+            finally
+            {
+                loadingDefectGrid = false;
             }
         }
 

@@ -118,9 +118,14 @@ namespace IAD.Repositories
             using (SQLiteConnection connection = connectionFactory.CreateOpenConnection())
             using (SQLiteCommand command = connection.CreateCommand())
             {
-                command.CommandText = @"SELECT Id, DatasetImageId, CategoryId, CategoryCode, CategoryName, AnnotationType,
-                                               GeometryData, BrushWidth, Confidence, IsVisible, CreatedAtUtc, UpdatedAtUtc
-                                        FROM DatasetAnnotations WHERE DatasetImageId = @ImageId ORDER BY Id;";
+                command.CommandText = @"SELECT a.Id, a.DatasetImageId, a.CategoryId,
+                                               COALESCE(c.CategoryCode, a.CategoryCode) AS CategoryCode,
+                                               COALESCE(c.CategoryName, a.CategoryName) AS CategoryName,
+                                               a.AnnotationType, a.GeometryData, a.BrushWidth, a.Confidence,
+                                               a.IsVisible, a.CreatedAtUtc, a.UpdatedAtUtc
+                                        FROM DatasetAnnotations a
+                                        LEFT JOIN DefectCategories c ON c.Id = a.CategoryId
+                                        WHERE a.DatasetImageId = @ImageId ORDER BY a.Id;";
                 command.Parameters.AddWithValue("@ImageId", imageId);
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
@@ -227,10 +232,12 @@ namespace IAD.Repositories
                 using (SQLiteCommand annotationSnapshot = new SQLiteCommand(@"INSERT INTO DatasetVersionAnnotations
                     (VersionId, SourceAnnotationId, SourceImageId, CategoryCode, CategoryName, AnnotationType,
                      GeometryData, BrushWidth, Confidence, IsVisible)
-                    SELECT @VersionId, a.Id, a.DatasetImageId, a.CategoryCode, a.CategoryName, a.AnnotationType,
+                    SELECT @VersionId, a.Id, a.DatasetImageId,
+                           COALESCE(c.CategoryCode, a.CategoryCode), COALESCE(c.CategoryName, a.CategoryName), a.AnnotationType,
                            a.GeometryData, a.BrushWidth, a.Confidence, a.IsVisible
                     FROM DatasetAnnotations a
                     INNER JOIN DatasetImages i ON i.Id = a.DatasetImageId
+                    LEFT JOIN DefectCategories c ON c.Id = a.CategoryId
                     WHERE i.ProductId = @ProductId;", connection, transaction))
                 {
                     annotationSnapshot.Parameters.AddWithValue("@VersionId", versionId);
