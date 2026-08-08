@@ -72,6 +72,7 @@
     <Compile Include="Repositories\InspectionResultRepository.cs" />
 
     <Compile Include="Services\ProductService.cs" />
+    <Compile Include="Services\DefectCategoryCsv.cs" />
     <Compile Include="Services\RecipeService.cs" />
     <Compile Include="Services\ResultService.cs" />
     <Compile Include="Services\AppServices.cs" />

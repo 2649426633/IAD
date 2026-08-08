@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
@@ -16,6 +17,7 @@ namespace IAD.Pages
         private long currentProductId;
         private Product currentProduct;
         private ProductDefinitionSettings currentSettings;
+        private string referencePreviewMessage;
 
         public ProductDefinitionPage()
         {
@@ -35,16 +37,32 @@ namespace IAD.Pages
 
         private void ConfigureRuntimeUi()
         {
-            btnVersion.Text = "产品管理";
+            btnVersion.Text = "切换 / 新建产品";
             btnRectangleRoi.Text = "管理 ROI";
             btnClearRoi.Text = "清空 ROI";
             btnEditDefect.Text = "保存选中";
-            btnImportDefects.Enabled = false;
-            btnExportDefects.Enabled = false;
+            btnBuildTemplate.Text = "校验模板配置";
+            btnTestLocalization.Text = "测试定位（待接）";
+            btnTestLocalization.Enabled = false;
+            btnImportDefects.Enabled = true;
+            btnExportDefects.Enabled = true;
             dgvDefects.AllowUserToAddRows = false;
             dgvDefects.AllowUserToDeleteRows = false;
             dgvDefects.MultiSelect = false;
             dgvDefects.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvDefects.ReadOnly = false;
+            dgvDefects.EditMode = DataGridViewEditMode.EditOnEnter;
+            dgvDefectsCol1.ReadOnly = true;
+            dgvDefectsCol2.ReadOnly = false;
+            dgvDefectsCol3.ReadOnly = false;
+            dgvDefectsCol4.ReadOnly = false;
+            dgvDefectsCol5.ReadOnly = false;
+            dgvDefectsCol6.ReadOnly = false;
+            dgvDefectsCol7.ReadOnly = false;
+            dgvDefectsCol8.ReadOnly = true;
+
+            pnlTemplateCanvas.BackgroundImageLayout = ImageLayout.Zoom;
+            lblCanvasHint.BackColor = Color.Transparent;
         }
 
         private void BindEvents()
@@ -58,14 +76,13 @@ namespace IAD.Pages
             btnEditDefect.Click += delegate { SaveSelectedDefectCategory(); };
             btnDeleteDefect.Click += delegate { DeleteSelectedDefectCategory(); };
             btnToggleDefect.Click += delegate { ToggleSelectedDefectCategory(); };
-            btnBuildTemplate.Click += delegate
-            {
-                MessageBox.Show(this, "产品、基准图和 ROI 已可持久化。HALCON Shape Model 建模将在下一阶段接入。", "定位模板", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            };
-            btnTestLocalization.Click += delegate
-            {
-                lblLastScore.Text = "最近测试：等待 HALCON 定位模块";
-            };
+            btnImportDefects.Click += delegate { ImportDefectCategories(); };
+            btnExportDefects.Click += delegate { ExportDefectCategories(); };
+            btnFastMode.Click += delegate { ApplyLocalizationPreset("快速模式"); };
+            btnFineMode.Click += delegate { ApplyLocalizationPreset("精细模式"); };
+            btnAutoMode.Click += delegate { ApplyLocalizationPreset("自动模式"); };
+            btnBuildTemplate.Click += delegate { ValidateTemplateConfiguration(); };
+            Disposed += delegate { ClearReferencePreview(); };
         }
 
         public void LoadProductDefinition()
@@ -138,6 +155,8 @@ namespace IAD.Pages
             currentProductId = 0;
             currentProduct = null;
             currentSettings = ProductService.CreateDefaultSettings(0);
+            ClearReferencePreview();
+            referencePreviewMessage = null;
 
             txtProductName.Text = string.Empty;
             txtProductCode.Text = string.Empty;
@@ -174,23 +193,35 @@ namespace IAD.Pages
             {
                 string code = RequireText(txtProductCode.Text, "产品编号");
                 string name = RequireText(txtProductName.Text, "产品名称");
+                bool isNewProduct = currentProduct == null || currentProductId <= 0;
 
-                if (currentProduct == null || currentProductId <= 0)
+                // 先完成页面参数解析和校验，避免产品主记录已创建、扩展配置却保存失败。
+                ProductDefinitionSettings value = BuildSettingsFromPage(currentProductId);
+
+                if (isNewProduct)
                 {
                     currentProduct = AppServices.Products.CreateProduct(code, name, null);
                     currentProductId = currentProduct.Id;
+                    value.ProductId = currentProductId;
+                    value.ProductDefinitionVersion = "PD-1.0.0";
                 }
                 else
                 {
                     currentProduct.ProductCode = code;
                     currentProduct.ProductName = name;
                     AppServices.Products.UpdateProduct(currentProduct);
+                    value.ProductDefinitionVersion = IncrementVersion(value.ProductDefinitionVersion, "PD-");
                 }
 
-                currentSettings = BuildSettingsFromPage(currentProductId);
+                currentSettings = value;
                 AppServices.Products.SaveDefinitionSettings(currentSettings);
                 LoadProduct(currentProductId);
-                MessageBox.Show(this, "产品定义已保存到 SQLite。", "保存成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(
+                    this,
+                    "产品定义已保存到 SQLite。\r\n当前版本：" + currentSettings.ProductDefinitionVersion,
+                    "保存成功",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -209,7 +240,7 @@ namespace IAD.Pages
             value.TemplateType = string.IsNullOrWhiteSpace(value.TemplateType) ? "Shape Model" : value.TemplateType;
             value.LocalizationMethod = cboLocalizationMethod.Text;
             value.ModelType = cboModelType.Text;
-            value.MinScore = ParseDouble(txtMinScore.Text, "最小Score");
+            value.MinScore = ParseRangeDouble(txtMinScore.Text, "最小Score", 0, 1);
             value.AngleRange = txtAngleRange.Text.Trim();
             value.ScaleRange = txtScaleRange.Text.Trim();
             value.MatchCount = ParsePositiveInt(txtMatchCount.Text, "匹配数量");
@@ -265,7 +296,6 @@ namespace IAD.Pages
                     currentSettings.ReferenceImagePath = Path.Combine("Templates", safeCode, Path.GetFileName(targetFile));
                     AppServices.Products.SaveDefinitionSettings(currentSettings);
                     RefreshReferenceSummary();
-                    lblCanvasHint.Text = "产品：" + currentProduct.ProductName + "\r\n\r\n基准图已保存\r\n" + Path.GetFileName(targetFile) + "\r\n\r\n下一阶段在此接入 HALCON HWindowControl";
                 }
                 catch (Exception ex)
                 {
@@ -310,7 +340,7 @@ namespace IAD.Pages
 
             IList<RoiDefinition> rois = AppServices.Products.GetRois(currentProductId);
             lblRoiState.Text = "ROI：" + rois.Count + " 个";
-            lblCanvasHint.Text = "产品：" + currentProduct.ProductName + "\r\n\r\n已保存 ROI：" + rois.Count + " 个\r\n双击“管理 ROI”可维护精确坐标\r\n\r\n下一阶段在此接入 HALCON 图像显示";
+            UpdateCanvasHint(rois.Count);
         }
 
         private void AddDefectCategory()
@@ -323,7 +353,7 @@ namespace IAD.Pages
                 DefectCategory category = new DefectCategory
                 {
                     ProductId = currentProductId,
-                    CategoryCode = "DEFECT-" + order.ToString("000"),
+                    CategoryCode = BuildNextDefectCode(categories),
                     CategoryName = "新缺陷" + order,
                     DefectType = "表面缺陷",
                     DetectionStrategy = "Multi-label Segmentation",
@@ -347,15 +377,16 @@ namespace IAD.Pages
             if (!EnsureSavedProduct() || dgvDefects.CurrentRow == null || dgvDefects.CurrentRow.Tag == null) return;
             try
             {
+                dgvDefects.EndEdit();
                 DefectCategory category = dgvDefects.CurrentRow.Tag as DefectCategory;
                 if (category == null) return;
                 DataGridViewRow row = dgvDefects.CurrentRow;
-                category.CategoryName = CellText(row, 1);
-                category.DefectType = CellText(row, 2);
-                category.DetectionStrategy = CellText(row, 3);
-                category.DefaultThreshold = ParseDouble(CellText(row, 4), "默认阈值");
-                category.MinArea = ParseOptionalDouble(CellText(row, 5));
-                category.MinLength = ParseOptionalDouble(CellText(row, 6));
+                category.CategoryName = RequireText(CellText(row, 1), "缺陷名称");
+                category.DefectType = RequireText(CellText(row, 2), "缺陷类型");
+                category.DetectionStrategy = RequireText(CellText(row, 3), "检测策略");
+                category.DefaultThreshold = ParseRangeDouble(CellText(row, 4), "默认阈值", 0, 1);
+                category.MinArea = ParseOptionalNonNegativeDouble(CellText(row, 5), "最小面积");
+                category.MinLength = ParseOptionalNonNegativeDouble(CellText(row, 6), "最小长度");
                 category.IsEnabled = !string.Equals(CellText(row, 7), "停用", StringComparison.OrdinalIgnoreCase);
                 AppServices.Products.SaveDefectCategory(category);
                 RefreshDefectGrid(category.Id);
@@ -427,8 +458,33 @@ namespace IAD.Pages
         private void RefreshReferenceSummary()
         {
             string relative = currentSettings == null ? null : currentSettings.ReferenceImagePath;
-            lblReferenceFile.Text = string.IsNullOrWhiteSpace(relative) ? "基准图：未导入" : "基准图：" + Path.GetFileName(relative);
+            if (string.IsNullOrWhiteSpace(relative))
+            {
+                lblReferenceFile.Text = "基准图：未导入";
+                ClearReferencePreview();
+                referencePreviewMessage = null;
+            }
+            else
+            {
+                try
+                {
+                    string fullPath = ResolveWorkspaceFile(relative);
+                    lblReferenceFile.Text = File.Exists(fullPath)
+                        ? "基准图：" + Path.GetFileName(relative)
+                        : "基准图：文件缺失";
+                    LoadReferencePreview(fullPath);
+                }
+                catch (Exception ex)
+                {
+                    ClearReferencePreview();
+                    lblReferenceFile.Text = "基准图：路径无效";
+                    referencePreviewMessage = ex.Message;
+                }
+            }
+
             lblTemplateType.Text = "定位模板：" + ((currentSettings == null || string.IsNullOrWhiteSpace(currentSettings.TemplateType)) ? "Shape Model" : currentSettings.TemplateType);
+            int roiCount = currentProductId <= 0 ? 0 : AppServices.Products.GetRois(currentProductId).Count;
+            UpdateCanvasHint(roiCount);
         }
 
         private void RefreshVersionSummary()
@@ -437,6 +493,272 @@ namespace IAD.Pages
             lblVersion.Text = "当前产品：" + currentProduct.ProductCode + " / " + currentProduct.ProductName +
                               "    产品定义版本：" + (currentSettings.ProductDefinitionVersion ?? "PD-1.0.0") +
                               "    模板版本：" + (currentSettings.TemplateVersion ?? "LT-1.0.0");
+        }
+
+        private void ApplyLocalizationPreset(string preset)
+        {
+            if (string.Equals(preset, "快速模式", StringComparison.Ordinal))
+            {
+                SelectComboValue(cboLocalizationMethod, "HALCON Shape Matching", "HALCON Shape Matching");
+                SelectComboValue(cboModelType, "Shape Model", "Shape Model");
+                txtMinScore.Text = "0.60";
+                txtAngleRange.Text = "-15 ~ 15 deg";
+                txtScaleRange.Text = "0.95 ~ 1.05";
+                txtMatchCount.Text = "1";
+            }
+            else if (string.Equals(preset, "精细模式", StringComparison.Ordinal))
+            {
+                SelectComboValue(cboLocalizationMethod, "HALCON Shape Matching", "HALCON Shape Matching");
+                SelectComboValue(cboModelType, "Shape Model", "Shape Model");
+                txtMinScore.Text = "0.85";
+                txtAngleRange.Text = "-5 ~ 5 deg";
+                txtScaleRange.Text = "0.98 ~ 1.02";
+                txtMatchCount.Text = "1";
+            }
+            else
+            {
+                SelectComboValue(cboLocalizationMethod, "HALCON Shape Matching", "HALCON Shape Matching");
+                SelectComboValue(cboModelType, "Shape Model", "Shape Model");
+                txtMinScore.Text = "0.80";
+                txtAngleRange.Text = "-180 ~ 180 deg";
+                txtScaleRange.Text = "0.90 ~ 1.10";
+                txtMatchCount.Text = "1";
+            }
+
+            txtLastResult.Text = "已应用" + preset + "参数，尚未执行定位测试";
+            lblLastScore.Text = "最近测试：参数已更新";
+        }
+
+        private void ValidateTemplateConfiguration()
+        {
+            if (!EnsureSavedProduct()) return;
+
+            try
+            {
+                BuildSettingsFromPage(currentProductId);
+                List<string> problems = new List<string>();
+
+                if (!string.Equals(txtProductCode.Text.Trim(), currentProduct.ProductCode, StringComparison.Ordinal) ||
+                    !string.Equals(txtProductName.Text.Trim(), currentProduct.ProductName, StringComparison.Ordinal))
+                {
+                    problems.Add("产品名称或编号有未保存修改");
+                }
+
+                string referencePath = currentSettings == null ? null : currentSettings.ReferenceImagePath;
+                if (string.IsNullOrWhiteSpace(referencePath) || !File.Exists(ResolveWorkspaceFile(referencePath)))
+                    problems.Add("尚未导入有效基准图");
+
+                IList<RoiDefinition> rois = AppServices.Products.GetRois(currentProductId);
+                bool hasEnabledRoi = false;
+                foreach (RoiDefinition roi in rois)
+                {
+                    if (roi.IsEnabled)
+                    {
+                        hasEnabledRoi = true;
+                        break;
+                    }
+                }
+                if (!hasEnabledRoi) problems.Add("至少需要一个已启用 ROI");
+
+                if (problems.Count > 0)
+                {
+                    MessageBox.Show(
+                        this,
+                        "模板基础配置尚未就绪：\r\n\r\n- " + string.Join("\r\n- ", problems.ToArray()),
+                        "模板配置校验",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return;
+                }
+
+                MessageBox.Show(
+                    this,
+                    "基准图、定位参数和 ROI 配置完整。\r\n\r\n当前阶段仅完成配置校验；实际 Shape Model 文件将在接入 HALCON SDK 后生成。",
+                    "模板配置已就绪",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, ex.Message, "模板配置校验失败", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void ExportDefectCategories()
+        {
+            if (!EnsureSavedProduct()) return;
+
+            IList<DefectCategory> categories = AppServices.Products.GetDefectCategories(currentProductId);
+            if (categories.Count == 0)
+            {
+                MessageBox.Show(this, "当前产品没有可导出的缺陷类别。", "导出配置", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            using (SaveFileDialog dialog = new SaveFileDialog())
+            {
+                dialog.Filter = "CSV 配置文件|*.csv";
+                dialog.DefaultExt = "csv";
+                dialog.AddExtension = true;
+                dialog.FileName = MakeSafeFileName(currentProduct.ProductCode) + "_defect_categories.csv";
+                dialog.Title = "导出缺陷类别配置";
+                if (dialog.ShowDialog(this) != DialogResult.OK) return;
+
+                try
+                {
+                    DefectCategoryCsv.Write(dialog.FileName, categories);
+                    MessageBox.Show(this, "已导出 " + categories.Count + " 个缺陷类别。", "导出完成", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this, ex.Message, "导出配置失败", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+        }
+
+        private void ImportDefectCategories()
+        {
+            if (!EnsureSavedProduct()) return;
+
+            using (OpenFileDialog dialog = new OpenFileDialog())
+            {
+                dialog.Filter = "CSV 配置文件|*.csv|所有文件|*.*";
+                dialog.Title = "导入缺陷类别配置";
+                if (dialog.ShowDialog(this) != DialogResult.OK) return;
+
+                try
+                {
+                    IList<DefectCategory> imported = DefectCategoryCsv.Read(dialog.FileName, currentProductId);
+                    if (imported.Count == 0)
+                        throw new InvalidOperationException("配置文件中没有缺陷类别数据。");
+
+                    if (MessageBox.Show(
+                        this,
+                        "将按缺陷类别编码新增或更新 " + imported.Count + " 条配置；未出现在文件中的现有类别会保留。是否继续？",
+                        "确认导入",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question) != DialogResult.Yes) return;
+
+                    IList<DefectCategory> existing = AppServices.Products.GetDefectCategories(currentProductId);
+                    Dictionary<string, DefectCategory> existingByCode = new Dictionary<string, DefectCategory>(StringComparer.OrdinalIgnoreCase);
+                    foreach (DefectCategory category in existing)
+                        existingByCode[category.CategoryCode] = category;
+
+                    int added = 0;
+                    int updated = 0;
+                    long selectedId = 0;
+                    foreach (DefectCategory category in imported)
+                    {
+                        DefectCategory saved;
+                        DefectCategory oldCategory;
+                        if (existingByCode.TryGetValue(category.CategoryCode, out oldCategory))
+                        {
+                            category.Id = oldCategory.Id;
+                            category.CreatedAtUtc = oldCategory.CreatedAtUtc;
+                            saved = AppServices.Products.SaveDefectCategory(category);
+                            updated++;
+                        }
+                        else
+                        {
+                            saved = AppServices.Products.SaveDefectCategory(category);
+                            added++;
+                        }
+                        selectedId = saved.Id;
+                    }
+
+                    RefreshDefectGrid(selectedId);
+                    MessageBox.Show(
+                        this,
+                        "导入完成。\r\n新增：" + added + "\r\n更新：" + updated,
+                        "导入配置",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this, ex.Message, "导入配置失败", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+        }
+
+        private static string BuildNextDefectCode(IList<DefectCategory> categories)
+        {
+            HashSet<string> codes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (DefectCategory category in categories)
+            {
+                if (!string.IsNullOrWhiteSpace(category.CategoryCode))
+                    codes.Add(category.CategoryCode.Trim());
+            }
+
+            for (int number = 1; number < 100000; number++)
+            {
+                string code = "DEFECT-" + number.ToString("000", CultureInfo.InvariantCulture);
+                if (!codes.Contains(code)) return code;
+            }
+
+            throw new InvalidOperationException("无法生成新的缺陷类别编码。");
+        }
+
+        private void LoadReferencePreview(string filePath)
+        {
+            ClearReferencePreview();
+            if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
+            {
+                referencePreviewMessage = "已记录的基准图文件不存在，请重新导入";
+                return;
+            }
+
+            try
+            {
+                using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (Image source = Image.FromStream(stream))
+                {
+                    pnlTemplateCanvas.BackgroundImage = new Bitmap(source);
+                }
+                referencePreviewMessage = null;
+            }
+            catch (Exception ex)
+            {
+                referencePreviewMessage = "基准图无法预览：" + ex.Message;
+            }
+        }
+
+        private void ClearReferencePreview()
+        {
+            if (pnlTemplateCanvas == null) return;
+            Image oldImage = pnlTemplateCanvas.BackgroundImage;
+            pnlTemplateCanvas.BackgroundImage = null;
+            if (oldImage != null) oldImage.Dispose();
+        }
+
+        private void UpdateCanvasHint(int roiCount)
+        {
+            if (pnlTemplateCanvas.BackgroundImage != null)
+            {
+                lblCanvasHint.Text = string.Empty;
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(referencePreviewMessage))
+            {
+                lblCanvasHint.Text = referencePreviewMessage;
+                return;
+            }
+
+            string productName = currentProduct == null ? "新产品" : currentProduct.ProductName;
+            lblCanvasHint.Text = productName + "\r\n\r\n尚未导入基准图\r\n已保存 ROI：" + roiCount + " 个";
+        }
+
+        private static string ResolveWorkspaceFile(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return null;
+            string root = Path.GetFullPath(ProjectStoragePaths.RootPath).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+            string fullPath = Path.IsPathRooted(path)
+                ? Path.GetFullPath(path)
+                : Path.GetFullPath(Path.Combine(ProjectStoragePaths.RootPath, path));
+            if (!fullPath.StartsWith(root, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("基准图路径超出当前 Workspace。请重新导入基准图。");
+            return fullPath;
         }
 
         private static void SelectComboValue(ComboBox comboBox, string value, string fallback)
@@ -471,6 +793,16 @@ namespace IAD.Pages
             double value;
             if (!double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value) && !double.TryParse(text, out value))
                 throw new ArgumentException(fieldName + "格式不正确。");
+            if (double.IsNaN(value) || double.IsInfinity(value))
+                throw new ArgumentException(fieldName + "必须是有限数值。");
+            return value;
+        }
+
+        private static double ParseRangeDouble(string text, string fieldName, double minimum, double maximum)
+        {
+            double value = ParseDouble(text, fieldName);
+            if (value < minimum || value > maximum)
+                throw new ArgumentException(fieldName + "必须在" + minimum.ToString(CultureInfo.InvariantCulture) + "到" + maximum.ToString(CultureInfo.InvariantCulture) + "之间。");
             return value;
         }
 
@@ -481,10 +813,36 @@ namespace IAD.Pages
             return value;
         }
 
-        private static double ParseOptionalDouble(string text)
+        private static double ParseOptionalNonNegativeDouble(string text, string fieldName)
         {
             if (string.IsNullOrWhiteSpace(text) || text.Trim() == "-") return 0;
-            return ParseDouble(text, "数值");
+            double value = ParseDouble(text, fieldName);
+            if (value < 0) throw new ArgumentException(fieldName + "不能小于0。");
+            return value;
+        }
+
+        private static string IncrementVersion(string version, string prefix)
+        {
+            string value = string.IsNullOrWhiteSpace(version) ? string.Empty : version.Trim();
+            if (!string.IsNullOrEmpty(prefix) && value.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                value = value.Substring(prefix.Length);
+
+            string[] parts = value.Split('.');
+            int major;
+            int minor;
+            int patch;
+            if (parts.Length != 3 ||
+                !int.TryParse(parts[0], NumberStyles.None, CultureInfo.InvariantCulture, out major) ||
+                !int.TryParse(parts[1], NumberStyles.None, CultureInfo.InvariantCulture, out minor) ||
+                !int.TryParse(parts[2], NumberStyles.None, CultureInfo.InvariantCulture, out patch) ||
+                major < 0 || minor < 0 || patch < 0 || patch == int.MaxValue)
+            {
+                return prefix + "1.0.1";
+            }
+
+            return prefix + major.ToString(CultureInfo.InvariantCulture) + "." +
+                   minor.ToString(CultureInfo.InvariantCulture) + "." +
+                   (patch + 1).ToString(CultureInfo.InvariantCulture);
         }
 
         private static string CellText(DataGridViewRow row, int index)

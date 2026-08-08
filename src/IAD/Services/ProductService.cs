@@ -127,6 +127,17 @@ namespace IAD.Services
 
             category.CategoryCode = NormalizeRequired(category.CategoryCode, "缺陷类别编码");
             category.CategoryName = NormalizeRequired(category.CategoryName, "缺陷类别名称");
+            category.DefectType = NormalizeOptional(category.DefectType);
+            category.DetectionStrategy = NormalizeOptional(category.DetectionStrategy);
+            if (double.IsNaN(category.DefaultThreshold) || double.IsInfinity(category.DefaultThreshold) ||
+                category.DefaultThreshold < 0 || category.DefaultThreshold > 1)
+                throw new ArgumentException("默认阈值必须在0到1之间。", "category");
+            if (double.IsNaN(category.MinArea) || double.IsInfinity(category.MinArea) || category.MinArea < 0)
+                throw new ArgumentException("最小面积不能小于0。", "category");
+            if (double.IsNaN(category.MinLength) || double.IsInfinity(category.MinLength) || category.MinLength < 0)
+                throw new ArgumentException("最小长度不能小于0。", "category");
+            if (category.DisplayOrder <= 0)
+                throw new ArgumentException("显示顺序必须大于0。", "category");
             DateTime now = DateTime.UtcNow;
 
             if (category.Id <= 0)
