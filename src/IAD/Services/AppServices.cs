@@ -1,0 +1,45 @@
+using System;
+using IAD.Infrastructure.Database;
+using IAD.Infrastructure.Storage;
+using IAD.Repositories;
+
+namespace IAD.Services
+{
+    internal static class AppServices
+    {
+        private static bool initialized;
+
+        public static ProductService Products { get; private set; }
+        public static RecipeService Recipes { get; private set; }
+        public static ResultService Results { get; private set; }
+        public static string DatabasePath { get { return ProjectStoragePaths.DatabasePath; } }
+
+        public static void Initialize()
+        {
+            if (initialized) return;
+
+            ProjectStoragePaths.EnsureCreated();
+
+            SqliteConnectionFactory connectionFactory = new SqliteConnectionFactory(ProjectStoragePaths.DatabasePath);
+            DatabaseInitializer.Initialize(connectionFactory);
+
+            IProductRepository productRepository = new ProductRepository(connectionFactory);
+            IDefectCategoryRepository categoryRepository = new DefectCategoryRepository(connectionFactory);
+            IRoiRepository roiRepository = new RoiRepository(connectionFactory);
+            IInspectionRecipeRepository recipeRepository = new InspectionRecipeRepository(connectionFactory);
+            IInspectionResultRepository resultRepository = new InspectionResultRepository(connectionFactory);
+
+            Products = new ProductService(productRepository, categoryRepository, roiRepository);
+            Recipes = new RecipeService(productRepository, recipeRepository);
+            Results = new ResultService(productRepository, resultRepository);
+
+            initialized = true;
+        }
+
+        public static void EnsureInitialized()
+        {
+            if (!initialized)
+                throw new InvalidOperationException("应用服务尚未初始化，请先调用 AppServices.Initialize()。 ");
+        }
+    }
+}
