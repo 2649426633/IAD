@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace IAD.Pages
@@ -7,24 +8,46 @@ namespace IAD.Pages
         public OnlineInspectionPage()
         {
             InitializeComponent();
-            BuildView();
-            BindEvents();
+            if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+            {
+                LoadSampleData();
+                BindEvents();
+            }
         }
 
         private void BindEvents()
         {
-            // 在线检测页功能事件统一放在此处。
-            // 后续接入：图像加载、批量检测、开始/暂停、结果导出、实时状态与告警刷新。
+            btnStart.Click += delegate { StartInspection(); };
+            btnPause.Click += delegate { StopInspection(); };
+        }
+
+        private void LoadSampleData()
+        {
+            dgvQueue.Rows.Add("IMG_142310.png", "检测中");
+            dgvQueue.Rows.Add("IMG_142311.png", "等待中");
+            dgvQueue.Rows.Add("IMG_142312.png", "等待中");
+            dgvResults.Rows.Add("#1", "OK", "0");
+            dgvResults.Rows.Add("#2", "NG", "1");
+            dgvResults.Rows.Add("#3", "OK", "0");
+            dgvResults.Rows.Add("#4", "NG", "2");
+            dgvResults.Rows.Add("#5", "OK", "0");
+            dgvResults.Rows.Add("#6", "NG", "1");
+            dgvResults.Rows.Add("#7", "ERROR", "-");
+            dgvResults.Rows.Add("#8", "OK", "0");
+            dgvDefects.Rows.Add("划痕", "0.96", "1824", "(1320,182)");
+            dgvNgStats.Rows.Add("划痕", "186", "45.8%");
+            dgvNgStats.Rows.Add("脏污", "128", "31.5%");
+            dgvNgStats.Rows.Add("缺口", "73", "18.0%");
         }
 
         public void StartInspection()
         {
-            // TODO: 调用检测服务启动当前Recipe检测流程。
+            lblDetect.Text = "运行中";
         }
 
         public void StopInspection()
         {
-            // TODO: 停止或暂停检测任务。
+            lblDetect.Text = "已暂停";
         }
     }
 }
