@@ -47,6 +47,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
 
     <Compile Include="Models\Product.cs" />
+    <Compile Include="Models\ProductDefinitionSettings.cs" />
     <Compile Include="Models\DefectCategory.cs" />
     <Compile Include="Models\RoiDefinition.cs" />
     <Compile Include="Models\InspectionRecipe.cs" />
@@ -60,6 +61,7 @@
 
     <Compile Include="Repositories\RepositoryContracts.cs" />
     <Compile Include="Repositories\ProductRepository.cs" />
+    <Compile Include="Repositories\ProductDefinitionSettingsRepository.cs" />
     <Compile Include="Repositories\DefectCategoryRepository.cs" />
     <Compile Include="Repositories\RoiRepository.cs" />
     <Compile Include="Repositories\InspectionRecipeRepository.cs" />
@@ -73,6 +75,10 @@
     <Compile Include="Security\AppSession.cs" />
     <Compile Include="Shell\LoginForm.cs"><SubType>Form</SubType></Compile>
     <Compile Include="Shell\LoginForm.Designer.cs"><DependentUpon>LoginForm.cs</DependentUpon></Compile>
+    <Compile Include="Shell\ProductSelectionDialog.cs"><SubType>Form</SubType></Compile>
+    <Compile Include="Shell\ProductSelectionDialog.Designer.cs"><DependentUpon>ProductSelectionDialog.cs</DependentUpon></Compile>
+    <Compile Include="Shell\RoiManagerDialog.cs"><SubType>Form</SubType></Compile>
+    <Compile Include="Shell\RoiManagerDialog.Designer.cs"><DependentUpon>RoiManagerDialog.cs</DependentUpon></Compile>
     <Compile Include="Shell\MainForm.cs"><SubType>Form</SubType></Compile>
     <Compile Include="Shell\MainForm.Designer.cs"><DependentUpon>MainForm.cs</DependentUpon></Compile>
     <Compile Include="Shell\MainForm.Session.cs"><DependentUpon>MainForm.cs</DependentUpon></Compile>
