@@ -1,17 +1,65 @@
-using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using IAD.UI;
 
 namespace IAD.Pages
 {
-    public partial class DatasetAnnotationPage
+    partial class DatasetAnnotationPage
     {
         private IContainer components = null;
-        private Panel annotationCanvas;
-        private DataGridView imageGrid;
-        private DataGridView classGrid;
+        private TableLayoutPanel rootLayout;
+        private FlowLayoutPanel toolbar;
+        private Button btnImportImages;
+        private Button btnRectangle;
+        private Button btnPolygon;
+        private Button btnBrush;
+        private Button btnEraser;
+        private Button btnMaskEdit;
+        private Button btnAutoFix;
+        private Button btnVersion;
+        private TableLayoutPanel bodyLayout;
+        private GroupBox grpImages;
+        private DataGridView dgvImages;
+        private DataGridViewTextBoxColumn dgvImagesCol1;
+        private DataGridViewTextBoxColumn dgvImagesCol2;
+        private GroupBox grpCanvas;
+        private Panel pnlCanvas;
+        private Label lblCanvasInfo;
+        private TableLayoutPanel rightLayout;
+        private GroupBox grpClasses;
+        private DataGridView dgvClasses;
+        private DataGridViewTextBoxColumn dgvClassesCol1;
+        private DataGridViewTextBoxColumn dgvClassesCol2;
+        private DataGridViewTextBoxColumn dgvClassesCol3;
+        private GroupBox grpCurrentClass;
+        private TableLayoutPanel currentClassLayout;
+        private Label lblCurrentClassKey;
+        private ComboBox cboCurrentClass;
+        private Label lblLineWidthKey;
+        private NumericUpDown numLineWidth;
+        private Label lblThresholdKey;
+        private NumericUpDown numThreshold;
+        private GroupBox grpLayers;
+        private DataGridView dgvLayers;
+        private DataGridViewTextBoxColumn dgvLayersCol1;
+        private DataGridViewTextBoxColumn dgvLayersCol2;
+        private DataGridViewTextBoxColumn dgvLayersCol3;
+        private GroupBox grpQuality;
+        private TableLayoutPanel qualityLayout;
+        private Label lblTotalAnnotationsKey;
+        private Label lblTotalAnnotations;
+        private Label lblBoundaryScoreKey;
+        private Label lblBoundaryScore;
+        private Label lblQualityScoreKey;
+        private Label lblQualityScore;
+        private Label lblQualityAdviceKey;
+        private Label lblQualityAdvice;
+        private GroupBox grpQueue;
+        private DataGridView dgvQueue;
+        private DataGridViewTextBoxColumn dgvQueueCol1;
+        private DataGridViewTextBoxColumn dgvQueueCol2;
+        private DataGridViewTextBoxColumn dgvQueueCol3;
+        private DataGridViewTextBoxColumn dgvQueueCol4;
 
         protected override void Dispose(bool disposing)
         {
@@ -22,164 +70,228 @@ namespace IAD.Pages
         private void InitializeComponent()
         {
             this.components = new Container();
+            this.rootLayout = new TableLayoutPanel();
+            this.toolbar = new FlowLayoutPanel();
+            this.btnImportImages = new Button();
+            this.btnRectangle = new Button();
+            this.btnPolygon = new Button();
+            this.btnBrush = new Button();
+            this.btnEraser = new Button();
+            this.btnMaskEdit = new Button();
+            this.btnAutoFix = new Button();
+            this.btnVersion = new Button();
+            this.bodyLayout = new TableLayoutPanel();
+            this.grpImages = new GroupBox();
+            this.dgvImages = new DataGridView();
+            this.dgvImagesCol1 = new DataGridViewTextBoxColumn();
+            this.dgvImagesCol2 = new DataGridViewTextBoxColumn();
+            this.grpCanvas = new GroupBox();
+            this.pnlCanvas = new Panel();
+            this.lblCanvasInfo = new Label();
+            this.rightLayout = new TableLayoutPanel();
+            this.grpClasses = new GroupBox();
+            this.dgvClasses = new DataGridView();
+            this.dgvClassesCol1 = new DataGridViewTextBoxColumn();
+            this.dgvClassesCol2 = new DataGridViewTextBoxColumn();
+            this.dgvClassesCol3 = new DataGridViewTextBoxColumn();
+            this.grpCurrentClass = new GroupBox();
+            this.currentClassLayout = new TableLayoutPanel();
+            this.lblCurrentClassKey = new Label();
+            this.cboCurrentClass = new ComboBox();
+            this.lblLineWidthKey = new Label();
+            this.numLineWidth = new NumericUpDown();
+            this.lblThresholdKey = new Label();
+            this.numThreshold = new NumericUpDown();
+            this.grpLayers = new GroupBox();
+            this.dgvLayers = new DataGridView();
+            this.dgvLayersCol1 = new DataGridViewTextBoxColumn();
+            this.dgvLayersCol2 = new DataGridViewTextBoxColumn();
+            this.dgvLayersCol3 = new DataGridViewTextBoxColumn();
+            this.grpQuality = new GroupBox();
+            this.qualityLayout = new TableLayoutPanel();
+            this.lblTotalAnnotationsKey = new Label();
+            this.lblTotalAnnotations = new Label();
+            this.lblBoundaryScoreKey = new Label();
+            this.lblBoundaryScore = new Label();
+            this.lblQualityScoreKey = new Label();
+            this.lblQualityScore = new Label();
+            this.lblQualityAdviceKey = new Label();
+            this.lblQualityAdvice = new Label();
+            this.grpQueue = new GroupBox();
+            this.dgvQueue = new DataGridView();
+            this.dgvQueueCol1 = new DataGridViewTextBoxColumn();
+            this.dgvQueueCol2 = new DataGridViewTextBoxColumn();
+            this.dgvQueueCol3 = new DataGridViewTextBoxColumn();
+            this.dgvQueueCol4 = new DataGridViewTextBoxColumn();
+            ((ISupportInitialize)(this.dgvImages)).BeginInit();
+            ((ISupportInitialize)(this.dgvClasses)).BeginInit();
+            ((ISupportInitialize)(this.numLineWidth)).BeginInit();
+            ((ISupportInitialize)(this.numThreshold)).BeginInit();
+            ((ISupportInitialize)(this.dgvLayers)).BeginInit();
+            ((ISupportInitialize)(this.dgvQueue)).BeginInit();
             this.SuspendLayout();
-            this.AutoScaleDimensions = new SizeF(8F, 15F);
+
+            this.rootLayout.BackColor = Color.FromArgb(247,247,247);
+            this.rootLayout.ColumnCount = 1;
+            this.rootLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100F));
+            this.rootLayout.Dock = DockStyle.Fill;
+            this.rootLayout.RowCount = 3;
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute,46F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Percent,100F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute,130F));
+
+            this.toolbar.Dock = DockStyle.Fill;
+            this.toolbar.WrapContents = false;
+            this.btnImportImages.Text = "导入图片";
+            this.btnRectangle.Text = "Rectangle";
+            this.btnPolygon.Text = "Polygon";
+            this.btnBrush.Text = "Brush";
+            this.btnEraser.Text = "Eraser";
+            this.btnMaskEdit.Text = "Mask修改";
+            this.btnAutoFix.Text = "自动修正";
+            this.btnVersion.Text = "版本管理";
+            this.toolbar.Controls.Add(this.btnImportImages);
+            this.toolbar.Controls.Add(this.btnRectangle);
+            this.toolbar.Controls.Add(this.btnPolygon);
+            this.toolbar.Controls.Add(this.btnBrush);
+            this.toolbar.Controls.Add(this.btnEraser);
+            this.toolbar.Controls.Add(this.btnMaskEdit);
+            this.toolbar.Controls.Add(this.btnAutoFix);
+            this.toolbar.Controls.Add(this.btnVersion);
+
+            this.bodyLayout.ColumnCount = 3;
+            this.bodyLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,240F));
+            this.bodyLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100F));
+            this.bodyLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,310F));
+            this.bodyLayout.Dock = DockStyle.Fill;
+            this.grpImages.Dock = DockStyle.Fill;
+            this.grpImages.Text = "数据集图片";
+            this.grpImages.Controls.Add(this.dgvImages);
+            this.dgvImages.Dock = DockStyle.Fill;
+            this.dgvImages.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvImages.ReadOnly = true;
+            this.dgvImages.RowHeadersVisible = false;
+            this.dgvImages.Columns.AddRange(new DataGridViewColumn[] { this.dgvImagesCol1, this.dgvImagesCol2 });
+            this.dgvImagesCol1.HeaderText = "文件";
+            this.dgvImagesCol2.HeaderText = "状态";
+
+            this.grpCanvas.Dock = DockStyle.Fill;
+            this.grpCanvas.Text = "标注画布  |  2048 × 1536  |  Fit";
+            this.grpCanvas.Controls.Add(this.pnlCanvas);
+            this.pnlCanvas.Dock = DockStyle.Fill;
+            this.pnlCanvas.BackColor = Color.FromArgb(55,55,55);
+            this.pnlCanvas.Controls.Add(this.lblCanvasInfo);
+            this.lblCanvasInfo.Dock = DockStyle.Fill;
+            this.lblCanvasInfo.ForeColor = Color.Gainsboro;
+            this.lblCanvasInfo.Font = new Font("Microsoft YaHei UI",10F);
+            this.lblCanvasInfo.Text = "图像标注工作区\r\n\r\nRectangle / Polygon / Brush / Mask\r\n后续在功能层接入 HALCON 图像显示与交互";
+            this.lblCanvasInfo.TextAlign = ContentAlignment.MiddleCenter;
+
+            this.rightLayout.ColumnCount = 1;
+            this.rightLayout.Dock = DockStyle.Fill;
+            this.rightLayout.RowCount = 4;
+            this.rightLayout.RowStyles.Add(new RowStyle(SizeType.Percent,30F));
+            this.rightLayout.RowStyles.Add(new RowStyle(SizeType.Percent,22F));
+            this.rightLayout.RowStyles.Add(new RowStyle(SizeType.Percent,24F));
+            this.rightLayout.RowStyles.Add(new RowStyle(SizeType.Percent,24F));
+
+            this.grpClasses.Dock = DockStyle.Fill;
+            this.grpClasses.Text = "瑕疵类别";
+            this.grpClasses.Controls.Add(this.dgvClasses);
+            this.dgvClasses.Dock = DockStyle.Fill;
+            this.dgvClasses.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvClasses.ReadOnly = true;
+            this.dgvClasses.RowHeadersVisible = false;
+            this.dgvClasses.Columns.AddRange(new DataGridViewColumn[] { this.dgvClassesCol1, this.dgvClassesCol2, this.dgvClassesCol3 });
+            this.dgvClassesCol1.HeaderText = "ID"; this.dgvClassesCol2.HeaderText = "类别"; this.dgvClassesCol3.HeaderText = "类型";
+
+            this.grpCurrentClass.Dock = DockStyle.Fill;
+            this.grpCurrentClass.Text = "当前类别";
+            this.grpCurrentClass.Controls.Add(this.currentClassLayout);
+            this.currentClassLayout.ColumnCount = 2;
+            this.currentClassLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,42F));
+            this.currentClassLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,58F));
+            this.currentClassLayout.Dock = DockStyle.Fill;
+            this.currentClassLayout.RowCount = 3;
+            this.lblCurrentClassKey.Text = "类别";
+            this.cboCurrentClass.Items.AddRange(new object[] { "划痕 (ID:1)", "缺料 (ID:2)", "裂纹 (ID:3)", "脏污 (ID:4)" });
+            this.cboCurrentClass.SelectedIndex = 0;
+            this.lblLineWidthKey.Text = "线宽";
+            this.numLineWidth.Minimum = 1;
+            this.numLineWidth.Maximum = 20;
+            this.numLineWidth.Value = 2;
+            this.lblThresholdKey.Text = "置信度阈值";
+            this.numThreshold.DecimalPlaces = 2;
+            this.numThreshold.Maximum = 1;
+            this.numThreshold.Value = 0.50M;
+            this.currentClassLayout.Controls.Add(this.lblCurrentClassKey,0,0);
+            this.currentClassLayout.Controls.Add(this.cboCurrentClass,1,0);
+            this.currentClassLayout.Controls.Add(this.lblLineWidthKey,0,1);
+            this.currentClassLayout.Controls.Add(this.numLineWidth,1,1);
+            this.currentClassLayout.Controls.Add(this.lblThresholdKey,0,2);
+            this.currentClassLayout.Controls.Add(this.numThreshold,1,2);
+
+            this.grpLayers.Dock = DockStyle.Fill;
+            this.grpLayers.Text = "图层与标注属性";
+            this.grpLayers.Controls.Add(this.dgvLayers);
+            this.dgvLayers.Dock = DockStyle.Fill;
+            this.dgvLayers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvLayers.ReadOnly = true;
+            this.dgvLayers.RowHeadersVisible = false;
+            this.dgvLayers.Columns.AddRange(new DataGridViewColumn[] { this.dgvLayersCol1, this.dgvLayersCol2, this.dgvLayersCol3 });
+            this.dgvLayersCol1.HeaderText = "类别"; this.dgvLayersCol2.HeaderText = "实例数"; this.dgvLayersCol3.HeaderText = "可见";
+
+            this.grpQuality.Dock = DockStyle.Fill;
+            this.grpQuality.Text = "标注质量";
+            this.grpQuality.Controls.Add(this.qualityLayout);
+            this.qualityLayout.ColumnCount = 2;
+            this.qualityLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,55F));
+            this.qualityLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,45F));
+            this.qualityLayout.Dock = DockStyle.Fill;
+            this.qualityLayout.RowCount = 4;
+            this.lblTotalAnnotationsKey.Text = "总标注"; this.lblTotalAnnotations.Text = "7";
+            this.lblBoundaryScoreKey.Text = "边界完整性"; this.lblBoundaryScore.Text = "0.92";
+            this.lblQualityScoreKey.Text = "综合评分"; this.lblQualityScore.Text = "0.94";
+            this.lblQualityAdviceKey.Text = "建议"; this.lblQualityAdvice.Text = "通过";
+            this.qualityLayout.Controls.Add(this.lblTotalAnnotationsKey,0,0); this.qualityLayout.Controls.Add(this.lblTotalAnnotations,1,0);
+            this.qualityLayout.Controls.Add(this.lblBoundaryScoreKey,0,1); this.qualityLayout.Controls.Add(this.lblBoundaryScore,1,1);
+            this.qualityLayout.Controls.Add(this.lblQualityScoreKey,0,2); this.qualityLayout.Controls.Add(this.lblQualityScore,1,2);
+            this.qualityLayout.Controls.Add(this.lblQualityAdviceKey,0,3); this.qualityLayout.Controls.Add(this.lblQualityAdvice,1,3);
+            this.rightLayout.Controls.Add(this.grpClasses,0,0);
+            this.rightLayout.Controls.Add(this.grpCurrentClass,0,1);
+            this.rightLayout.Controls.Add(this.grpLayers,0,2);
+            this.rightLayout.Controls.Add(this.grpQuality,0,3);
+            this.bodyLayout.Controls.Add(this.grpImages,0,0);
+            this.bodyLayout.Controls.Add(this.grpCanvas,1,0);
+            this.bodyLayout.Controls.Add(this.rightLayout,2,0);
+
+            this.grpQueue.Dock = DockStyle.Fill;
+            this.grpQueue.Text = "标注队列 / 缩略图";
+            this.grpQueue.Controls.Add(this.dgvQueue);
+            this.dgvQueue.Dock = DockStyle.Fill;
+            this.dgvQueue.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvQueue.ReadOnly = true;
+            this.dgvQueue.RowHeadersVisible = false;
+            this.dgvQueue.Columns.AddRange(new DataGridViewColumn[] { this.dgvQueueCol1, this.dgvQueueCol2, this.dgvQueueCol3, this.dgvQueueCol4 });
+            this.dgvQueueCol1.HeaderText = "序号"; this.dgvQueueCol2.HeaderText = "文件"; this.dgvQueueCol3.HeaderText = "状态"; this.dgvQueueCol4.HeaderText = "类别数";
+
+            this.rootLayout.Controls.Add(this.toolbar,0,0);
+            this.rootLayout.Controls.Add(this.bodyLayout,0,1);
+            this.rootLayout.Controls.Add(this.grpQueue,0,2);
+            this.AutoScaleDimensions = new SizeF(8F,15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.BackColor = Color.FromArgb(247, 247, 247);
+            this.BackColor = Color.FromArgb(247,247,247);
+            this.Controls.Add(this.rootLayout);
             this.Name = "DatasetAnnotationPage";
-            this.Size = new Size(1400, 820);
+            this.Padding = new Padding(14,10,4,10);
+            this.Size = new Size(1400,820);
+            ((ISupportInitialize)(this.dgvImages)).EndInit();
+            ((ISupportInitialize)(this.dgvClasses)).EndInit();
+            ((ISupportInitialize)(this.numLineWidth)).EndInit();
+            ((ISupportInitialize)(this.numThreshold)).EndInit();
+            ((ISupportInitialize)(this.dgvLayers)).EndInit();
+            ((ISupportInitialize)(this.dgvQueue)).EndInit();
             this.ResumeLayout(false);
-        }
-
-        private void BuildView()
-        {
-            this.SuspendLayout();
-            this.Controls.Clear();
-            this.Dock = DockStyle.Fill;
-            this.BackColor = UiTheme.Page;
-            this.Padding = new Padding(14, 10, 4, 10);
-
-            TableLayoutPanel root = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 3,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 46F));
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 105F));
-            root.Controls.Add(UiFactory.Toolbar("导入图片", "Rectangle", "Polygon", "Brush", "Eraser", "Mask修改", "自动修正", "版本管理"), 0, 0);
-            root.Controls.Add(BuildMainBody(), 0, 1);
-            root.Controls.Add(UiFactory.Card("标注队列 / 缩略图", BuildFilmstrip()), 0, 2);
-
-            this.Controls.Add(root);
-            this.ResumeLayout(true);
-        }
-
-        private Control BuildMainBody()
-        {
-            TableLayoutPanel body = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 3,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            body.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 235F));
-            body.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            body.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 290F));
-
-            string[][] images =
-            {
-                new[] { "IMG_142310.png", "已标注" },
-                new[] { "IMG_143105.png", "已标注" },
-                new[] { "IMG_143701.png", "部分标注" },
-                new[] { "IMG_144203.png", "未标注" },
-                new[] { "IMG_144856.png", "已标注" },
-                new[] { "IMG_142756.png", "已标注" },
-                new[] { "IMG_143012.png", "未标注" }
-            };
-            imageGrid = UiFactory.Grid(new[] { "文件", "状态" }, images);
-            body.Controls.Add(UiFactory.Card("数据集图片", imageGrid), 0, 0);
-
-            annotationCanvas = new Panel
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(62, 62, 62),
-                Margin = new Padding(8)
-            };
-            annotationCanvas.Paint += PaintAnnotationCanvas;
-            body.Controls.Add(UiFactory.Card("标注画布  |  2048 × 1536  |  Fit", annotationCanvas), 1, 0);
-
-            body.Controls.Add(BuildRightPanel(), 2, 0);
-            return body;
-        }
-
-        private void PaintAnnotationCanvas(object sender, PaintEventArgs e)
-        {
-            Panel canvas = sender as Panel;
-            if (canvas == null) return;
-            int w = Math.Max(80, (canvas.Width - 80) / 3);
-            int h = Math.Max(80, (canvas.Height - 70) / 2);
-            for (int r = 0; r < 2; r++)
-            {
-                for (int c = 0; c < 3; c++)
-                {
-                    Rectangle box = new Rectangle(25 + c * (w + 15), 25 + r * (h + 15), w, h);
-                    using (Brush b = new SolidBrush(Color.FromArgb(155, 155, 155)))
-                    {
-                        e.Graphics.FillEllipse(b, box.X + 20, box.Y + 10, Math.Max(20, box.Width - 40), Math.Max(20, box.Height - 20));
-                    }
-                    using (Pen p = new Pen(Color.White, 1.5F))
-                    {
-                        e.Graphics.DrawRectangle(p, box);
-                    }
-                    e.Graphics.DrawString((c + r * 3 + 1).ToString("00") + "  标注区域", UiTheme.Font(8F, true), Brushes.White, box.X + 6, box.Y + 6);
-                }
-            }
-        }
-
-        private Control BuildRightPanel()
-        {
-            TableLayoutPanel right = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 4,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            right.RowStyles.Add(new RowStyle(SizeType.Percent, 28F));
-            right.RowStyles.Add(new RowStyle(SizeType.Percent, 22F));
-            right.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-            right.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-
-            string[][] classes =
-            {
-                new[] { "1", "划痕", "Rectangle" },
-                new[] { "2", "缺料", "Polygon" },
-                new[] { "3", "裂纹", "Polygon" },
-                new[] { "4", "脏污", "Brush/Mask" }
-            };
-            classGrid = UiFactory.Grid(new[] { "ID", "类别", "类型" }, classes);
-            right.Controls.Add(UiFactory.Card("瑕疵类别", classGrid), 0, 0);
-            right.Controls.Add(UiFactory.Card("当前类别", UiFactory.KeyValues(new[,] { { "类别：", "划痕 (ID:1)" }, { "线宽：", "2" }, { "置信度阈值：", "0.50" } }, 45)), 0, 1);
-            right.Controls.Add(UiFactory.Card("图层与标注属性", UiFactory.KeyValues(new[,] { { "划痕：", "4 / 可见" }, { "缺料：", "1 / 可见" }, { "裂纹：", "1 / 可见" }, { "脏污：", "1 / 可见" } }, 45)), 0, 2);
-            right.Controls.Add(UiFactory.Card("标注质量", UiFactory.KeyValues(new[,] { { "总标注：", "7" }, { "边界完整性：", "0.92" }, { "综合评分：", "0.94" }, { "建议：", "通过" } }, 45)), 0, 3);
-            return right;
-        }
-
-        private Control BuildFilmstrip()
-        {
-            FlowLayoutPanel film = new FlowLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                FlowDirection = FlowDirection.LeftToRight,
-                WrapContents = false,
-                AutoScroll = true,
-                BackColor = UiTheme.Surface,
-                Padding = new Padding(10, 8, 0, 6)
-            };
-            for (int i = 1; i <= 10; i++)
-            {
-                Panel thumb = new Panel
-                {
-                    Width = 92,
-                    Height = 72,
-                    BackColor = Color.FromArgb(220, 220, 220),
-                    Margin = new Padding(0, 0, 8, 0)
-                };
-                Label label = UiFactory.Label(i.ToString("0000") + "\n" + (i % 4 == 0 ? "未标注" : "已标注"), 8F, false, ContentAlignment.MiddleCenter);
-                thumb.Controls.Add(label);
-                film.Controls.Add(thumb);
-            }
-            return film;
         }
     }
 }
