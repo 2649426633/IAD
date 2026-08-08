@@ -1,25 +1,110 @@
-# IAD - 通用工业瑕疵质检系统
+# IAD — 通用工业瑕疵质检系统
 
-本仓库采用 **C# WinForms (.NET Framework 4.7.2)**，按工业软件页面职责重新组织。
+IAD（Industrial Anomaly Detection）是一套面向工业视觉质检场景的 Windows 桌面应用。目前项目已经打通“产品定义 → 数据集导入 → 人工标注 → 瑕疵模板辅助识别 → 标注回写”的本地业务闭环，并使用 SQLite 持久化产品、类别、图片、标注和版本数据。
 
-## 项目结构
+## 当前进度
 
-- `Shell/MainForm`：全屏主壳、左侧导航、页面切换、底部运行状态。
-- `Pages/DashboardPage`：工作台。
-- `Pages/ProductDefinitionPage`：产品定义、定位模板、标定。
-- `Pages/DatasetAnnotationPage`：数据集标注。
-- `Pages/TemplateRecognitionPage`：少样本瑕疵模板识别与辅助扩标。
-- `Pages/TrainingModelsPage`：训练任务、验证验收、模型库。
-- `Pages/RulesRecipePage`：质量规则、检测区域、Inspection Recipe。
-- `Pages/OnlineInspectionPage`：在线/离线图片检测工作台。
-- `Pages/TraceabilityPage`：检测结果追溯与审计。
-- `Pages/SystemSettingsPage`：运行时、存储、部署、备份、适配器配置。
-- `UI/UiTheme`、`UI/UiFactory`：统一灰/黑/白视觉规范与通用控件工厂。
+| 模块 | 状态 | 已实现能力 |
+| --- | --- | --- |
+| 产品定义 | 可用 | 产品新建/切换、基本信息、产品定义版本、基准图、定位参数、缺陷类别、CSV 导入导出、ROI 管理 |
+| 数据集标注 | 可用 | 文件/文件夹/拖拽导入、图片预览与多选删除、矩形/多边形/画笔标注、橡皮擦、图层显隐、边界检查、数据集版本发布 |
+| 产品与标注联动 | 可用 | 标注页面严格跟随当前产品，自动加载对应产品定义版本、缺陷类别、图片、标注和数据集版本 |
+| 瑕疵模板识别 | 基础闭环可用 | 基于已确认标注构建正样本，CPU 原型匹配生成候选，Top-K/NMS、边缘框精修、确认回写、拒绝及 Hard Negative 学习 |
+| 训练与模型 | 页面框架 | 训练任务、验证验收和模型库界面已建立，训练 Worker 尚待接入 |
+| 规则与 Recipe | 页面框架 | 质量规则、检测区域和 Recipe 页面已建立，执行引擎尚待接入 |
+| 在线检测与追溯 | 页面框架 | 在线/离线检测工作台、结果追溯与审计页面已建立，设备及推理运行时尚待接入 |
+| 系统设置 | 页面框架 | 运行时、存储、部署、备份及适配器配置界面已建立 |
 
-## 窗口策略
+## 推荐使用流程
 
-程序启动后强制最大化、无可调整边框，不提供最小化与普通窗口模式，仅保留关闭入口。
+1. 在“产品定义”中切换或新建产品，填写产品基本信息。
+2. 配置该产品的瑕疵类别和 ROI，保存产品定义。
+3. 进入“数据集标注”，导入图片文件或文件夹。
+4. 选择当前产品的瑕疵类别，使用矩形、多边形或画笔完成首批人工标注。
+5. 发布数据集版本，保存当前图片与标注快照。
+6. 进入“瑕疵模板识别”，选择产品类别，以已有标注作为正样本生成候选。
+7. 对候选执行精修、确认、拒绝或加入难负样本；确认后的候选会直接写回该产品的数据集标注。
 
-## 后续集成边界
+> 产品定义、数据集标注和模板识别共享当前产品上下文。开始标注前应先选择并保存产品；各产品的类别、图片、标注和识别数据彼此隔离。
 
-当前版本完成 UI 骨架与静态演示数据，后续可按架构接入 HALCON、SQLite、ONNX Runtime、Python Trainer Worker、相机/PLC/MES 适配器。
+## 数据集实用操作
+
+- “导入文件”支持一次选择多张图片。
+- “导入文件夹”会递归扫描子目录并过滤不支持的文件。
+- 可以直接将图片或文件夹拖到图片列表进行导入。
+- 图片列表支持 `Ctrl` / `Shift` 多选以及 `Delete` 快捷键删除。
+- 删除图片时会同时清理当前数据集内的关联标注；已被历史数据集版本引用的文件会保留，避免破坏版本快照。
+- 瑕疵类别来自当前产品定义。修改类别后会自动保存，标注页面切换或刷新时加载最新类别。
+
+## 技术栈与运行要求
+
+- C# 7.3
+- WinForms / .NET Framework 4.7.2
+- System.Data.SQLite
+- Windows x64
+- Visual Studio（需安装“.NET 桌面开发”工作负载及 .NET Framework 4.7.2 Developer Pack）
+
+项目固定使用 `x64` 平台，以匹配 SQLite 原生运行时。Debug 和 Release 均应选择 `x64`，不要使用 `Any CPU`。
+
+## 构建与运行
+
+1. 使用 Visual Studio 打开根目录下的 `IAD.sln`。
+2. 将解决方案配置设为 `Debug` 或 `Release`，平台设为 `x64`。
+3. 还原 NuGet 包并生成解决方案。
+4. 启动 `IAD` 项目。
+
+也可以在 Visual Studio Developer PowerShell 中构建：
+
+```powershell
+msbuild IAD.sln /restore /p:Configuration=Debug /p:Platform=x64
+```
+
+当前开发版本暂时跳过登录页并直接进入主界面；登录窗体和会话框架已经保留，正式部署前需恢复登录流程并接入角色权限。
+
+## 本地数据与目录
+
+程序首次启动时会在可执行文件同级创建 `Workspace`，核心目录如下：
+
+```text
+Workspace/
+├─ project.db       # SQLite 业务数据库
+├─ Images/          # 导入的数据集图片
+├─ Masks/           # Mask 文件
+├─ Templates/       # 模板资源
+├─ Models/          # 模型文件
+├─ TrainingRuns/    # 训练任务产物
+├─ Results/         # 检测结果
+├─ Logs/            # 运行日志
+└─ Cache/           # 临时缓存
+```
+
+`Workspace` 属于运行时生产数据，不应提交到 Git。迁移或备份项目时，需要同时备份整个 `Workspace` 目录。
+
+## 代码结构
+
+```text
+src/IAD/
+├─ Pages/           # 各业务页面及 Designer 文件
+├─ Shell/           # 主窗体、登录、产品选择和 ROI 管理对话框
+├─ Models/          # 领域模型
+├─ Repositories/    # SQLite 数据访问
+├─ Services/        # 产品、数据集、识别、Recipe 和结果服务
+├─ Infrastructure/  # 数据库初始化及 Workspace 路径
+├─ Security/        # 会话状态
+└─ UI/              # 主题、控件工厂和布局辅助
+```
+
+## 当前算法边界
+
+瑕疵模板识别目前采用无需外部运行时的纯 CPU 灰度特征与类别原型匹配，主要用于验证业务流程、候选审核和算法接口。它不是最终工业部署模型。后续计划接入：
+
+- ONNX Runtime / CUDA / TensorRT 特征提取与推理；
+- HALCON 定位及模板算子；
+- SAM2 等像素级 Mask 精修能力；
+- 可取消的后台批处理和大规模数据集优化；
+- 相机、PLC、MES 等现场适配器；
+- 完整训练 Worker、模型验收和在线检测闭环。
+
+## 开发记录
+
+详细阶段进度、验证结果和遗留事项见 [`开发日志.md`](开发日志.md)。项目约定每次功能开发完成后，都在该文件末尾追加一条记录。
