@@ -5,7 +5,7 @@ namespace IAD.Infrastructure.Database
 {
     internal static class DatabaseInitializer
     {
-        public const int CurrentSchemaVersion = 2;
+        public const int CurrentSchemaVersion = 3;
 
         public static void Initialize(SqliteConnectionFactory connectionFactory)
         {
@@ -25,10 +25,14 @@ namespace IAD.Infrastructure.Database
                     foreach (string sql in SchemaStatements)
                     {
                         using (SQLiteCommand command = new SQLiteCommand(sql, connection, transaction))
-                        {
                             command.ExecuteNonQuery();
-                        }
                     }
+
+                    EnsureColumn(connection, transaction, "DefectCategories", "DefectType", "TEXT NULL");
+                    EnsureColumn(connection, transaction, "DefectCategories", "DetectionStrategy", "TEXT NULL");
+                    EnsureColumn(connection, transaction, "DefectCategories", "DefaultThreshold", "REAL NOT NULL DEFAULT 0.8");
+                    EnsureColumn(connection, transaction, "DefectCategories", "MinArea", "REAL NOT NULL DEFAULT 0");
+                    EnsureColumn(connection, transaction, "DefectCategories", "MinLength", "REAL NOT NULL DEFAULT 0");
 
                     using (SQLiteCommand versionCommand = new SQLiteCommand(
                         "INSERT OR REPLACE INTO SchemaInfo (Key, Value) VALUES ('SchemaVersion', @Value);",
@@ -41,6 +45,29 @@ namespace IAD.Infrastructure.Database
 
                     transaction.Commit();
                 }
+            }
+        }
+
+        private static void EnsureColumn(SQLiteConnection connection, SQLiteTransaction transaction, string tableName, string columnName, string definition)
+        {
+            bool exists = false;
+            using (SQLiteCommand command = new SQLiteCommand("PRAGMA table_info(" + tableName + ");", connection, transaction))
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    if (string.Equals(Convert.ToString(reader["name"]), columnName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!exists)
+            {
+                using (SQLiteCommand alter = new SQLiteCommand("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " " + definition + ";", connection, transaction))
+                    alter.ExecuteNonQuery();
             }
         }
 
@@ -93,6 +120,11 @@ namespace IAD.Infrastructure.Database
                 ProductId INTEGER NOT NULL,
                 CategoryCode TEXT NOT NULL,
                 CategoryName TEXT NOT NULL,
+                DefectType TEXT NULL,
+                DetectionStrategy TEXT NULL,
+                DefaultThreshold REAL NOT NULL DEFAULT 0.8,
+                MinArea REAL NOT NULL DEFAULT 0,
+                MinLength REAL NOT NULL DEFAULT 0,
                 DisplayOrder INTEGER NOT NULL DEFAULT 0,
                 IsEnabled INTEGER NOT NULL DEFAULT 1,
                 CreatedAtUtc TEXT NOT NULL,
