@@ -84,6 +84,19 @@ namespace IAD.Repositories
             }
         }
 
+        public void Delete(long id, long productId)
+        {
+            using (SQLiteConnection connection = connectionFactory.CreateOpenConnection())
+            using (SQLiteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "DELETE FROM DefectCategories WHERE Id = @Id AND ProductId = @ProductId;";
+                command.Parameters.AddWithValue("@Id", id);
+                command.Parameters.AddWithValue("@ProductId", productId);
+                if (command.ExecuteNonQuery() == 0)
+                    throw new InvalidOperationException("未找到需要删除的缺陷类别。Id=" + id);
+            }
+        }
+
         private static void AddParameters(SQLiteCommand command, DefectCategory category)
         {
             command.Parameters.AddWithValue("@ProductId", category.ProductId);
