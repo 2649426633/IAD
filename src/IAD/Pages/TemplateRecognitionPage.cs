@@ -7,6 +7,7 @@ namespace IAD.Pages
         public TemplateRecognitionPage()
         {
             InitializeComponent();
+            BuildView();
             BindEvents();
         }
 
