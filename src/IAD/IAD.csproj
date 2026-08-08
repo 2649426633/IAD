@@ -45,6 +45,7 @@
     <Compile Include="Shell\LoginForm.Designer.cs"><DependentUpon>LoginForm.cs</DependentUpon></Compile>
     <Compile Include="Shell\MainForm.cs"><SubType>Form</SubType></Compile>
     <Compile Include="Shell\MainForm.Designer.cs"><DependentUpon>MainForm.cs</DependentUpon></Compile>
+    <Compile Include="Shell\MainForm.Session.cs"><DependentUpon>MainForm.cs</DependentUpon></Compile>
     <Compile Include="UI\UiTheme.cs" />
     <Compile Include="UI\UiFactory.cs" />
     <Compile Include="UI\ResponsiveLayoutManager.cs" />
