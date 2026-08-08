@@ -8,12 +8,18 @@ namespace IAD.Services
     public sealed class ProductService
     {
         private readonly IProductRepository products;
+        private readonly IProductDefinitionSettingsRepository settings;
         private readonly IDefectCategoryRepository categories;
         private readonly IRoiRepository rois;
 
-        internal ProductService(IProductRepository products, IDefectCategoryRepository categories, IRoiRepository rois)
+        internal ProductService(
+            IProductRepository products,
+            IProductDefinitionSettingsRepository settings,
+            IDefectCategoryRepository categories,
+            IRoiRepository rois)
         {
             this.products = products ?? throw new ArgumentNullException("products");
+            this.settings = settings ?? throw new ArgumentNullException("settings");
             this.categories = categories ?? throw new ArgumentNullException("categories");
             this.rois = rois ?? throw new ArgumentNullException("rois");
         }
@@ -26,6 +32,13 @@ namespace IAD.Services
         public Product GetProduct(long productId)
         {
             return products.GetById(productId);
+        }
+
+        public ProductDefinitionSettings GetDefinitionSettings(long productId)
+        {
+            EnsureProductExists(productId);
+            ProductDefinitionSettings value = settings.GetByProduct(productId);
+            return value ?? CreateDefaultSettings(productId);
         }
 
         public IList<DefectCategory> GetDefectCategories(long productId)
@@ -57,6 +70,7 @@ namespace IAD.Services
                 UpdatedAtUtc = now
             };
             product.Id = products.Insert(product);
+            SaveDefinitionSettings(CreateDefaultSettings(product.Id));
             return product;
         }
 
@@ -67,9 +81,43 @@ namespace IAD.Services
 
             product.ProductCode = NormalizeRequired(product.ProductCode, "产品编号");
             product.ProductName = NormalizeRequired(product.ProductName, "产品名称");
+
+            Product sameCode = products.GetByCode(product.ProductCode);
+            if (sameCode != null && sameCode.Id != product.Id)
+                throw new InvalidOperationException("产品编号已存在：" + product.ProductCode);
+
             product.Description = NormalizeOptional(product.Description);
             product.UpdatedAtUtc = DateTime.UtcNow;
             products.Update(product);
+        }
+
+        public ProductDefinitionSettings SaveDefinitionSettings(ProductDefinitionSettings value)
+        {
+            if (value == null) throw new ArgumentNullException("value");
+            EnsureProductExists(value.ProductId);
+            if (value.ProductCount <= 0) throw new ArgumentException("单图产品数必须大于0。", "value");
+            if (value.MatchCount <= 0) throw new ArgumentException("匹配数量必须大于0。", "value");
+            if (value.MinScore < 0 || value.MinScore > 1) throw new ArgumentException("最小Score必须在0到1之间。", "value");
+            if (value.PixelX <= 0 || value.PixelY <= 0) throw new ArgumentException("像素标定值必须大于0。", "value");
+
+            value.ImageSize = NormalizeOptional(value.ImageSize);
+            value.Pose = NormalizeOptional(value.Pose);
+            value.AcquisitionCondition = NormalizeOptional(value.AcquisitionCondition);
+            value.ReferenceImagePath = NormalizeOptional(value.ReferenceImagePath);
+            value.TemplateType = NormalizeOptional(value.TemplateType);
+            value.LocalizationMethod = NormalizeOptional(value.LocalizationMethod);
+            value.ModelType = NormalizeOptional(value.ModelType);
+            value.AngleRange = NormalizeOptional(value.AngleRange);
+            value.ScaleRange = NormalizeOptional(value.ScaleRange);
+            value.LengthUnit = NormalizeOptional(value.LengthUnit);
+            value.AreaUnit = NormalizeOptional(value.AreaUnit);
+            value.CalibrationVersion = NormalizeOptional(value.CalibrationVersion);
+            value.CalibrationState = NormalizeOptional(value.CalibrationState);
+            value.ProductDefinitionVersion = NormalizeOptional(value.ProductDefinitionVersion);
+            value.TemplateVersion = NormalizeOptional(value.TemplateVersion);
+            value.UpdatedAtUtc = DateTime.UtcNow;
+            settings.Upsert(value);
+            return value;
         }
 
         public DefectCategory SaveDefectCategory(DefectCategory category)
@@ -96,6 +144,12 @@ namespace IAD.Services
             return category;
         }
 
+        public void DeleteDefectCategory(long productId, long categoryId)
+        {
+            EnsureProductExists(productId);
+            categories.Delete(categoryId, productId);
+        }
+
         public RoiDefinition SaveRoi(RoiDefinition roi)
         {
             if (roi == null) throw new ArgumentNullException("roi");
@@ -120,6 +174,47 @@ namespace IAD.Services
             }
 
             return roi;
+        }
+
+        public void DeleteRoi(long productId, long roiId)
+        {
+            EnsureProductExists(productId);
+            rois.Delete(roiId, productId);
+        }
+
+        public void DeleteAllRois(long productId)
+        {
+            EnsureProductExists(productId);
+            rois.DeleteByProduct(productId);
+        }
+
+        public static ProductDefinitionSettings CreateDefaultSettings(long productId)
+        {
+            return new ProductDefinitionSettings
+            {
+                ProductId = productId,
+                ImageSize = string.Empty,
+                ProductCount = 1,
+                Pose = "允许旋转",
+                AcquisitionCondition = string.Empty,
+                ReferenceImagePath = string.Empty,
+                TemplateType = "Shape Model",
+                LocalizationMethod = "Shape Matching",
+                ModelType = "Shape Model",
+                MinScore = 0.8,
+                AngleRange = "-180 ~ 180 deg",
+                ScaleRange = "0.90 ~ 1.10",
+                MatchCount = 1,
+                PixelX = 1,
+                PixelY = 1,
+                LengthUnit = "px",
+                AreaUnit = "px²",
+                CalibrationVersion = "CAL-1.0.0",
+                CalibrationState = "未标定",
+                ProductDefinitionVersion = "PD-1.0.0",
+                TemplateVersion = "LT-1.0.0",
+                UpdatedAtUtc = DateTime.UtcNow
+            };
         }
 
         private void EnsureProductExists(long productId)

@@ -93,6 +93,30 @@ namespace IAD.Repositories
             }
         }
 
+        public void Delete(long id, long productId)
+        {
+            using (SQLiteConnection connection = connectionFactory.CreateOpenConnection())
+            using (SQLiteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "DELETE FROM ProductRois WHERE Id = @Id AND ProductId = @ProductId;";
+                command.Parameters.AddWithValue("@Id", id);
+                command.Parameters.AddWithValue("@ProductId", productId);
+                if (command.ExecuteNonQuery() == 0)
+                    throw new InvalidOperationException("未找到需要删除的ROI。Id=" + id);
+            }
+        }
+
+        public void DeleteByProduct(long productId)
+        {
+            using (SQLiteConnection connection = connectionFactory.CreateOpenConnection())
+            using (SQLiteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "DELETE FROM ProductRois WHERE ProductId = @ProductId;";
+                command.Parameters.AddWithValue("@ProductId", productId);
+                command.ExecuteNonQuery();
+            }
+        }
+
         private static void AddParameters(SQLiteCommand command, RoiDefinition roi)
         {
             command.Parameters.AddWithValue("@ProductId", roi.ProductId);
