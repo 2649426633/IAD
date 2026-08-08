@@ -10,6 +10,10 @@ namespace IAD.Shell
         private TableLayoutPanel rootLayout;
         private Label lblTitle;
         private DataGridView dgvProducts;
+        private DataGridViewTextBoxColumn colCode;
+        private DataGridViewTextBoxColumn colName;
+        private DataGridViewTextBoxColumn colState;
+        private DataGridViewTextBoxColumn colUpdated;
         private FlowLayoutPanel buttonPanel;
         private Button btnNew;
         private Button btnOpen;
@@ -27,21 +31,30 @@ namespace IAD.Shell
             this.rootLayout = new TableLayoutPanel();
             this.lblTitle = new Label();
             this.dgvProducts = new DataGridView();
+            this.colCode = new DataGridViewTextBoxColumn();
+            this.colName = new DataGridViewTextBoxColumn();
+            this.colState = new DataGridViewTextBoxColumn();
+            this.colUpdated = new DataGridViewTextBoxColumn();
             this.buttonPanel = new FlowLayoutPanel();
             this.btnNew = new Button();
             this.btnOpen = new Button();
             this.btnCancel = new Button();
+            this.rootLayout.SuspendLayout();
             ((ISupportInitialize)(this.dgvProducts)).BeginInit();
+            this.buttonPanel.SuspendLayout();
             this.SuspendLayout();
 
             this.rootLayout.ColumnCount = 1;
             this.rootLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            this.rootLayout.Controls.Add(this.lblTitle, 0, 0);
+            this.rootLayout.Controls.Add(this.dgvProducts, 0, 1);
+            this.rootLayout.Controls.Add(this.buttonPanel, 0, 2);
+            this.rootLayout.Dock = DockStyle.Fill;
+            this.rootLayout.Padding = new Padding(16);
             this.rootLayout.RowCount = 3;
             this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 52F));
             this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 56F));
-            this.rootLayout.Dock = DockStyle.Fill;
-            this.rootLayout.Padding = new Padding(16);
 
             this.lblTitle.Dock = DockStyle.Fill;
             this.lblTitle.Font = new Font("Microsoft YaHei UI", 12F, FontStyle.Bold);
@@ -54,38 +67,40 @@ namespace IAD.Shell
             this.dgvProducts.BackgroundColor = Color.White;
             this.dgvProducts.BorderStyle = BorderStyle.Fixed3D;
             this.dgvProducts.ColumnHeadersHeight = 32;
+            this.dgvProducts.Columns.AddRange(new DataGridViewColumn[] { this.colCode, this.colName, this.colState, this.colUpdated });
             this.dgvProducts.Dock = DockStyle.Fill;
             this.dgvProducts.MultiSelect = false;
             this.dgvProducts.ReadOnly = true;
             this.dgvProducts.RowHeadersVisible = false;
             this.dgvProducts.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            this.dgvProducts.Columns.Add("colCode", "产品编号");
-            this.dgvProducts.Columns.Add("colName", "产品名称");
-            this.dgvProducts.Columns.Add("colState", "状态");
-            this.dgvProducts.Columns.Add("colUpdated", "更新时间");
             this.dgvProducts.CellDoubleClick += new DataGridViewCellEventHandler(this.dgvProducts_CellDoubleClick);
 
+            this.colCode.HeaderText = "产品编号";
+            this.colCode.Name = "colCode";
+            this.colName.HeaderText = "产品名称";
+            this.colName.Name = "colName";
+            this.colState.HeaderText = "状态";
+            this.colState.Name = "colState";
+            this.colUpdated.HeaderText = "更新时间";
+            this.colUpdated.Name = "colUpdated";
+
+            this.buttonPanel.Controls.Add(this.btnCancel);
+            this.buttonPanel.Controls.Add(this.btnOpen);
+            this.buttonPanel.Controls.Add(this.btnNew);
             this.buttonPanel.Dock = DockStyle.Fill;
             this.buttonPanel.FlowDirection = FlowDirection.RightToLeft;
             this.buttonPanel.Padding = new Padding(0, 10, 0, 0);
             this.buttonPanel.WrapContents = false;
 
-            this.btnCancel.Text = "取消";
-            this.btnCancel.Size = new Size(88, 34);
             this.btnCancel.DialogResult = DialogResult.Cancel;
-            this.btnOpen.Text = "打开";
+            this.btnCancel.Size = new Size(88, 34);
+            this.btnCancel.Text = "取消";
             this.btnOpen.Size = new Size(88, 34);
+            this.btnOpen.Text = "打开";
             this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
-            this.btnNew.Text = "新建产品";
             this.btnNew.Size = new Size(100, 34);
+            this.btnNew.Text = "新建产品";
             this.btnNew.Click += new System.EventHandler(this.btnNew_Click);
-
-            this.buttonPanel.Controls.Add(this.btnCancel);
-            this.buttonPanel.Controls.Add(this.btnOpen);
-            this.buttonPanel.Controls.Add(this.btnNew);
-            this.rootLayout.Controls.Add(this.lblTitle, 0, 0);
-            this.rootLayout.Controls.Add(this.dgvProducts, 0, 1);
-            this.rootLayout.Controls.Add(this.buttonPanel, 0, 2);
 
             this.AcceptButton = this.btnOpen;
             this.CancelButton = this.btnCancel;
@@ -100,7 +115,9 @@ namespace IAD.Shell
             this.StartPosition = FormStartPosition.CenterParent;
             this.Text = "产品管理";
 
+            this.rootLayout.ResumeLayout(false);
             ((ISupportInitialize)(this.dgvProducts)).EndInit();
+            this.buttonPanel.ResumeLayout(false);
             this.ResumeLayout(false);
         }
     }
