@@ -114,6 +114,8 @@ namespace IAD.UI
             {
                 process.Padding = narrow ? new Padding(2) : new Padding(6, 4, 6, 4);
             }
+
+            SetRowsEvenly(Field<TableLayoutPanel>(page, "pendingLayout"));
         }
 
         private static void OptimizeProductDefinition(UserControl page, bool narrow, bool compactHeight)
@@ -158,6 +160,9 @@ namespace IAD.UI
             SetRow(right, 1, SizeType.Percent, 23F);
             SetRow(right, 2, SizeType.Percent, 24F);
             SetRow(right, 3, SizeType.Percent, 24F);
+
+            SetRowsEvenly(Field<TableLayoutPanel>(page, "currentClassLayout"));
+            SetRowsEvenly(Field<TableLayoutPanel>(page, "qualityLayout"));
 
             SetFlowScroll(page, "toolbar");
         }
@@ -270,6 +275,10 @@ namespace IAD.UI
                 SetColumn(middle, 1, SizeType.Percent, 34F);
                 SetColumn(middle, 2, SizeType.Percent, 28F);
             }
+
+            SetRowsEvenly(Field<TableLayoutPanel>(page, "recipeLayout"));
+            SetRowsEvenly(Field<TableLayoutPanel>(page, "acceptanceLayout"));
+            SetRowsEvenly(Field<TableLayoutPanel>(page, "estimateLayout"));
         }
 
         private static void OptimizeOnlineInspection(UserControl page, bool narrow, bool compactHeight)
@@ -305,6 +314,9 @@ namespace IAD.UI
                 SetColumn(bottom, 1, SizeType.Percent, 24F);
                 SetColumn(bottom, 2, SizeType.Percent, 28F);
             }
+
+            SetRowsEvenly(Field<TableLayoutPanel>(page, "pipelineLayout"));
+            SetRowsEvenly(Field<TableLayoutPanel>(page, "backendLayout"));
 
             SetFlowScroll(page, "toolbar");
         }
@@ -368,6 +380,8 @@ namespace IAD.UI
             SetColumn(bottom, 1, SizeType.Percent, 42F);
             SetColumn(bottom, 2, SizeType.Percent, narrow ? 22F : 20F);
 
+            SetRowsEvenly(Field<TableLayoutPanel>(page, "detailLayout"));
+
             SetFlowScroll(page, "exportPanel");
         }
 
@@ -397,6 +411,34 @@ namespace IAD.UI
         {
             foreach (Control control in parent.Controls)
             {
+                GroupBox groupBox = control as GroupBox;
+                if (groupBox != null)
+                {
+                    groupBox.BackColor = UiTheme.Surface;
+                    groupBox.ForeColor = UiTheme.Text;
+                }
+
+                Label label = control as Label;
+                if (label != null && control.Parent is TableLayoutPanel)
+                {
+                    // Designer-created labels keep their small design-time bounds by default.
+                    // When a TableLayoutPanel is resized for the current DPI, that stale bound
+                    // can collapse the text to a single character. Let the table cell own the
+                    // label bounds and preserve any explicit horizontal alignment.
+                    label.AutoSize = false;
+                    label.AutoEllipsis = true;
+                    label.Dock = DockStyle.Fill;
+                    label.Margin = new Padding(4, 0, 4, 0);
+                    label.TextAlign = WithMiddleVerticalAlignment(label.TextAlign);
+
+                    if (string.Equals(label.Text, "→", StringComparison.Ordinal))
+                    {
+                        label.AutoEllipsis = false;
+                        label.Margin = Padding.Empty;
+                        label.TextAlign = ContentAlignment.MiddleCenter;
+                    }
+                }
+
                 DataGridView grid = control as DataGridView;
                 if (grid != null)
                 {
@@ -428,11 +470,22 @@ namespace IAD.UI
                 }
 
                 Button button = control as Button;
-                if (button != null && control.Parent is FlowLayoutPanel)
+                if (button != null)
                 {
-                    button.AutoSize = true;
-                    button.MinimumSize = new Size(82, 28);
-                    button.Margin = new Padding(3, 3, 3, 3);
+                    button.FlatStyle = FlatStyle.Flat;
+                    button.BackColor = UiTheme.Surface;
+                    button.ForeColor = UiTheme.Text;
+                    button.Cursor = Cursors.Hand;
+                    button.FlatAppearance.BorderColor = Color.FromArgb(178, 178, 178);
+                    button.FlatAppearance.BorderSize = 1;
+                    button.FlatAppearance.MouseOverBackColor = Color.FromArgb(236, 236, 236);
+
+                    if (control.Parent is FlowLayoutPanel)
+                    {
+                        button.AutoSize = true;
+                        button.MinimumSize = new Size(82, 30);
+                        button.Margin = new Padding(3, 3, 3, 3);
+                    }
                 }
 
                 if (control.HasChildren)
@@ -445,18 +498,43 @@ namespace IAD.UI
         private static void ConfigureGrid(DataGridView grid, int pageWidth)
         {
             grid.ScrollBars = ScrollBars.Both;
-            grid.ColumnHeadersHeight = 30;
-            grid.RowTemplate.Height = 26;
+            grid.BackgroundColor = UiTheme.Surface;
+            grid.BorderStyle = BorderStyle.FixedSingle;
+            grid.GridColor = UiTheme.SoftBorder;
+            grid.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+            grid.EnableHeadersVisualStyles = false;
+            grid.RowHeadersVisible = false;
+            grid.AllowUserToResizeRows = false;
+            grid.MultiSelect = false;
+            grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            grid.ColumnHeadersHeight = 32;
+            grid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            grid.RowTemplate.Height = 28;
+            grid.ColumnHeadersDefaultCellStyle.BackColor = UiTheme.Header;
+            grid.ColumnHeadersDefaultCellStyle.ForeColor = UiTheme.Text;
+            grid.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            grid.ColumnHeadersDefaultCellStyle.Padding = new Padding(4, 0, 4, 0);
+            grid.ColumnHeadersDefaultCellStyle.WrapMode = DataGridViewTriState.False;
+            grid.DefaultCellStyle.BackColor = UiTheme.Surface;
+            grid.DefaultCellStyle.ForeColor = UiTheme.Text;
+            grid.DefaultCellStyle.SelectionBackColor = Color.FromArgb(222, 232, 242);
+            grid.DefaultCellStyle.SelectionForeColor = UiTheme.Text;
+            grid.DefaultCellStyle.Padding = new Padding(4, 0, 4, 0);
+            grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(250, 250, 250);
 
-            if (pageWidth < CompactWidth && grid.Columns.Count >= 7)
+            int availableWidth = grid.ClientSize.Width;
+            bool crampedGrid = grid.Columns.Count >= 4 &&
+                               availableWidth > 0 &&
+                               availableWidth / grid.Columns.Count < 88;
+            if ((pageWidth < CompactWidth && grid.Columns.Count >= 7) || crampedGrid)
             {
                 grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
                 foreach (DataGridViewColumn column in grid.Columns)
                 {
                     column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-                    column.MinimumWidth = 64;
+                    column.MinimumWidth = 72;
                     string header = column.HeaderText ?? string.Empty;
-                    int width = 82;
+                    int width = 88;
                     if (header.Contains("批次") || header.Contains("时间") || header.Contains("版本") ||
                         header.Contains("模型") || header.Contains("路径") || header.Contains("Recipe") ||
                         header.Contains("Confidence"))
@@ -481,6 +559,23 @@ namespace IAD.UI
             }
         }
 
+        private static ContentAlignment WithMiddleVerticalAlignment(ContentAlignment alignment)
+        {
+            switch (alignment)
+            {
+                case ContentAlignment.TopCenter:
+                case ContentAlignment.MiddleCenter:
+                case ContentAlignment.BottomCenter:
+                    return ContentAlignment.MiddleCenter;
+                case ContentAlignment.TopRight:
+                case ContentAlignment.MiddleRight:
+                case ContentAlignment.BottomRight:
+                    return ContentAlignment.MiddleRight;
+                default:
+                    return ContentAlignment.MiddleLeft;
+            }
+        }
+
         private static void SetFlowScroll(UserControl page, string fieldName)
         {
             FlowLayoutPanel flow = Field<FlowLayoutPanel>(page, fieldName);
@@ -488,6 +583,17 @@ namespace IAD.UI
             {
                 flow.AutoScroll = true;
                 flow.WrapContents = false;
+            }
+        }
+
+        private static void SetRowsEvenly(TableLayoutPanel layout)
+        {
+            if (layout == null || layout.RowCount <= 0) return;
+
+            float height = 100F / layout.RowCount;
+            for (int i = 0; i < layout.RowCount; i++)
+            {
+                SetRow(layout, i, SizeType.Percent, height);
             }
         }
 
