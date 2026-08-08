@@ -7,6 +7,7 @@ namespace IAD.Pages
         public DatasetAnnotationPage()
         {
             InitializeComponent();
+            BuildView();
             BindEvents();
         }
 
