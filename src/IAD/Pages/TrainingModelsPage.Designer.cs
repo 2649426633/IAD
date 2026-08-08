@@ -1,16 +1,81 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using IAD.UI;
 
 namespace IAD.Pages
 {
-    public partial class TrainingModelsPage
+    partial class TrainingModelsPage
     {
         private IContainer components = null;
-        private DataGridView trainingJobGrid;
-        private DataGridView modelGrid;
-        private TextBox trainingLog;
+        private TableLayoutPanel rootLayout;
+        private TableLayoutPanel topLayout;
+        private GroupBox grpConfig;
+        private TableLayoutPanel configLayout;
+        private Label lblArchitectureKey;
+        private ComboBox cboArchitecture;
+        private Label lblTileSizeKey;
+        private ComboBox cboTileSize;
+        private Label lblBatchSizeKey;
+        private NumericUpDown numBatchSize;
+        private Label lblEpochKey;
+        private NumericUpDown numEpoch;
+        private Label lblLearningRateKey;
+        private TextBox txtLearningRate;
+        private Label lblAugmentationKey;
+        private TextBox txtAugmentation;
+        private Label lblDeviceKey;
+        private ComboBox cboDevice;
+        private GroupBox grpDatasetSplit;
+        private DataGridView dgvDatasetSplit;
+        private DataGridViewTextBoxColumn dgvDatasetSplitCol1;
+        private DataGridViewTextBoxColumn dgvDatasetSplitCol2;
+        private DataGridViewTextBoxColumn dgvDatasetSplitCol3;
+        private DataGridViewTextBoxColumn dgvDatasetSplitCol4;
+        private DataGridViewTextBoxColumn dgvDatasetSplitCol5;
+        private GroupBox grpTrainingQueue;
+        private DataGridView dgvTrainingQueue;
+        private DataGridViewTextBoxColumn dgvTrainingQueueCol1;
+        private DataGridViewTextBoxColumn dgvTrainingQueueCol2;
+        private DataGridViewTextBoxColumn dgvTrainingQueueCol3;
+        private DataGridViewTextBoxColumn dgvTrainingQueueCol4;
+        private DataGridViewTextBoxColumn dgvTrainingQueueCol5;
+        private DataGridViewTextBoxColumn dgvTrainingQueueCol6;
+        private TableLayoutPanel middleLayout;
+        private GroupBox grpLog;
+        private TextBox txtTrainingLog;
+        private GroupBox grpBenchmark;
+        private DataGridView dgvBenchmark;
+        private DataGridViewTextBoxColumn dgvBenchmarkCol1;
+        private DataGridViewTextBoxColumn dgvBenchmarkCol2;
+        private DataGridViewTextBoxColumn dgvBenchmarkCol3;
+        private DataGridViewTextBoxColumn dgvBenchmarkCol4;
+        private DataGridViewTextBoxColumn dgvBenchmarkCol5;
+        private DataGridViewTextBoxColumn dgvBenchmarkCol6;
+        private DataGridViewTextBoxColumn dgvBenchmarkCol7;
+        private DataGridViewTextBoxColumn dgvBenchmarkCol8;
+        private TableLayoutPanel bottomLayout;
+        private GroupBox grpAcceptance;
+        private TableLayoutPanel acceptanceLayout;
+        private Label lblValMiouKey;
+        private Label lblValMiou;
+        private Label lblF1Key;
+        private Label lblF1;
+        private Label lblRecallKey;
+        private Label lblRecall;
+        private Label lblPrecisionKey;
+        private Label lblPrecision;
+        private Label lblAcceptanceKey;
+        private Label lblAcceptance;
+        private GroupBox grpModelLibrary;
+        private DataGridView dgvModelLibrary;
+        private DataGridViewTextBoxColumn dgvModelLibraryCol1;
+        private DataGridViewTextBoxColumn dgvModelLibraryCol2;
+        private DataGridViewTextBoxColumn dgvModelLibraryCol3;
+        private DataGridViewTextBoxColumn dgvModelLibraryCol4;
+        private DataGridViewTextBoxColumn dgvModelLibraryCol5;
+        private DataGridViewTextBoxColumn dgvModelLibraryCol6;
+        private DataGridViewTextBoxColumn dgvModelLibraryCol7;
+        private DataGridViewTextBoxColumn dgvModelLibraryCol8;
 
         protected override void Dispose(bool disposing)
         {
@@ -21,147 +86,228 @@ namespace IAD.Pages
         private void InitializeComponent()
         {
             this.components = new Container();
+            this.rootLayout = new TableLayoutPanel();
+            this.topLayout = new TableLayoutPanel();
+            this.grpConfig = new GroupBox();
+            this.configLayout = new TableLayoutPanel();
+            this.lblArchitectureKey = new Label();
+            this.cboArchitecture = new ComboBox();
+            this.lblTileSizeKey = new Label();
+            this.cboTileSize = new ComboBox();
+            this.lblBatchSizeKey = new Label();
+            this.numBatchSize = new NumericUpDown();
+            this.lblEpochKey = new Label();
+            this.numEpoch = new NumericUpDown();
+            this.lblLearningRateKey = new Label();
+            this.txtLearningRate = new TextBox();
+            this.lblAugmentationKey = new Label();
+            this.txtAugmentation = new TextBox();
+            this.lblDeviceKey = new Label();
+            this.cboDevice = new ComboBox();
+            this.grpDatasetSplit = new GroupBox();
+            this.dgvDatasetSplit = new DataGridView();
+            this.dgvDatasetSplitCol1 = new DataGridViewTextBoxColumn();
+            this.dgvDatasetSplitCol2 = new DataGridViewTextBoxColumn();
+            this.dgvDatasetSplitCol3 = new DataGridViewTextBoxColumn();
+            this.dgvDatasetSplitCol4 = new DataGridViewTextBoxColumn();
+            this.dgvDatasetSplitCol5 = new DataGridViewTextBoxColumn();
+            this.grpTrainingQueue = new GroupBox();
+            this.dgvTrainingQueue = new DataGridView();
+            this.dgvTrainingQueueCol1 = new DataGridViewTextBoxColumn();
+            this.dgvTrainingQueueCol2 = new DataGridViewTextBoxColumn();
+            this.dgvTrainingQueueCol3 = new DataGridViewTextBoxColumn();
+            this.dgvTrainingQueueCol4 = new DataGridViewTextBoxColumn();
+            this.dgvTrainingQueueCol5 = new DataGridViewTextBoxColumn();
+            this.dgvTrainingQueueCol6 = new DataGridViewTextBoxColumn();
+            this.middleLayout = new TableLayoutPanel();
+            this.grpLog = new GroupBox();
+            this.txtTrainingLog = new TextBox();
+            this.grpBenchmark = new GroupBox();
+            this.dgvBenchmark = new DataGridView();
+            this.dgvBenchmarkCol1 = new DataGridViewTextBoxColumn();
+            this.dgvBenchmarkCol2 = new DataGridViewTextBoxColumn();
+            this.dgvBenchmarkCol3 = new DataGridViewTextBoxColumn();
+            this.dgvBenchmarkCol4 = new DataGridViewTextBoxColumn();
+            this.dgvBenchmarkCol5 = new DataGridViewTextBoxColumn();
+            this.dgvBenchmarkCol6 = new DataGridViewTextBoxColumn();
+            this.dgvBenchmarkCol7 = new DataGridViewTextBoxColumn();
+            this.dgvBenchmarkCol8 = new DataGridViewTextBoxColumn();
+            this.bottomLayout = new TableLayoutPanel();
+            this.grpAcceptance = new GroupBox();
+            this.acceptanceLayout = new TableLayoutPanel();
+            this.lblValMiouKey = new Label();
+            this.lblValMiou = new Label();
+            this.lblF1Key = new Label();
+            this.lblF1 = new Label();
+            this.lblRecallKey = new Label();
+            this.lblRecall = new Label();
+            this.lblPrecisionKey = new Label();
+            this.lblPrecision = new Label();
+            this.lblAcceptanceKey = new Label();
+            this.lblAcceptance = new Label();
+            this.grpModelLibrary = new GroupBox();
+            this.dgvModelLibrary = new DataGridView();
+            this.dgvModelLibraryCol1 = new DataGridViewTextBoxColumn();
+            this.dgvModelLibraryCol2 = new DataGridViewTextBoxColumn();
+            this.dgvModelLibraryCol3 = new DataGridViewTextBoxColumn();
+            this.dgvModelLibraryCol4 = new DataGridViewTextBoxColumn();
+            this.dgvModelLibraryCol5 = new DataGridViewTextBoxColumn();
+            this.dgvModelLibraryCol6 = new DataGridViewTextBoxColumn();
+            this.dgvModelLibraryCol7 = new DataGridViewTextBoxColumn();
+            this.dgvModelLibraryCol8 = new DataGridViewTextBoxColumn();
+            ((ISupportInitialize)(this.numBatchSize)).BeginInit();
+            ((ISupportInitialize)(this.numEpoch)).BeginInit();
+            ((ISupportInitialize)(this.dgvDatasetSplit)).BeginInit();
+            ((ISupportInitialize)(this.dgvTrainingQueue)).BeginInit();
+            ((ISupportInitialize)(this.dgvBenchmark)).BeginInit();
+            ((ISupportInitialize)(this.dgvModelLibrary)).BeginInit();
             this.SuspendLayout();
-            this.AutoScaleDimensions = new SizeF(8F, 15F);
+
+            this.rootLayout.BackColor = Color.FromArgb(247,247,247);
+            this.rootLayout.ColumnCount = 1;
+            this.rootLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100F));
+            this.rootLayout.Dock = DockStyle.Fill;
+            this.rootLayout.RowCount = 3;
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute,250F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Percent,100F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute,195F));
+
+            this.topLayout.ColumnCount = 3;
+            this.topLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,27F));
+            this.topLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,27F));
+            this.topLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,46F));
+            this.topLayout.Dock = DockStyle.Fill;
+
+            this.grpConfig.Dock = DockStyle.Fill;
+            this.grpConfig.Text = "训练配置";
+            this.grpConfig.Controls.Add(this.configLayout);
+            this.configLayout.ColumnCount = 2;
+            this.configLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,42F));
+            this.configLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,58F));
+            this.configLayout.Dock = DockStyle.Fill;
+            this.configLayout.RowCount = 7;
+            this.lblArchitectureKey.Text = "模型结构";
+            this.cboArchitecture.Items.AddRange(new object[] { "SegFormer-B2", "SegFormer-B1", "UNet" });
+            this.cboArchitecture.SelectedIndex = 0;
+            this.lblTileSizeKey.Text = "Tile Size";
+            this.cboTileSize.Items.AddRange(new object[] { "1024 × 1024", "768 × 768", "512 × 512" });
+            this.cboTileSize.SelectedIndex = 0;
+            this.lblBatchSizeKey.Text = "Batch Size";
+            this.numBatchSize.Minimum = 1; this.numBatchSize.Maximum = 64; this.numBatchSize.Value = 16;
+            this.lblEpochKey.Text = "Epoch";
+            this.numEpoch.Minimum = 1; this.numEpoch.Maximum = 1000; this.numEpoch.Value = 100;
+            this.lblLearningRateKey.Text = "学习率";
+            this.txtLearningRate.Text = "0.0001";
+            this.lblAugmentationKey.Text = "数据增强";
+            this.txtAugmentation.Text = "翻转 / 旋转 / 抖动 / 裁剪";
+            this.lblDeviceKey.Text = "GPU / CPU";
+            this.cboDevice.Items.AddRange(new object[] { "自动选择", "GPU", "CPU" });
+            this.cboDevice.SelectedIndex = 0;
+            this.configLayout.Controls.Add(this.lblArchitectureKey,0,0); this.configLayout.Controls.Add(this.cboArchitecture,1,0);
+            this.configLayout.Controls.Add(this.lblTileSizeKey,0,1); this.configLayout.Controls.Add(this.cboTileSize,1,1);
+            this.configLayout.Controls.Add(this.lblBatchSizeKey,0,2); this.configLayout.Controls.Add(this.numBatchSize,1,2);
+            this.configLayout.Controls.Add(this.lblEpochKey,0,3); this.configLayout.Controls.Add(this.numEpoch,1,3);
+            this.configLayout.Controls.Add(this.lblLearningRateKey,0,4); this.configLayout.Controls.Add(this.txtLearningRate,1,4);
+            this.configLayout.Controls.Add(this.lblAugmentationKey,0,5); this.configLayout.Controls.Add(this.txtAugmentation,1,5);
+            this.configLayout.Controls.Add(this.lblDeviceKey,0,6); this.configLayout.Controls.Add(this.cboDevice,1,6);
+
+            this.grpDatasetSplit.Dock = DockStyle.Fill;
+            this.grpDatasetSplit.Text = "数据集划分";
+            this.grpDatasetSplit.Controls.Add(this.dgvDatasetSplit);
+            this.dgvDatasetSplit.Dock = DockStyle.Fill;
+            this.dgvDatasetSplit.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvDatasetSplit.ReadOnly = true;
+            this.dgvDatasetSplit.RowHeadersVisible = false;
+            this.dgvDatasetSplit.Columns.AddRange(new DataGridViewColumn[] { this.dgvDatasetSplitCol1, this.dgvDatasetSplitCol2, this.dgvDatasetSplitCol3, this.dgvDatasetSplitCol4, this.dgvDatasetSplitCol5 });
+            this.dgvDatasetSplitCol1.HeaderText = "集合"; this.dgvDatasetSplitCol2.HeaderText = "图片数"; this.dgvDatasetSplitCol3.HeaderText = "占比"; this.dgvDatasetSplitCol4.HeaderText = "缺陷实例"; this.dgvDatasetSplitCol5.HeaderText = "占比";
+
+            this.grpTrainingQueue.Dock = DockStyle.Fill;
+            this.grpTrainingQueue.Text = "训练任务队列";
+            this.grpTrainingQueue.Controls.Add(this.dgvTrainingQueue);
+            this.dgvTrainingQueue.Dock = DockStyle.Fill;
+            this.dgvTrainingQueue.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvTrainingQueue.ReadOnly = true;
+            this.dgvTrainingQueue.RowHeadersVisible = false;
+            this.dgvTrainingQueue.Columns.AddRange(new DataGridViewColumn[] { this.dgvTrainingQueueCol1, this.dgvTrainingQueueCol2, this.dgvTrainingQueueCol3, this.dgvTrainingQueueCol4, this.dgvTrainingQueueCol5, this.dgvTrainingQueueCol6 });
+            this.dgvTrainingQueueCol1.HeaderText = "任务ID"; this.dgvTrainingQueueCol2.HeaderText = "模型"; this.dgvTrainingQueueCol3.HeaderText = "数据集"; this.dgvTrainingQueueCol4.HeaderText = "提交时间"; this.dgvTrainingQueueCol5.HeaderText = "状态"; this.dgvTrainingQueueCol6.HeaderText = "优先级";
+            this.topLayout.Controls.Add(this.grpConfig,0,0);
+            this.topLayout.Controls.Add(this.grpDatasetSplit,1,0);
+            this.topLayout.Controls.Add(this.grpTrainingQueue,2,0);
+
+            this.middleLayout.ColumnCount = 2;
+            this.middleLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,40F));
+            this.middleLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,60F));
+            this.middleLayout.Dock = DockStyle.Fill;
+            this.grpLog.Dock = DockStyle.Fill;
+            this.grpLog.Text = "训练状态 / 实时日志";
+            this.grpLog.Controls.Add(this.txtTrainingLog);
+            this.txtTrainingLog.Dock = DockStyle.Fill;
+            this.txtTrainingLog.Multiline = true;
+            this.txtTrainingLog.ReadOnly = true;
+            this.txtTrainingLog.ScrollBars = ScrollBars.Vertical;
+            this.grpBenchmark.Dock = DockStyle.Fill;
+            this.grpBenchmark.Text = "模型基准对比（验证集）";
+            this.grpBenchmark.Controls.Add(this.dgvBenchmark);
+            this.dgvBenchmark.Dock = DockStyle.Fill;
+            this.dgvBenchmark.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvBenchmark.ReadOnly = true;
+            this.dgvBenchmark.RowHeadersVisible = false;
+            this.dgvBenchmark.Columns.AddRange(new DataGridViewColumn[] { this.dgvBenchmarkCol1, this.dgvBenchmarkCol2, this.dgvBenchmarkCol3, this.dgvBenchmarkCol4, this.dgvBenchmarkCol5, this.dgvBenchmarkCol6, this.dgvBenchmarkCol7, this.dgvBenchmarkCol8 });
+            this.dgvBenchmarkCol1.HeaderText = "模型"; this.dgvBenchmarkCol2.HeaderText = "Recall"; this.dgvBenchmarkCol3.HeaderText = "Precision"; this.dgvBenchmarkCol4.HeaderText = "F1"; this.dgvBenchmarkCol5.HeaderText = "mIoU"; this.dgvBenchmarkCol6.HeaderText = "小缺陷召回"; this.dgvBenchmarkCol7.HeaderText = "推理ms"; this.dgvBenchmarkCol8.HeaderText = "显存GB";
+            this.middleLayout.Controls.Add(this.grpLog,0,0);
+            this.middleLayout.Controls.Add(this.grpBenchmark,1,0);
+
+            this.bottomLayout.ColumnCount = 2;
+            this.bottomLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,31F));
+            this.bottomLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,69F));
+            this.bottomLayout.Dock = DockStyle.Fill;
+            this.grpAcceptance.Dock = DockStyle.Fill;
+            this.grpAcceptance.Text = "验证与验收";
+            this.grpAcceptance.Controls.Add(this.acceptanceLayout);
+            this.acceptanceLayout.ColumnCount = 2;
+            this.acceptanceLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,52F));
+            this.acceptanceLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,48F));
+            this.acceptanceLayout.Dock = DockStyle.Fill;
+            this.acceptanceLayout.RowCount = 5;
+            this.lblValMiouKey.Text = "Validation mIoU"; this.lblValMiou.Text = "0.7421";
+            this.lblF1Key.Text = "F1"; this.lblF1.Text = "0.7518";
+            this.lblRecallKey.Text = "Recall"; this.lblRecall.Text = "0.7325";
+            this.lblPrecisionKey.Text = "Precision"; this.lblPrecision.Text = "0.7719";
+            this.lblAcceptanceKey.Text = "Acceptance"; this.lblAcceptance.Text = "待评估";
+            this.acceptanceLayout.Controls.Add(this.lblValMiouKey,0,0); this.acceptanceLayout.Controls.Add(this.lblValMiou,1,0);
+            this.acceptanceLayout.Controls.Add(this.lblF1Key,0,1); this.acceptanceLayout.Controls.Add(this.lblF1,1,1);
+            this.acceptanceLayout.Controls.Add(this.lblRecallKey,0,2); this.acceptanceLayout.Controls.Add(this.lblRecall,1,2);
+            this.acceptanceLayout.Controls.Add(this.lblPrecisionKey,0,3); this.acceptanceLayout.Controls.Add(this.lblPrecision,1,3);
+            this.acceptanceLayout.Controls.Add(this.lblAcceptanceKey,0,4); this.acceptanceLayout.Controls.Add(this.lblAcceptance,1,4);
+            this.grpModelLibrary.Dock = DockStyle.Fill;
+            this.grpModelLibrary.Text = "模型库";
+            this.grpModelLibrary.Controls.Add(this.dgvModelLibrary);
+            this.dgvModelLibrary.Dock = DockStyle.Fill;
+            this.dgvModelLibrary.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvModelLibrary.ReadOnly = true;
+            this.dgvModelLibrary.RowHeadersVisible = false;
+            this.dgvModelLibrary.Columns.AddRange(new DataGridViewColumn[] { this.dgvModelLibraryCol1, this.dgvModelLibraryCol2, this.dgvModelLibraryCol3, this.dgvModelLibraryCol4, this.dgvModelLibraryCol5, this.dgvModelLibraryCol6, this.dgvModelLibraryCol7, this.dgvModelLibraryCol8 });
+            this.dgvModelLibraryCol1.HeaderText = "版本"; this.dgvModelLibraryCol2.HeaderText = "结构"; this.dgvModelLibraryCol3.HeaderText = "数据集"; this.dgvModelLibraryCol4.HeaderText = "训练时间"; this.dgvModelLibraryCol5.HeaderText = "mIoU"; this.dgvModelLibraryCol6.HeaderText = "状态"; this.dgvModelLibraryCol7.HeaderText = "SHA256"; this.dgvModelLibraryCol8.HeaderText = "操作";
+            this.bottomLayout.Controls.Add(this.grpAcceptance,0,0);
+            this.bottomLayout.Controls.Add(this.grpModelLibrary,1,0);
+
+            this.rootLayout.Controls.Add(this.topLayout,0,0);
+            this.rootLayout.Controls.Add(this.middleLayout,0,1);
+            this.rootLayout.Controls.Add(this.bottomLayout,0,2);
+            this.AutoScaleDimensions = new SizeF(8F,15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.BackColor = Color.FromArgb(247, 247, 247);
+            this.BackColor = Color.FromArgb(247,247,247);
+            this.Controls.Add(this.rootLayout);
             this.Name = "TrainingModelsPage";
-            this.Size = new Size(1400, 820);
+            this.Padding = new Padding(14,14,4,10);
+            this.Size = new Size(1400,820);
+            ((ISupportInitialize)(this.numBatchSize)).EndInit();
+            ((ISupportInitialize)(this.numEpoch)).EndInit();
+            ((ISupportInitialize)(this.dgvDatasetSplit)).EndInit();
+            ((ISupportInitialize)(this.dgvTrainingQueue)).EndInit();
+            ((ISupportInitialize)(this.dgvBenchmark)).EndInit();
+            ((ISupportInitialize)(this.dgvModelLibrary)).EndInit();
             this.ResumeLayout(false);
-        }
-
-        private void BuildView()
-        {
-            this.SuspendLayout();
-            this.Controls.Clear();
-            this.Dock = DockStyle.Fill;
-            this.BackColor = UiTheme.Page;
-            this.Padding = new Padding(14, 14, 4, 10);
-
-            TableLayoutPanel root = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 3,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 245F));
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 190F));
-
-            root.Controls.Add(BuildTop(), 0, 0);
-            root.Controls.Add(BuildMiddle(), 0, 1);
-            root.Controls.Add(BuildBottom(), 0, 2);
-
-            this.Controls.Add(root);
-            this.ResumeLayout(true);
-        }
-
-        private Control BuildTop()
-        {
-            TableLayoutPanel top = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 3,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            top.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 27F));
-            top.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 27F));
-            top.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 46F));
-
-            top.Controls.Add(UiFactory.Card("训练配置", UiFactory.KeyValues(new[,] {
-                { "模型结构：", "SegFormer-B2" }, { "Tile Size：", "1024 × 1024" }, { "Batch Size：", "16" },
-                { "Epoch：", "100" }, { "学习率：", "0.0001" }, { "数据增强：", "翻转 / 旋转 / 抖动 / 裁剪" }, { "GPU/CPU：", "自动选择" }
-            }, 42)), 0, 0);
-
-            top.Controls.Add(UiFactory.Card("数据集划分", UiFactory.Grid(
-                new[] { "集合", "图片数", "占比", "缺陷实例", "占比" },
-                new[] {
-                    new[] { "Train", "18,732", "70%", "98,732", "70.1%" },
-                    new[] { "Validation", "4,027", "15%", "21,365", "15.2%" },
-                    new[] { "Acceptance", "4,027", "15%", "21,402", "14.7%" }
-                })), 1, 0);
-
-            trainingJobGrid = UiFactory.Grid(
-                new[] { "任务ID", "模型", "数据集", "提交时间", "状态", "优先级" },
-                new[] {
-                    new[] { "TRN-005", "SegFormer-B2", "V2.1.0", "14:25:32", "训练中", "高" },
-                    new[] { "TRN-004", "UNet", "V2.1.0", "13:48:21", "排队中", "中" },
-                    new[] { "TRN-003", "Model-X", "V2.1.0", "13:30:11", "等待资源", "低" },
-                    new[] { "TRN-002", "SegFormer-B1", "V2.1.0", "12:55:06", "已完成", "中" }
-                });
-            top.Controls.Add(UiFactory.Card("训练任务队列", trainingJobGrid), 2, 0);
-            return top;
-        }
-
-        private Control BuildMiddle()
-        {
-            TableLayoutPanel middle = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 2,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            middle.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
-            middle.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60F));
-
-            trainingLog = new TextBox
-            {
-                Dock = DockStyle.Fill,
-                Multiline = true,
-                ReadOnly = true,
-                ScrollBars = ScrollBars.Vertical,
-                BorderStyle = BorderStyle.None,
-                Font = UiTheme.Font(8.2F, false),
-                Text = "当前任务：TRN-20250516-005 (SegFormer-B2)\r\n进度：Epoch 38 / 100 (38%)\r\n预计剩余：00:42:17\r\n当前学习率：0.000087\r\n最佳验证集 mIoU：0.7421 (Epoch 32)\r\n\r\n[14:41:02] Loss 0.3867  Dice 0.7183  mIoU 0.7112\r\n[14:41:46] Loss 0.3681  Dice 0.7245  mIoU 0.7169\r\n[14:43:15] Validation mIoU 0.7421  Recall 0.7325  Precision 0.7719\r\n[14:43:15] New best model saved."
-            };
-            middle.Controls.Add(UiFactory.Card("训练状态 / 实时日志", trainingLog), 0, 0);
-
-            middle.Controls.Add(UiFactory.Card("模型基准对比（验证集）", UiFactory.Grid(
-                new[] { "模型", "Recall", "Precision", "F1", "mIoU", "小缺陷召回", "推理ms", "显存GB" },
-                new[] {
-                    new[] { "SegFormer-B2", "0.7325", "0.7719", "0.7518", "0.7421", "0.6123", "42.3", "6.21" },
-                    new[] { "UNet", "0.7086", "0.7472", "0.7274", "0.7098", "0.5891", "31.7", "5.03" },
-                    new[] { "Model-X", "0.7243", "0.7581", "0.7410", "0.7312", "0.6048", "38.9", "5.76" }
-                })), 1, 0);
-            return middle;
-        }
-
-        private Control BuildBottom()
-        {
-            TableLayoutPanel bottom = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 2,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            bottom.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 31F));
-            bottom.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 69F));
-
-            bottom.Controls.Add(UiFactory.Card("验证与验收", UiFactory.KeyValues(new[,] {
-                { "Validation mIoU：", "0.7421" }, { "F1：", "0.7518" }, { "Recall：", "0.7325" }, { "Precision：", "0.7719" }, { "Acceptance：", "待评估" }
-            }, 52)), 0, 0);
-
-            modelGrid = UiFactory.Grid(
-                new[] { "版本", "结构", "数据集", "训练时间", "mIoU", "状态", "SHA256", "操作" },
-                new[] {
-                    new[] { "V2.1.0", "SegFormer-B2", "V2.1.0", "05-16", "0.7398", "已发布", "3e6f7a9c...", "导出/停用/回滚" },
-                    new[] { "V2.0.0", "SegFormer-B1", "V2.0.0", "05-14", "0.7216", "已停用", "7b1c2d3e...", "导出/发布/回滚" },
-                    new[] { "V1.3.0", "UNet", "V1.3.0", "05-12", "0.6991", "已停用", "9a8b7c6d...", "导出/发布/回滚" }
-                });
-            bottom.Controls.Add(UiFactory.Card("模型库", modelGrid), 1, 0);
-            return bottom;
         }
     }
 }
