@@ -7,6 +7,7 @@ namespace IAD.Pages
         public ProductDefinitionPage()
         {
             InitializeComponent();
+            BuildView();
             BindEvents();
         }
 
