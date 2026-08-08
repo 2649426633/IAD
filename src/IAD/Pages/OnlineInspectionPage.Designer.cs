@@ -1,17 +1,76 @@
-using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using IAD.UI;
 
 namespace IAD.Pages
 {
-    public partial class OnlineInspectionPage
+    partial class OnlineInspectionPage
     {
         private IContainer components = null;
-        private Panel inspectionCanvas;
-        private DataGridView queueGrid;
-        private DataGridView resultGrid;
+        private TableLayoutPanel rootLayout;
+        private TableLayoutPanel toolbarLayout;
+        private FlowLayoutPanel toolbar;
+        private Button btnLoadImage;
+        private Button btnBatchInspect;
+        private Button btnStart;
+        private Button btnPause;
+        private Button btnExport;
+        private Label lblMetrics;
+        private TableLayoutPanel bodyLayout;
+        private GroupBox grpQueue;
+        private DataGridView dgvQueue;
+        private DataGridViewTextBoxColumn dgvQueueCol1;
+        private DataGridViewTextBoxColumn dgvQueueCol2;
+        private GroupBox grpCanvas;
+        private TableLayoutPanel productGrid;
+        private Label lblProduct1;
+        private Label lblProduct2;
+        private Label lblProduct3;
+        private Label lblProduct4;
+        private Label lblProduct5;
+        private Label lblProduct6;
+        private Label lblProduct7;
+        private Label lblProduct8;
+        private TableLayoutPanel rightLayout;
+        private GroupBox grpResults;
+        private DataGridView dgvResults;
+        private DataGridViewTextBoxColumn dgvResultsCol1;
+        private DataGridViewTextBoxColumn dgvResultsCol2;
+        private DataGridViewTextBoxColumn dgvResultsCol3;
+        private GroupBox grpDefectDetail;
+        private DataGridView dgvDefects;
+        private DataGridViewTextBoxColumn dgvDefectsCol1;
+        private DataGridViewTextBoxColumn dgvDefectsCol2;
+        private DataGridViewTextBoxColumn dgvDefectsCol3;
+        private DataGridViewTextBoxColumn dgvDefectsCol4;
+        private TableLayoutPanel bottomLayout;
+        private GroupBox grpPipeline;
+        private TableLayoutPanel pipelineLayout;
+        private Label lblAcquireKey;
+        private Label lblAcquire;
+        private Label lblPreprocessKey;
+        private Label lblPreprocess;
+        private Label lblLocateKey;
+        private Label lblLocate;
+        private Label lblDetectKey;
+        private Label lblDetect;
+        private Label lblJudgeKey;
+        private Label lblJudge;
+        private GroupBox grpBackend;
+        private TableLayoutPanel backendLayout;
+        private Label lblRecipeKey;
+        private Label lblRecipe;
+        private Label lblModelKey;
+        private Label lblModel;
+        private Label lblBackendKey;
+        private Label lblBackend;
+        private Label lblDeviceKey;
+        private Label lblDevice;
+        private GroupBox grpNgStats;
+        private DataGridView dgvNgStats;
+        private DataGridViewTextBoxColumn dgvNgStatsCol1;
+        private DataGridViewTextBoxColumn dgvNgStatsCol2;
+        private DataGridViewTextBoxColumn dgvNgStatsCol3;
 
         protected override void Dispose(bool disposing)
         {
@@ -22,174 +81,242 @@ namespace IAD.Pages
         private void InitializeComponent()
         {
             this.components = new Container();
+            this.rootLayout = new TableLayoutPanel();
+            this.toolbarLayout = new TableLayoutPanel();
+            this.toolbar = new FlowLayoutPanel();
+            this.btnLoadImage = new Button();
+            this.btnBatchInspect = new Button();
+            this.btnStart = new Button();
+            this.btnPause = new Button();
+            this.btnExport = new Button();
+            this.lblMetrics = new Label();
+            this.bodyLayout = new TableLayoutPanel();
+            this.grpQueue = new GroupBox();
+            this.dgvQueue = new DataGridView();
+            this.dgvQueueCol1 = new DataGridViewTextBoxColumn();
+            this.dgvQueueCol2 = new DataGridViewTextBoxColumn();
+            this.grpCanvas = new GroupBox();
+            this.productGrid = new TableLayoutPanel();
+            this.lblProduct1 = new Label();
+            this.lblProduct2 = new Label();
+            this.lblProduct3 = new Label();
+            this.lblProduct4 = new Label();
+            this.lblProduct5 = new Label();
+            this.lblProduct6 = new Label();
+            this.lblProduct7 = new Label();
+            this.lblProduct8 = new Label();
+            this.rightLayout = new TableLayoutPanel();
+            this.grpResults = new GroupBox();
+            this.dgvResults = new DataGridView();
+            this.dgvResultsCol1 = new DataGridViewTextBoxColumn();
+            this.dgvResultsCol2 = new DataGridViewTextBoxColumn();
+            this.dgvResultsCol3 = new DataGridViewTextBoxColumn();
+            this.grpDefectDetail = new GroupBox();
+            this.dgvDefects = new DataGridView();
+            this.dgvDefectsCol1 = new DataGridViewTextBoxColumn();
+            this.dgvDefectsCol2 = new DataGridViewTextBoxColumn();
+            this.dgvDefectsCol3 = new DataGridViewTextBoxColumn();
+            this.dgvDefectsCol4 = new DataGridViewTextBoxColumn();
+            this.bottomLayout = new TableLayoutPanel();
+            this.grpPipeline = new GroupBox();
+            this.pipelineLayout = new TableLayoutPanel();
+            this.lblAcquireKey = new Label();
+            this.lblAcquire = new Label();
+            this.lblPreprocessKey = new Label();
+            this.lblPreprocess = new Label();
+            this.lblLocateKey = new Label();
+            this.lblLocate = new Label();
+            this.lblDetectKey = new Label();
+            this.lblDetect = new Label();
+            this.lblJudgeKey = new Label();
+            this.lblJudge = new Label();
+            this.grpBackend = new GroupBox();
+            this.backendLayout = new TableLayoutPanel();
+            this.lblRecipeKey = new Label();
+            this.lblRecipe = new Label();
+            this.lblModelKey = new Label();
+            this.lblModel = new Label();
+            this.lblBackendKey = new Label();
+            this.lblBackend = new Label();
+            this.lblDeviceKey = new Label();
+            this.lblDevice = new Label();
+            this.grpNgStats = new GroupBox();
+            this.dgvNgStats = new DataGridView();
+            this.dgvNgStatsCol1 = new DataGridViewTextBoxColumn();
+            this.dgvNgStatsCol2 = new DataGridViewTextBoxColumn();
+            this.dgvNgStatsCol3 = new DataGridViewTextBoxColumn();
+            ((ISupportInitialize)(this.dgvQueue)).BeginInit();
+            ((ISupportInitialize)(this.dgvResults)).BeginInit();
+            ((ISupportInitialize)(this.dgvDefects)).BeginInit();
+            ((ISupportInitialize)(this.dgvNgStats)).BeginInit();
             this.SuspendLayout();
-            this.AutoScaleDimensions = new SizeF(8F, 15F);
+
+            this.rootLayout.BackColor = Color.FromArgb(247,247,247);
+            this.rootLayout.ColumnCount = 1;
+            this.rootLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100F));
+            this.rootLayout.Dock = DockStyle.Fill;
+            this.rootLayout.RowCount = 3;
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute,54F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Percent,100F));
+            this.rootLayout.RowStyles.Add(new RowStyle(SizeType.Absolute,165F));
+
+            this.toolbarLayout.ColumnCount = 2;
+            this.toolbarLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100F));
+            this.toolbarLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,470F));
+            this.toolbarLayout.Dock = DockStyle.Fill;
+            this.toolbar.Dock = DockStyle.Fill;
+            this.toolbar.WrapContents = false;
+            this.btnLoadImage.Text = "加载图片";
+            this.btnBatchInspect.Text = "批量检测";
+            this.btnStart.Text = "开始检测";
+            this.btnPause.Text = "暂停";
+            this.btnExport.Text = "导出结果";
+            this.toolbar.Controls.Add(this.btnLoadImage);
+            this.toolbar.Controls.Add(this.btnBatchInspect);
+            this.toolbar.Controls.Add(this.btnStart);
+            this.toolbar.Controls.Add(this.btnPause);
+            this.toolbar.Controls.Add(this.btnExport);
+            this.lblMetrics.Dock = DockStyle.Fill;
+            this.lblMetrics.Text = "当前速度  28件/分     今日检测  12,560件     NG率  2.34%";
+            this.lblMetrics.TextAlign = ContentAlignment.MiddleRight;
+            this.toolbarLayout.Controls.Add(this.toolbar,0,0);
+            this.toolbarLayout.Controls.Add(this.lblMetrics,1,0);
+
+            this.bodyLayout.ColumnCount = 3;
+            this.bodyLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,240F));
+            this.bodyLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100F));
+            this.bodyLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,310F));
+            this.bodyLayout.Dock = DockStyle.Fill;
+            this.grpQueue.Dock = DockStyle.Fill;
+            this.grpQueue.Text = "图像队列 (24)";
+            this.grpQueue.Controls.Add(this.dgvQueue);
+            this.dgvQueue.Dock = DockStyle.Fill;
+            this.dgvQueue.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvQueue.ReadOnly = true;
+            this.dgvQueue.RowHeadersVisible = false;
+            this.dgvQueue.Columns.AddRange(new DataGridViewColumn[] { this.dgvQueueCol1, this.dgvQueueCol2 });
+            this.dgvQueueCol1.HeaderText = "文件"; this.dgvQueueCol2.HeaderText = "状态";
+
+            this.grpCanvas.Dock = DockStyle.Fill;
+            this.grpCanvas.Text = "当前图像：IMG_20250516_142310.png  |  2448 × 2048  |  Fit";
+            this.grpCanvas.Controls.Add(this.productGrid);
+            this.productGrid.BackColor = Color.FromArgb(35,35,35);
+            this.productGrid.ColumnCount = 4;
+            this.productGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,25F));
+            this.productGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,25F));
+            this.productGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,25F));
+            this.productGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,25F));
+            this.productGrid.Dock = DockStyle.Fill;
+            this.productGrid.RowCount = 2;
+            this.productGrid.RowStyles.Add(new RowStyle(SizeType.Percent,50F));
+            this.productGrid.RowStyles.Add(new RowStyle(SizeType.Percent,50F));
+            this.lblProduct1.Text = "#1  OK\r\n\r\n产品检测区域";
+            this.lblProduct2.Text = "#2  NG\r\n\r\n产品检测区域";
+            this.lblProduct3.Text = "#3  OK\r\n\r\n产品检测区域";
+            this.lblProduct4.Text = "#4  NG\r\n\r\n产品检测区域";
+            this.lblProduct5.Text = "#5  OK\r\n\r\n产品检测区域";
+            this.lblProduct6.Text = "#6  NG\r\n\r\n产品检测区域";
+            this.lblProduct7.Text = "#7  ERROR\r\n\r\n产品检测区域";
+            this.lblProduct8.Text = "#8  OK\r\n\r\n产品检测区域";
+            this.lblProduct1.Dock = this.lblProduct2.Dock = this.lblProduct3.Dock = this.lblProduct4.Dock = this.lblProduct5.Dock = this.lblProduct6.Dock = this.lblProduct7.Dock = this.lblProduct8.Dock = DockStyle.Fill;
+            this.lblProduct1.BorderStyle = this.lblProduct2.BorderStyle = this.lblProduct3.BorderStyle = this.lblProduct4.BorderStyle = this.lblProduct5.BorderStyle = this.lblProduct6.BorderStyle = this.lblProduct7.BorderStyle = this.lblProduct8.BorderStyle = BorderStyle.FixedSingle;
+            this.lblProduct1.ForeColor = this.lblProduct2.ForeColor = this.lblProduct3.ForeColor = this.lblProduct4.ForeColor = this.lblProduct5.ForeColor = this.lblProduct6.ForeColor = this.lblProduct7.ForeColor = this.lblProduct8.ForeColor = Color.White;
+            this.lblProduct1.TextAlign = this.lblProduct2.TextAlign = this.lblProduct3.TextAlign = this.lblProduct4.TextAlign = this.lblProduct5.TextAlign = this.lblProduct6.TextAlign = this.lblProduct7.TextAlign = this.lblProduct8.TextAlign = ContentAlignment.MiddleCenter;
+            this.productGrid.Controls.Add(this.lblProduct1,0,0); this.productGrid.Controls.Add(this.lblProduct2,1,0); this.productGrid.Controls.Add(this.lblProduct3,2,0); this.productGrid.Controls.Add(this.lblProduct4,3,0);
+            this.productGrid.Controls.Add(this.lblProduct5,0,1); this.productGrid.Controls.Add(this.lblProduct6,1,1); this.productGrid.Controls.Add(this.lblProduct7,2,1); this.productGrid.Controls.Add(this.lblProduct8,3,1);
+
+            this.rightLayout.ColumnCount = 1;
+            this.rightLayout.Dock = DockStyle.Fill;
+            this.rightLayout.RowCount = 2;
+            this.rightLayout.RowStyles.Add(new RowStyle(SizeType.Percent,70F));
+            this.rightLayout.RowStyles.Add(new RowStyle(SizeType.Percent,30F));
+            this.grpResults.Dock = DockStyle.Fill;
+            this.grpResults.Text = "产品结果 (8)";
+            this.grpResults.Controls.Add(this.dgvResults);
+            this.dgvResults.Dock = DockStyle.Fill;
+            this.dgvResults.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvResults.ReadOnly = true;
+            this.dgvResults.RowHeadersVisible = false;
+            this.dgvResults.Columns.AddRange(new DataGridViewColumn[] { this.dgvResultsCol1, this.dgvResultsCol2, this.dgvResultsCol3 });
+            this.dgvResultsCol1.HeaderText = "产品"; this.dgvResultsCol2.HeaderText = "状态"; this.dgvResultsCol3.HeaderText = "缺陷数";
+            this.grpDefectDetail.Dock = DockStyle.Fill;
+            this.grpDefectDetail.Text = "#2 缺陷详情";
+            this.grpDefectDetail.Controls.Add(this.dgvDefects);
+            this.dgvDefects.Dock = DockStyle.Fill;
+            this.dgvDefects.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvDefects.ReadOnly = true;
+            this.dgvDefects.RowHeadersVisible = false;
+            this.dgvDefects.Columns.AddRange(new DataGridViewColumn[] { this.dgvDefectsCol1, this.dgvDefectsCol2, this.dgvDefectsCol3, this.dgvDefectsCol4 });
+            this.dgvDefectsCol1.HeaderText = "类型"; this.dgvDefectsCol2.HeaderText = "置信度"; this.dgvDefectsCol3.HeaderText = "面积(px)"; this.dgvDefectsCol4.HeaderText = "位置";
+            this.rightLayout.Controls.Add(this.grpResults,0,0);
+            this.rightLayout.Controls.Add(this.grpDefectDetail,0,1);
+            this.bodyLayout.Controls.Add(this.grpQueue,0,0);
+            this.bodyLayout.Controls.Add(this.grpCanvas,1,0);
+            this.bodyLayout.Controls.Add(this.rightLayout,2,0);
+
+            this.bottomLayout.ColumnCount = 3;
+            this.bottomLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,48F));
+            this.bottomLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,24F));
+            this.bottomLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,28F));
+            this.bottomLayout.Dock = DockStyle.Fill;
+            this.grpPipeline.Dock = DockStyle.Fill;
+            this.grpPipeline.Text = "检测流程";
+            this.grpPipeline.Controls.Add(this.pipelineLayout);
+            this.pipelineLayout.ColumnCount = 2;
+            this.pipelineLayout.Dock = DockStyle.Fill;
+            this.pipelineLayout.RowCount = 5;
+            this.lblAcquireKey.Text = "1 图像获取"; this.lblAcquire.Text = "OK";
+            this.lblPreprocessKey.Text = "2 预处理"; this.lblPreprocess.Text = "OK";
+            this.lblLocateKey.Text = "3 产品定位"; this.lblLocate.Text = "OK";
+            this.lblDetectKey.Text = "4 缺陷检测"; this.lblDetect.Text = "运行中";
+            this.lblJudgeKey.Text = "5 规则判定"; this.lblJudge.Text = "等待中";
+            this.pipelineLayout.Controls.Add(this.lblAcquireKey,0,0); this.pipelineLayout.Controls.Add(this.lblAcquire,1,0);
+            this.pipelineLayout.Controls.Add(this.lblPreprocessKey,0,1); this.pipelineLayout.Controls.Add(this.lblPreprocess,1,1);
+            this.pipelineLayout.Controls.Add(this.lblLocateKey,0,2); this.pipelineLayout.Controls.Add(this.lblLocate,1,2);
+            this.pipelineLayout.Controls.Add(this.lblDetectKey,0,3); this.pipelineLayout.Controls.Add(this.lblDetect,1,3);
+            this.pipelineLayout.Controls.Add(this.lblJudgeKey,0,4); this.pipelineLayout.Controls.Add(this.lblJudge,1,4);
+            this.grpBackend.Dock = DockStyle.Fill;
+            this.grpBackend.Text = "配置 / 推理后端";
+            this.grpBackend.Controls.Add(this.backendLayout);
+            this.backendLayout.ColumnCount = 2;
+            this.backendLayout.Dock = DockStyle.Fill;
+            this.backendLayout.RowCount = 4;
+            this.lblRecipeKey.Text = "当前Recipe"; this.lblRecipe.Text = "Recipe 1.0.0";
+            this.lblModelKey.Text = "模型版本"; this.lblModel.Text = "V1.2.3";
+            this.lblBackendKey.Text = "后端"; this.lblBackend.Text = "CUDA / TensorRT";
+            this.lblDeviceKey.Text = "设备"; this.lblDevice.Text = "NVIDIA RTX 3060";
+            this.backendLayout.Controls.Add(this.lblRecipeKey,0,0); this.backendLayout.Controls.Add(this.lblRecipe,1,0);
+            this.backendLayout.Controls.Add(this.lblModelKey,0,1); this.backendLayout.Controls.Add(this.lblModel,1,1);
+            this.backendLayout.Controls.Add(this.lblBackendKey,0,2); this.backendLayout.Controls.Add(this.lblBackend,1,2);
+            this.backendLayout.Controls.Add(this.lblDeviceKey,0,3); this.backendLayout.Controls.Add(this.lblDevice,1,3);
+            this.grpNgStats.Dock = DockStyle.Fill;
+            this.grpNgStats.Text = "NG原因统计（今日）";
+            this.grpNgStats.Controls.Add(this.dgvNgStats);
+            this.dgvNgStats.Dock = DockStyle.Fill;
+            this.dgvNgStats.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvNgStats.ReadOnly = true;
+            this.dgvNgStats.RowHeadersVisible = false;
+            this.dgvNgStats.Columns.AddRange(new DataGridViewColumn[] { this.dgvNgStatsCol1, this.dgvNgStatsCol2, this.dgvNgStatsCol3 });
+            this.dgvNgStatsCol1.HeaderText = "缺陷"; this.dgvNgStatsCol2.HeaderText = "数量"; this.dgvNgStatsCol3.HeaderText = "占比";
+            this.bottomLayout.Controls.Add(this.grpPipeline,0,0);
+            this.bottomLayout.Controls.Add(this.grpBackend,1,0);
+            this.bottomLayout.Controls.Add(this.grpNgStats,2,0);
+
+            this.rootLayout.Controls.Add(this.toolbarLayout,0,0);
+            this.rootLayout.Controls.Add(this.bodyLayout,0,1);
+            this.rootLayout.Controls.Add(this.bottomLayout,0,2);
+            this.AutoScaleDimensions = new SizeF(8F,15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.BackColor = Color.FromArgb(247, 247, 247);
+            this.BackColor = Color.FromArgb(247,247,247);
+            this.Controls.Add(this.rootLayout);
             this.Name = "OnlineInspectionPage";
-            this.Size = new Size(1400, 820);
+            this.Padding = new Padding(14,10,4,10);
+            this.Size = new Size(1400,820);
+            ((ISupportInitialize)(this.dgvQueue)).EndInit();
+            ((ISupportInitialize)(this.dgvResults)).EndInit();
+            ((ISupportInitialize)(this.dgvDefects)).EndInit();
+            ((ISupportInitialize)(this.dgvNgStats)).EndInit();
             this.ResumeLayout(false);
-        }
-
-        private void BuildView()
-        {
-            this.SuspendLayout();
-            this.Controls.Clear();
-            this.Dock = DockStyle.Fill;
-            this.BackColor = UiTheme.Page;
-            this.Padding = new Padding(14, 10, 4, 10);
-
-            TableLayoutPanel root = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 3,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 54F));
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 155F));
-
-            FlowLayoutPanel toolbar = UiFactory.Toolbar("加载图片", "批量检测", "开始检测", "暂停", "导出结果");
-            Label metrics = UiFactory.Label("当前速度  28件/分     今日检测  12,560件     NG率  2.34%", 10F, true, ContentAlignment.MiddleRight);
-            metrics.Width = 460;
-            metrics.Height = 35;
-            toolbar.Controls.Add(metrics);
-            root.Controls.Add(toolbar, 0, 0);
-            root.Controls.Add(BuildBody(), 0, 1);
-            root.Controls.Add(BuildBottom(), 0, 2);
-
-            this.Controls.Add(root);
-            this.ResumeLayout(true);
-        }
-
-        private Control BuildBody()
-        {
-            TableLayoutPanel body = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 3,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            body.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 235F));
-            body.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            body.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 305F));
-
-            string[][] queue = {
-                new[] { "IMG_142310.png", "检测中" }, new[] { "IMG_142311.png", "等待中" },
-                new[] { "IMG_142312.png", "等待中" }, new[] { "IMG_142313.png", "等待中" },
-                new[] { "IMG_142314.png", "等待中" }, new[] { "IMG_142315.png", "等待中" }
-            };
-            queueGrid = UiFactory.Grid(new[] { "文件", "状态" }, queue);
-            body.Controls.Add(UiFactory.Card("图像队列 (24)", queueGrid), 0, 0);
-
-            inspectionCanvas = new Panel
-            {
-                Dock = DockStyle.Fill,
-                BackColor = UiTheme.Canvas,
-                Margin = new Padding(8)
-            };
-            inspectionCanvas.Paint += PaintInspectionCanvas;
-            body.Controls.Add(UiFactory.Card("当前图像：IMG_20250516_142310.png  |  2448 × 2048  |  Fit", inspectionCanvas), 1, 0);
-
-            body.Controls.Add(BuildRightPanel(), 2, 0);
-            return body;
-        }
-
-        private void PaintInspectionCanvas(object sender, PaintEventArgs e)
-        {
-            Panel canvas = sender as Panel;
-            if (canvas == null) return;
-
-            int gap = 18;
-            int w = Math.Max(70, (canvas.Width - gap * 5) / 4);
-            int h = Math.Max(70, (canvas.Height - gap * 3) / 2);
-            for (int i = 0; i < 8; i++)
-            {
-                int r = i / 4;
-                int c = i % 4;
-                Rectangle box = new Rectangle(gap + c * (w + gap), gap + r * (h + gap), w, h);
-                string state = (i == 1 || i == 3 || i == 5) ? "NG" : (i == 6 ? "ERROR" : "OK");
-
-                using (Pen p = new Pen(i == 6 ? Color.White : Color.FromArgb(160, 160, 160), i == 6 ? 2F : 1F))
-                {
-                    e.Graphics.DrawRectangle(p, box);
-                }
-                using (Brush b = new SolidBrush(Color.FromArgb(150, 150, 150)))
-                {
-                    e.Graphics.FillRectangle(b, box.X + box.Width / 4, box.Y + 15, Math.Max(20, box.Width / 2), Math.Max(20, box.Height - 30));
-                }
-                e.Graphics.DrawString("#" + (i + 1) + "  " + state, UiTheme.Font(8.5F, true), Brushes.White, box.X + 5, box.Y + 5);
-                if (state == "NG")
-                {
-                    using (Pen p = new Pen(Color.White, 2F))
-                    {
-                        e.Graphics.DrawLine(p, box.X + 20, box.Bottom - 35, box.Right - 18, box.Y + 30);
-                    }
-                }
-            }
-        }
-
-        private Control BuildRightPanel()
-        {
-            TableLayoutPanel right = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 2,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            right.RowStyles.Add(new RowStyle(SizeType.Percent, 70F));
-            right.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
-
-            string[][] results = {
-                new[] { "#1", "OK", "0" }, new[] { "#2", "NG", "1" }, new[] { "#3", "OK", "0" }, new[] { "#4", "NG", "2" },
-                new[] { "#5", "OK", "0" }, new[] { "#6", "NG", "1" }, new[] { "#7", "ERROR", "-" }, new[] { "#8", "OK", "0" }
-            };
-            resultGrid = UiFactory.Grid(new[] { "产品", "状态", "缺陷数" }, results);
-            right.Controls.Add(UiFactory.Card("产品结果 (8)", resultGrid), 0, 0);
-            right.Controls.Add(UiFactory.Card("#2 缺陷详情", UiFactory.Grid(
-                new[] { "类型", "置信度", "面积(px)", "位置" },
-                new[] { new[] { "划痕", "0.96", "1824", "(1320,182)" } })), 0, 1);
-            return right;
-        }
-
-        private Control BuildBottom()
-        {
-            TableLayoutPanel bottom = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 3,
-                RowCount = 1,
-                BackColor = UiTheme.Page,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            bottom.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 48F));
-            bottom.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 24F));
-            bottom.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 28F));
-
-            bottom.Controls.Add(UiFactory.Card("检测流程", UiFactory.KeyValues(new[,] {
-                { "1 图像获取：", "OK" }, { "2 预处理：", "OK" }, { "3 产品定位：", "OK" }, { "4 缺陷检测：", "运行中" }, { "5 规则判定：", "等待中" }
-            }, 44)), 0, 0);
-
-            bottom.Controls.Add(UiFactory.Card("配置 / 推理后端", UiFactory.KeyValues(new[,] {
-                { "当前Recipe：", "Recipe 1.0.0" }, { "模型版本：", "V1.2.3" }, { "后端：", "CUDA / TensorRT" }, { "设备：", "NVIDIA RTX 3060" }
-            }, 43)), 1, 0);
-
-            bottom.Controls.Add(UiFactory.Card("NG原因统计（今日）", UiFactory.Grid(
-                new[] { "缺陷", "数量", "占比" },
-                new[] {
-                    new[] { "划痕", "186", "45.8%" }, new[] { "脏污", "128", "31.5%" }, new[] { "缺口", "73", "18.0%" }, new[] { "变形", "19", "4.7%" }
-                })), 2, 0);
-            return bottom;
         }
     }
 }
