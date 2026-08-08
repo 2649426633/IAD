@@ -5,7 +5,7 @@ namespace IAD.Infrastructure.Database
 {
     internal static class DatabaseInitializer
     {
-        public const int CurrentSchemaVersion = 3;
+        public const int CurrentSchemaVersion = 4;
 
         public static void Initialize(SqliteConnectionFactory connectionFactory)
         {
@@ -207,7 +207,80 @@ namespace IAD.Infrastructure.Database
                 FOREIGN KEY(RoiId) REFERENCES ProductRois(Id) ON DELETE SET NULL,
                 FOREIGN KEY(CategoryId) REFERENCES DefectCategories(Id) ON DELETE SET NULL
             );",
-            @"CREATE INDEX IF NOT EXISTS IX_DefectInstances_Result ON DefectInstances(InspectionResultId);"
+            @"CREATE INDEX IF NOT EXISTS IX_DefectInstances_Result ON DefectInstances(InspectionResultId);",
+
+            @"CREATE TABLE IF NOT EXISTS DatasetImages (
+                Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                ProductId INTEGER NOT NULL,
+                FileName TEXT NOT NULL,
+                RelativePath TEXT NOT NULL,
+                Width INTEGER NOT NULL,
+                Height INTEGER NOT NULL,
+                Status TEXT NOT NULL DEFAULT '未标注',
+                CreatedAtUtc TEXT NOT NULL,
+                UpdatedAtUtc TEXT NOT NULL,
+                FOREIGN KEY(ProductId) REFERENCES Products(Id) ON DELETE CASCADE
+            );",
+            @"CREATE UNIQUE INDEX IF NOT EXISTS UX_DatasetImages_Product_Path ON DatasetImages(ProductId, RelativePath);",
+            @"CREATE INDEX IF NOT EXISTS IX_DatasetImages_Product_Status ON DatasetImages(ProductId, Status);",
+
+            @"CREATE TABLE IF NOT EXISTS DatasetAnnotations (
+                Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                DatasetImageId INTEGER NOT NULL,
+                CategoryId INTEGER NULL,
+                CategoryCode TEXT NULL,
+                CategoryName TEXT NOT NULL,
+                AnnotationType TEXT NOT NULL,
+                GeometryData TEXT NOT NULL,
+                BrushWidth REAL NOT NULL DEFAULT 1,
+                Confidence REAL NOT NULL DEFAULT 1,
+                IsVisible INTEGER NOT NULL DEFAULT 1,
+                CreatedAtUtc TEXT NOT NULL,
+                UpdatedAtUtc TEXT NOT NULL,
+                FOREIGN KEY(DatasetImageId) REFERENCES DatasetImages(Id) ON DELETE CASCADE,
+                FOREIGN KEY(CategoryId) REFERENCES DefectCategories(Id) ON DELETE SET NULL
+            );",
+            @"CREATE INDEX IF NOT EXISTS IX_DatasetAnnotations_Image ON DatasetAnnotations(DatasetImageId);",
+            @"CREATE INDEX IF NOT EXISTS IX_DatasetAnnotations_Category ON DatasetAnnotations(CategoryId);",
+
+            @"CREATE TABLE IF NOT EXISTS DatasetVersions (
+                Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                ProductId INTEGER NOT NULL,
+                VersionCode TEXT NOT NULL,
+                ImageCount INTEGER NOT NULL,
+                AnnotationCount INTEGER NOT NULL,
+                Notes TEXT NULL,
+                CreatedAtUtc TEXT NOT NULL,
+                FOREIGN KEY(ProductId) REFERENCES Products(Id) ON DELETE CASCADE
+            );",
+            @"CREATE UNIQUE INDEX IF NOT EXISTS UX_DatasetVersions_Product_Code ON DatasetVersions(ProductId, VersionCode);",
+
+            @"CREATE TABLE IF NOT EXISTS DatasetVersionImages (
+                VersionId INTEGER NOT NULL,
+                SourceImageId INTEGER NOT NULL,
+                FileName TEXT NOT NULL,
+                RelativePath TEXT NOT NULL,
+                Width INTEGER NOT NULL,
+                Height INTEGER NOT NULL,
+                Status TEXT NOT NULL,
+                PRIMARY KEY(VersionId, SourceImageId),
+                FOREIGN KEY(VersionId) REFERENCES DatasetVersions(Id) ON DELETE CASCADE
+            );",
+
+            @"CREATE TABLE IF NOT EXISTS DatasetVersionAnnotations (
+                VersionId INTEGER NOT NULL,
+                SourceAnnotationId INTEGER NOT NULL,
+                SourceImageId INTEGER NOT NULL,
+                CategoryCode TEXT NULL,
+                CategoryName TEXT NOT NULL,
+                AnnotationType TEXT NOT NULL,
+                GeometryData TEXT NOT NULL,
+                BrushWidth REAL NOT NULL,
+                Confidence REAL NOT NULL,
+                IsVisible INTEGER NOT NULL,
+                PRIMARY KEY(VersionId, SourceAnnotationId),
+                FOREIGN KEY(VersionId) REFERENCES DatasetVersions(Id) ON DELETE CASCADE
+            );"
         };
     }
 }

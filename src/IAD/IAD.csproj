@@ -57,6 +57,9 @@
     <Compile Include="Models\InspectionRecipe.cs" />
     <Compile Include="Models\InspectionResult.cs" />
     <Compile Include="Models\DefectInstance.cs" />
+    <Compile Include="Models\DatasetImage.cs" />
+    <Compile Include="Models\DatasetAnnotation.cs" />
+    <Compile Include="Models\DatasetVersion.cs" />
 
     <Compile Include="Infrastructure\Storage\ProjectStoragePaths.cs" />
     <Compile Include="Infrastructure\Database\SqliteConnectionFactory.cs" />
@@ -70,9 +73,12 @@
     <Compile Include="Repositories\RoiRepository.cs" />
     <Compile Include="Repositories\InspectionRecipeRepository.cs" />
     <Compile Include="Repositories\InspectionResultRepository.cs" />
+    <Compile Include="Repositories\DatasetRepository.cs" />
 
     <Compile Include="Services\ProductService.cs" />
     <Compile Include="Services\DefectCategoryCsv.cs" />
+    <Compile Include="Services\AnnotationGeometry.cs" />
+    <Compile Include="Services\DatasetService.cs" />
     <Compile Include="Services\RecipeService.cs" />
     <Compile Include="Services\ResultService.cs" />
     <Compile Include="Services\AppServices.cs" />
@@ -99,6 +105,7 @@
     <Compile Include="Pages\ProductDefinitionPage.Designer.cs"><DependentUpon>ProductDefinitionPage.cs</DependentUpon></Compile>
 
     <Compile Include="Pages\DatasetAnnotationPage.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Include="Pages\DatasetAnnotationPage.Canvas.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
     <Compile Include="Pages\DatasetAnnotationPage.Designer.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
 
     <Compile Include="Pages\TemplateRecognitionPage.cs"><SubType>UserControl</SubType></Compile>

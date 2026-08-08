@@ -184,7 +184,7 @@ namespace IAD.Pages
             this.lblCanvasInfo.Dock = DockStyle.Fill;
             this.lblCanvasInfo.ForeColor = Color.Gainsboro;
             this.lblCanvasInfo.Font = new Font("Microsoft YaHei UI",10F);
-            this.lblCanvasInfo.Text = "图像标注工作区\r\n\r\nRectangle / Polygon / Brush / Mask\r\n后续在功能层接入 HALCON 图像显示与交互";
+            this.lblCanvasInfo.Text = "图像标注工作区\r\n\r\n导入图片后可使用矩形、多边形、画笔与橡皮擦完成标注";
             this.lblCanvasInfo.TextAlign = ContentAlignment.MiddleCenter;
 
             this.rightLayout.ColumnCount = 1;

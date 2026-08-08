@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using IAD.Models;
 
@@ -52,5 +53,21 @@ namespace IAD.Repositories
         long Save(InspectionResult result);
         InspectionResult GetById(long id);
         IList<InspectionResult> GetRecent(int limit);
+    }
+
+    public interface IDatasetRepository
+    {
+        IList<DatasetImage> GetImagesByProduct(long productId);
+        DatasetImage GetImageById(long imageId);
+        long InsertImage(DatasetImage image);
+        void UpdateImageStatus(long imageId, string status, DateTime updatedAtUtc);
+        IList<DatasetAnnotation> GetAnnotationsByImage(long imageId);
+        long InsertAnnotation(DatasetAnnotation annotation);
+        void UpdateAnnotation(DatasetAnnotation annotation);
+        void DeleteAnnotation(long annotationId, long imageId);
+        DatasetVersion GetLatestVersion(long productId);
+        long InsertVersion(DatasetVersion version);
+        int CountImages(long productId);
+        int CountAnnotations(long productId);
     }
 }

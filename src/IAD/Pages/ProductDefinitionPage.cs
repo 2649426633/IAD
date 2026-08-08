@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using IAD.Infrastructure.Storage;
 using IAD.Models;
 using IAD.Services;
+using IAD.Security;
 using IAD.Shell;
 
 namespace IAD.Pages
@@ -120,6 +121,7 @@ namespace IAD.Pages
 
             currentProductId = product.Id;
             currentProduct = product;
+            AppSession.SelectProduct(product.Id);
             currentSettings = AppServices.Products.GetDefinitionSettings(product.Id);
 
             txtProductName.Text = product.ProductName ?? string.Empty;
@@ -154,6 +156,7 @@ namespace IAD.Pages
         {
             currentProductId = 0;
             currentProduct = null;
+            AppSession.SelectProduct(0);
             currentSettings = ProductService.CreateDefaultSettings(0);
             ClearReferencePreview();
             referencePreviewMessage = null;

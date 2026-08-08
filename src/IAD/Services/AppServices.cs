@@ -10,6 +10,7 @@ namespace IAD.Services
         private static bool initialized;
 
         public static ProductService Products { get; private set; }
+        public static DatasetService Datasets { get; private set; }
         public static RecipeService Recipes { get; private set; }
         public static ResultService Results { get; private set; }
         public static string DatabasePath { get { return ProjectStoragePaths.DatabasePath; } }
@@ -29,8 +30,10 @@ namespace IAD.Services
             IRoiRepository roiRepository = new RoiRepository(connectionFactory);
             IInspectionRecipeRepository recipeRepository = new InspectionRecipeRepository(connectionFactory);
             IInspectionResultRepository resultRepository = new InspectionResultRepository(connectionFactory);
+            IDatasetRepository datasetRepository = new DatasetRepository(connectionFactory);
 
             Products = new ProductService(productRepository, definitionSettingsRepository, categoryRepository, roiRepository);
+            Datasets = new DatasetService(productRepository, categoryRepository, datasetRepository);
             Recipes = new RecipeService(productRepository, recipeRepository);
             Results = new ResultService(productRepository, resultRepository);
 
