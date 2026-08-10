@@ -15,17 +15,20 @@ namespace IAD.Services
         private readonly IProductDefinitionSettingsRepository definitionSettings;
         private readonly IDefectCategoryRepository categories;
         private readonly IDatasetRepository datasets;
+        private readonly IDatasetMaskRepository masks;
 
         public DatasetService(
             IProductRepository products,
             IProductDefinitionSettingsRepository definitionSettings,
             IDefectCategoryRepository categories,
-            IDatasetRepository datasets)
+            IDatasetRepository datasets,
+            IDatasetMaskRepository masks)
         {
             this.products = products ?? throw new ArgumentNullException("products");
             this.definitionSettings = definitionSettings ?? throw new ArgumentNullException("definitionSettings");
             this.categories = categories ?? throw new ArgumentNullException("categories");
             this.datasets = datasets ?? throw new ArgumentNullException("datasets");
+            this.masks = masks ?? throw new ArgumentNullException("masks");
         }
 
         public IList<DatasetImage> GetImages(long productId)
@@ -286,7 +289,9 @@ namespace IAD.Services
 
         private void RefreshImageStatus(long imageId)
         {
-            string status = datasets.GetAnnotationsByImage(imageId).Count == 0 ? "未标注" : "已标注";
+            bool hasAnnotations = datasets.GetAnnotationsByImage(imageId).Count > 0;
+            bool hasMasks = masks.GetByImage(imageId).Count > 0;
+            string status = hasAnnotations || hasMasks ? "已标注" : "未标注";
             datasets.UpdateImageStatus(imageId, status, DateTime.UtcNow);
         }
 
