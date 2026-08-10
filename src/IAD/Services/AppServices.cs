@@ -39,7 +39,7 @@ namespace IAD.Services
             IDefectRecognitionRepository recognitionRepository = new DefectRecognitionRepository(connectionFactory);
 
             Products = new ProductService(productRepository, definitionSettingsRepository, categoryRepository, roiRepository);
-            Datasets = new DatasetService(productRepository, definitionSettingsRepository, categoryRepository, datasetRepository);
+            Datasets = new DatasetService(productRepository, definitionSettingsRepository, categoryRepository, datasetRepository, maskRepository);
             AnnotationEditing = new AnnotationEditingService(datasetRepository, categoryRepository);
             Masks = new DatasetMaskService(datasetRepository, categoryRepository, maskRepository);
             DefectRecognition = new DefectRecognitionService(productRepository, categoryRepository, Datasets, recognitionRepository);
