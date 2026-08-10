@@ -81,6 +81,7 @@
     <Compile Include="Services\DefectCategoryCsv.cs" />
     <Compile Include="Services\AnnotationGeometry.cs" />
     <Compile Include="Services\DatasetService.cs" />
+    <Compile Include="Services\AnnotationEditingService.cs" />
     <Compile Include="Services\TemplateMatchingEngine.cs" />
     <Compile Include="Services\DefectRecognitionService.cs" />
     <Compile Include="Services\RecipeService.cs" />
@@ -110,6 +111,8 @@
 
     <Compile Include="Pages\DatasetAnnotationPage.cs"><SubType>UserControl</SubType></Compile>
     <Compile Include="Pages\DatasetAnnotationPage.Canvas.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
+    <Compile Include="Pages\DatasetAnnotationPage.ThemeBridge.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
+    <Compile Include="Pages\DatasetAnnotationPage.InteractionGuards.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
     <Compile Include="Pages\DatasetAnnotationPage.Designer.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
 
     <Compile Include="Pages\TemplateRecognitionPage.cs"><SubType>UserControl</SubType></Compile>

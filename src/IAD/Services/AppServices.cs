@@ -11,6 +11,7 @@ namespace IAD.Services
 
         public static ProductService Products { get; private set; }
         public static DatasetService Datasets { get; private set; }
+        public static AnnotationEditingService AnnotationEditing { get; private set; }
         public static DefectRecognitionService DefectRecognition { get; private set; }
         public static RecipeService Recipes { get; private set; }
         public static ResultService Results { get; private set; }
@@ -36,6 +37,7 @@ namespace IAD.Services
 
             Products = new ProductService(productRepository, definitionSettingsRepository, categoryRepository, roiRepository);
             Datasets = new DatasetService(productRepository, definitionSettingsRepository, categoryRepository, datasetRepository);
+            AnnotationEditing = new AnnotationEditingService(datasetRepository, categoryRepository);
             DefectRecognition = new DefectRecognitionService(productRepository, categoryRepository, Datasets, recognitionRepository);
             Recipes = new RecipeService(productRepository, recipeRepository);
             Results = new ResultService(productRepository, resultRepository);
