@@ -73,6 +73,18 @@ namespace IAD.Repositories
         int CountAnnotations(long productId);
     }
 
+    public interface IDatasetMaskRepository
+    {
+        IList<DatasetMask> GetByImage(long imageId);
+        DatasetMask GetByImageAndCategory(long imageId, long categoryId);
+        DatasetMask GetById(long maskId);
+        long Insert(DatasetMask mask);
+        void Update(DatasetMask mask);
+        void Delete(long maskId, long imageId);
+        bool IsRelativePathReferencedByVersion(string relativePath);
+        IList<string> GetAllReferencedRelativePaths();
+    }
+
     public interface IDefectRecognitionRepository
     {
         DefectRecognitionSettings GetSettings(long productId, long categoryId);

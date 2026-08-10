@@ -59,6 +59,7 @@
     <Compile Include="Models\DefectInstance.cs" />
     <Compile Include="Models\DatasetImage.cs" />
     <Compile Include="Models\DatasetAnnotation.cs" />
+    <Compile Include="Models\DatasetMask.cs" />
     <Compile Include="Models\DatasetVersion.cs" />
     <Compile Include="Models\DefectRecognition.cs" />
 
@@ -66,6 +67,7 @@
     <Compile Include="Infrastructure\Database\SqliteConnectionFactory.cs" />
     <Compile Include="Infrastructure\Database\DbConvert.cs" />
     <Compile Include="Infrastructure\Database\DatabaseInitializer.cs" />
+    <Compile Include="Infrastructure\Database\DatasetMaskDatabaseMigration.cs" />
 
     <Compile Include="Repositories\RepositoryContracts.cs" />
     <Compile Include="Repositories\ProductRepository.cs" />
@@ -75,6 +77,7 @@
     <Compile Include="Repositories\InspectionRecipeRepository.cs" />
     <Compile Include="Repositories\InspectionResultRepository.cs" />
     <Compile Include="Repositories\DatasetRepository.cs" />
+    <Compile Include="Repositories\DatasetMaskRepository.cs" />
     <Compile Include="Repositories\DefectRecognitionRepository.cs" />
 
     <Compile Include="Services\ProductService.cs" />
@@ -82,6 +85,7 @@
     <Compile Include="Services\AnnotationGeometry.cs" />
     <Compile Include="Services\DatasetService.cs" />
     <Compile Include="Services\AnnotationEditingService.cs" />
+    <Compile Include="Services\DatasetMaskService.cs" />
     <Compile Include="Services\TemplateMatchingEngine.cs" />
     <Compile Include="Services\DefectRecognitionService.cs" />
     <Compile Include="Services\RecipeService.cs" />
@@ -111,6 +115,8 @@
 
     <Compile Include="Pages\DatasetAnnotationPage.cs"><SubType>UserControl</SubType></Compile>
     <Compile Include="Pages\DatasetAnnotationPage.Canvas.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
+    <Compile Include="Pages\DatasetAnnotationPage.Mask.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
+    <Compile Include="Pages\DatasetAnnotationPage.MaskIntegration.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
     <Compile Include="Pages\DatasetAnnotationPage.ThemeBridge.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
     <Compile Include="Pages\DatasetAnnotationPage.InteractionGuards.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
     <Compile Include="Pages\DatasetAnnotationPage.Designer.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
