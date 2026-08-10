@@ -154,6 +154,7 @@ namespace IAD.Services
             if (!DatasetReviewStatus.IsValid(reviewStatus))
                 throw new ArgumentException("无效的审核状态：" + reviewStatus, "reviewStatus");
 
+            bool changed = false;
             foreach (long imageId in imageIds ?? new long[0])
             {
                 DatasetImage image = RequireImage(imageId);
@@ -182,13 +183,16 @@ namespace IAD.Services
                 image.UpdatedAtUtc = DateTime.UtcNow;
                 if (string.IsNullOrWhiteSpace(image.DatasetSplit)) image.DatasetSplit = DatasetSplit.Unassigned;
                 datasets.UpdateImageWorkflow(image);
+                changed = true;
             }
+            if (changed) ProductDataRevisionTracker.MarkChanged(productId);
         }
 
         public void SetSplit(long productId, IEnumerable<long> imageIds, string split)
         {
             RequireProduct(productId);
             if (!DatasetSplit.IsValid(split)) throw new ArgumentException("无效的数据集划分：" + split, "split");
+            bool changed = false;
             foreach (long imageId in imageIds ?? new long[0])
             {
                 DatasetImage image = RequireImage(imageId);
@@ -197,7 +201,9 @@ namespace IAD.Services
                 image.UpdatedAtUtc = DateTime.UtcNow;
                 if (string.IsNullOrWhiteSpace(image.ReviewStatus)) image.ReviewStatus = DatasetReviewStatus.Pending;
                 datasets.UpdateImageWorkflow(image);
+                changed = true;
             }
+            if (changed) ProductDataRevisionTracker.MarkChanged(productId);
         }
 
         public void AssignSplits(long productId, int trainPercent, int validationPercent, int seed)
@@ -231,6 +237,7 @@ namespace IAD.Services
                 if (string.IsNullOrWhiteSpace(image.ReviewStatus)) image.ReviewStatus = DatasetReviewStatus.Pending;
                 datasets.UpdateImageWorkflow(image);
             }
+            if (eligible.Count > 0) ProductDataRevisionTracker.MarkChanged(productId);
         }
 
         public DatasetImportResult ImportCoco(long productId, string annotationFile)

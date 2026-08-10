@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Reflection;
 using System.Windows.Forms;
 using IAD.Pages;
 using IAD.UI;
@@ -14,9 +15,11 @@ namespace IAD.Shell
         private readonly Dictionary<string, UserControl> pages = new Dictionary<string, UserControl>();
         private readonly Dictionary<string, Button> navButtons = new Dictionary<string, Button>();
         private readonly Dictionary<string, Size> lastLayoutSizes = new Dictionary<string, Size>();
+        private readonly HashSet<string> preparedPageLayouts = new HashSet<string>();
         private Font navFont;
         private Font navActiveFont;
         private string currentPage;
+        private string selectedNavigationPage;
         private bool layoutInProgress;
 
         public MainForm()
@@ -43,6 +46,8 @@ namespace IAD.Shell
         {
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
             UpdateStyles();
+            EnableDoubleBuffer(contentHost);
+            EnableDoubleBuffer(navigationPanel);
 
             BackColor = UiTheme.Page;
             rootLayout.BackColor = UiTheme.Page;
@@ -176,6 +181,13 @@ namespace IAD.Shell
         {
             if (string.IsNullOrEmpty(pageName) || layoutInProgress) return;
 
+            UserControl visiblePage;
+            if (string.Equals(currentPage, pageName, StringComparison.Ordinal) &&
+                pages.TryGetValue(pageName, out visiblePage) && visiblePage.Visible)
+            {
+                return;
+            }
+
             UserControl nextPage = null;
             layoutInProgress = true;
             contentHost.SuspendLayout();
@@ -185,49 +197,48 @@ namespace IAD.Shell
                 nextPage = GetOrCreatePage(pageName);
                 if (nextPage == null) return;
 
-                if (currentPage == pageName && nextPage.Visible)
-                {
-                    FillPageToHost(nextPage);
-                    ApplyLayoutIfNeeded(pageName, nextPage, false);
-                    return;
-                }
-
                 UserControl previousPage;
                 if (!string.IsNullOrEmpty(currentPage) && pages.TryGetValue(currentPage, out previousPage))
                 {
                     previousPage.Visible = false;
                 }
 
-                // 先完成所有 Fill / 响应式计算，再把页面显示出来，避免先出现设计时尺寸再跳到全屏。
+                // 页面只在首次创建或宿主尺寸变化时重排。普通切页复用已经完成的布局。
                 nextPage.Visible = false;
-                PageFillLayoutManager.Apply(nextPage);
+                if (preparedPageLayouts.Add(pageName)) PageFillLayoutManager.Apply(nextPage);
                 FillPageToHost(nextPage);
-                ApplyLayoutIfNeeded(pageName, nextPage, true);
-                FillPageToHost(nextPage);
+                ApplyLayoutIfNeeded(pageName, nextPage);
 
                 nextPage.Visible = true;
                 nextPage.BringToFront();
                 currentPage = pageName;
+                UpdateNavigationSelection(pageName);
             }
             finally
             {
                 contentHost.ResumeLayout(true);
-                contentHost.PerformLayout();
-                if (nextPage != null) nextPage.PerformLayout();
                 layoutInProgress = false;
             }
-
-            UpdateNavigationSelection(pageName);
         }
 
         private void UpdateNavigationSelection(string pageName)
         {
-            foreach (KeyValuePair<string, Button> pair in navButtons)
+            if (string.Equals(selectedNavigationPage, pageName, StringComparison.Ordinal)) return;
+
+            Button previous;
+            if (!string.IsNullOrEmpty(selectedNavigationPage) && navButtons.TryGetValue(selectedNavigationPage, out previous))
             {
-                bool active = pair.Key == pageName;
-                pair.Value.BackColor = active ? UiTheme.Active : Color.Transparent;
-                pair.Value.Font = active ? navActiveFont : navFont;
+                previous.BackColor = Color.Transparent;
+                previous.Font = navFont;
             }
+
+            Button current;
+            if (navButtons.TryGetValue(pageName, out current))
+            {
+                current.BackColor = UiTheme.Active;
+                current.Font = navActiveFont;
+            }
+            selectedNavigationPage = pageName;
         }
 
         private void FillPageToHost(UserControl page)
@@ -244,19 +255,20 @@ namespace IAD.Shell
             }
         }
 
-        private void ApplyLayoutIfNeeded(string pageName, UserControl page, bool force)
+        private bool ApplyLayoutIfNeeded(string pageName, UserControl page)
         {
             Size size = contentHost.ClientSize;
-            if (size.Width <= 0 || size.Height <= 0) return;
+            if (size.Width <= 0 || size.Height <= 0) return false;
 
             Size previousSize;
-            if (!force && lastLayoutSizes.TryGetValue(pageName, out previousSize) && previousSize == size)
+            if (lastLayoutSizes.TryGetValue(pageName, out previousSize) && previousSize == size)
             {
-                return;
+                return false;
             }
 
             ResponsiveLayoutManager.Apply(page, size);
             lastLayoutSizes[pageName] = size;
+            return true;
         }
 
         private void contentHost_SizeChanged(object sender, EventArgs e)
@@ -276,17 +288,23 @@ namespace IAD.Shell
             page.SuspendLayout();
             try
             {
-                PageFillLayoutManager.Apply(page);
                 FillPageToHost(page);
-                ApplyLayoutIfNeeded(currentPage, page, false);
-                FillPageToHost(page);
+                ApplyLayoutIfNeeded(currentPage, page);
             }
             finally
             {
                 page.ResumeLayout(true);
-                page.PerformLayout();
                 layoutInProgress = false;
             }
+        }
+
+        private static void EnableDoubleBuffer(Control control)
+        {
+            if (control == null) return;
+            PropertyInfo property = control.GetType().GetProperty(
+                "DoubleBuffered",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            if (property != null) property.SetValue(control, true, null);
         }
 
         private void MainForm_SizeChanged(object sender, EventArgs e)

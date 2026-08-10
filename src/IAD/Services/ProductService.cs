@@ -89,6 +89,7 @@ namespace IAD.Services
             product.Description = NormalizeOptional(product.Description);
             product.UpdatedAtUtc = DateTime.UtcNow;
             products.Update(product);
+            ProductDataRevisionTracker.MarkChanged(product.Id);
         }
 
         public ProductDefinitionSettings SaveDefinitionSettings(ProductDefinitionSettings value)
@@ -117,6 +118,7 @@ namespace IAD.Services
             value.TemplateVersion = NormalizeOptional(value.TemplateVersion);
             value.UpdatedAtUtc = DateTime.UtcNow;
             settings.Upsert(value);
+            ProductDataRevisionTracker.MarkChanged(value.ProductId);
             return value;
         }
 
@@ -152,6 +154,7 @@ namespace IAD.Services
                 categories.Update(category);
             }
 
+            ProductDataRevisionTracker.MarkChanged(category.ProductId);
             return category;
         }
 
@@ -159,6 +162,7 @@ namespace IAD.Services
         {
             EnsureProductExists(productId);
             categories.Delete(categoryId, productId);
+            ProductDataRevisionTracker.MarkChanged(productId);
         }
 
         public RoiDefinition SaveRoi(RoiDefinition roi)
@@ -184,6 +188,7 @@ namespace IAD.Services
                 rois.Update(roi);
             }
 
+            ProductDataRevisionTracker.MarkChanged(roi.ProductId);
             return roi;
         }
 
@@ -191,12 +196,14 @@ namespace IAD.Services
         {
             EnsureProductExists(productId);
             rois.Delete(roiId, productId);
+            ProductDataRevisionTracker.MarkChanged(productId);
         }
 
         public void DeleteAllRois(long productId)
         {
             EnsureProductExists(productId);
             rois.DeleteByProduct(productId);
+            ProductDataRevisionTracker.MarkChanged(productId);
         }
 
         public static ProductDefinitionSettings CreateDefaultSettings(long productId)

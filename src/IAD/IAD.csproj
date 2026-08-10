@@ -84,6 +84,7 @@
     <Compile Include="Repositories\DefectRecognitionRepository.cs" />
 
     <Compile Include="Services\ProductService.cs" />
+    <Compile Include="Services\ProductDataRevisionTracker.cs" />
     <Compile Include="Services\DefectCategoryCsv.cs" />
     <Compile Include="Services\AnnotationGeometry.cs" />
     <Compile Include="Services\DatasetService.cs" />

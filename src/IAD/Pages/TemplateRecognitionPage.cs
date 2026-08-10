@@ -15,6 +15,8 @@ namespace IAD.Pages
         private bool loadingData;
         private bool synchronizingCandidateSelection;
         private Product currentProduct;
+        private long loadedProductId = -1;
+        private long loadedProductDataRevision = -1;
         private IList<DefectRecognitionCandidate> currentCandidates = new List<DefectRecognitionCandidate>();
         private Bitmap queryPreview;
         private Bitmap heatmapPreview;
@@ -37,7 +39,28 @@ namespace IAD.Pages
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
-            if (runtimeInitialized && Visible) LoadRecognitionData();
+            if (!runtimeInitialized) return;
+            if (Visible)
+            {
+                if (IsRecognitionSnapshotStale()) LoadRecognitionData();
+            }
+            else
+            {
+                CaptureRecognitionSnapshotRevision();
+            }
+        }
+
+        private bool IsRecognitionSnapshotStale()
+        {
+            long productId = AppSession.CurrentProductId;
+            return loadedProductId != productId ||
+                   loadedProductDataRevision != ProductDataRevisionTracker.GetRevision(productId);
+        }
+
+        private void CaptureRecognitionSnapshotRevision()
+        {
+            loadedProductId = AppSession.CurrentProductId;
+            loadedProductDataRevision = ProductDataRevisionTracker.GetRevision(loadedProductId);
         }
 
         private void ConfigureRuntimeUi()
@@ -159,6 +182,7 @@ namespace IAD.Pages
             finally
             {
                 loadingData = false;
+                CaptureRecognitionSnapshotRevision();
             }
 
             if (GetSelectedCategory() != null) LoadSelectedCategory(0);

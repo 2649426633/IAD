@@ -42,6 +42,8 @@ namespace IAD.WorkflowSmokeTests
             AppServices.Initialize();
             VerifyMaskRefinement();
             Product product = AppServices.Products.CreateProduct("WF-001", "工作流测试产品", null);
+            long productRevision = ProductDataRevisionTracker.GetRevision(product.Id);
+            Assert(productRevision > 0, "产品数据修订号没有在创建产品后更新。");
             DefectCategory category = AppServices.Products.SaveDefectCategory(new DefectCategory
             {
                 ProductId = product.Id,
@@ -55,6 +57,7 @@ namespace IAD.WorkflowSmokeTests
                 DisplayOrder = 1,
                 IsEnabled = true
             });
+            Assert(ProductDataRevisionTracker.GetRevision(product.Id) > productRevision, "产品类别修改没有更新数据修订号。");
 
             DatasetImageImportResult firstImport = AppServices.Datasets.ImportImageChecked(product.Id, defectImagePath);
             DatasetImageImportResult duplicateImport = AppServices.Datasets.ImportImageChecked(product.Id, defectImagePath);
@@ -62,6 +65,7 @@ namespace IAD.WorkflowSmokeTests
             Assert(!firstImport.IsDuplicate, "首次图片导入不应判定为重复。");
             Assert(duplicateImport.IsDuplicate && duplicateImport.Image.Id == firstImport.Image.Id, "SHA-256 重复图片检测失败。");
 
+            long revisionBeforeAnnotation = ProductDataRevisionTracker.GetRevision(product.Id);
             DatasetAnnotation annotation = AppServices.Datasets.CreateAnnotation(
                 firstImport.Image.Id,
                 category.Id,
@@ -70,7 +74,9 @@ namespace IAD.WorkflowSmokeTests
                 1F,
                 1D);
             Assert(annotation.Id > 0, "矢量标注创建失败。");
+            Assert(ProductDataRevisionTracker.GetRevision(product.Id) > revisionBeforeAnnotation, "矢量标注修改没有更新数据修订号。");
 
+            long revisionBeforeMask = ProductDataRevisionTracker.GetRevision(product.Id);
             using (Bitmap mask = new Bitmap(64, 64))
             using (Graphics graphics = Graphics.FromImage(mask))
             {
@@ -78,12 +84,15 @@ namespace IAD.WorkflowSmokeTests
                 graphics.FillRectangle(Brushes.White, 10, 10, 12, 10);
                 AppServices.Masks.SaveMask(firstImport.Image.Id, category.Id, mask);
             }
+            Assert(ProductDataRevisionTracker.GetRevision(product.Id) > revisionBeforeMask, "Mask 修改没有更新数据修订号。");
 
             DatasetImageQuality quality = AppServices.DatasetWorkflow.EvaluateImage(firstImport.Image.Id);
             Assert(quality.CanApprove && quality.VectorAnnotationCount == 1 && quality.MaskCount == 1, "真实质量检查未识别有效矢量标注和 Mask。");
+            long revisionBeforeReview = ProductDataRevisionTracker.GetRevision(product.Id);
             AppServices.DatasetWorkflow.SetReviewStatus(product.Id, new[] { firstImport.Image.Id }, DatasetReviewStatus.Approved, "测试通过", "smoke-test");
             AppServices.DatasetWorkflow.SetReviewStatus(product.Id, new[] { normalImage.Id }, DatasetReviewStatus.Normal, "确认正常", "smoke-test");
             AppServices.DatasetWorkflow.AssignSplits(product.Id, 50, 0, 42);
+            Assert(ProductDataRevisionTracker.GetRevision(product.Id) > revisionBeforeReview, "审核或数据划分没有更新数据修订号。");
 
             DatasetQualityReport report = AppServices.DatasetWorkflow.EvaluateProduct(product.Id);
             Assert(report.ErrorCount == 0 && report.ImageCount == 2, "产品级发布质量门禁失败。");

@@ -86,7 +86,11 @@ namespace IAD.Services
             {
                 TryDeleteFile(tempPath);
                 if (current != null) DeleteMask(imageId, categoryId);
-                else RefreshImageStatus(imageId);
+                else
+                {
+                    RefreshImageStatus(imageId);
+                    ProductDataRevisionTracker.MarkChanged(image.ProductId);
+                }
                 return null;
             }
 
@@ -124,6 +128,7 @@ namespace IAD.Services
             }
 
             DeleteUnreferencedPreviousFile(previousPath, relativePath);
+            ProductDataRevisionTracker.MarkChanged(image.ProductId);
             return result;
         }
 
@@ -135,6 +140,7 @@ namespace IAD.Services
             if (current == null)
             {
                 RefreshImageStatus(imageId);
+                ProductDataRevisionTracker.MarkChanged(image.ProductId);
                 return;
             }
 
@@ -142,6 +148,7 @@ namespace IAD.Services
             if (!masks.IsRelativePathReferencedByVersion(current.RelativePath))
                 TryDeleteFile(ResolveMaskPath(current.RelativePath));
             RefreshImageStatus(imageId);
+            ProductDataRevisionTracker.MarkChanged(image.ProductId);
         }
 
         public DatasetMask RasterizeAnnotations(long imageId, long categoryId)

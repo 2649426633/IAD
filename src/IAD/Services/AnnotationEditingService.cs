@@ -29,6 +29,7 @@ namespace IAD.Services
             annotation.UpdatedAtUtc = DateTime.UtcNow;
             datasets.UpdateAnnotation(annotation);
             datasets.UpdateImageStatus(image.Id, "待审核", annotation.UpdatedAtUtc);
+            ProductDataRevisionTracker.MarkChanged(image.ProductId);
             return annotation;
         }
 
@@ -49,6 +50,7 @@ namespace IAD.Services
             annotation.UpdatedAtUtc = now;
             annotation.Id = datasets.InsertAnnotation(annotation);
             datasets.UpdateImageStatus(image.Id, "已标注", now);
+            ProductDataRevisionTracker.MarkChanged(image.ProductId);
             return annotation;
         }
 

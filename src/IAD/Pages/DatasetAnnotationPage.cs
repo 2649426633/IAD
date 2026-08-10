@@ -19,6 +19,8 @@ namespace IAD.Pages
         private bool loadingData;
         private Product currentProduct;
         private ProductDefinitionSettings currentProductDefinition;
+        private long loadedProductId = -1;
+        private long loadedProductDataRevision = -1;
         private DatasetImage currentImage;
         private IList<DatasetImage> datasetImages = new List<DatasetImage>();
         private IList<DefectCategory> defectCategories = new List<DefectCategory>();
@@ -50,8 +52,28 @@ namespace IAD.Pages
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
-            if (runtimeInitialized && Visible)
-                LoadDataset();
+            if (!runtimeInitialized) return;
+            if (Visible)
+            {
+                if (IsDatasetSnapshotStale()) LoadDataset();
+            }
+            else
+            {
+                CaptureDatasetSnapshotRevision();
+            }
+        }
+
+        private bool IsDatasetSnapshotStale()
+        {
+            long productId = AppSession.CurrentProductId;
+            return loadedProductId != productId ||
+                   loadedProductDataRevision != ProductDataRevisionTracker.GetRevision(productId);
+        }
+
+        private void CaptureDatasetSnapshotRevision()
+        {
+            loadedProductId = AppSession.CurrentProductId;
+            loadedProductDataRevision = ProductDataRevisionTracker.GetRevision(loadedProductId);
         }
 
         private void ConfigureRuntimeUi()
@@ -219,6 +241,7 @@ namespace IAD.Pages
             finally
             {
                 loadingData = false;
+                CaptureDatasetSnapshotRevision();
             }
 
             SelectImageFromGrid();

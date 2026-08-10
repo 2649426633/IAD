@@ -116,6 +116,7 @@ namespace IAD.Services
                     UpdatedAtUtc = now
                 };
                 image.Id = datasets.InsertImage(image);
+                ProductDataRevisionTracker.MarkChanged(productId);
                 return new DatasetImageImportResult { Image = image, IsDuplicate = false };
             }
             catch
@@ -201,6 +202,7 @@ namespace IAD.Services
             try
             {
                 datasets.DeleteImage(image.Id, productId);
+                ProductDataRevisionTracker.MarkChanged(productId);
             }
             catch
             {
@@ -283,20 +285,23 @@ namespace IAD.Services
             };
             annotation.Id = datasets.InsertAnnotation(annotation);
             datasets.UpdateImageStatus(image.Id, "已标注", now);
+            ProductDataRevisionTracker.MarkChanged(image.ProductId);
             return annotation;
         }
 
         public void DeleteAnnotation(long imageId, long annotationId)
         {
-            EnsureImageExists(imageId);
+            DatasetImage image = EnsureImageExists(imageId);
             datasets.DeleteAnnotation(annotationId, imageId);
             RefreshImageStatus(imageId);
+            ProductDataRevisionTracker.MarkChanged(image.ProductId);
         }
 
         public void SetCategoryVisibility(long imageId, long? categoryId, string categoryName, bool isVisible)
         {
-            EnsureImageExists(imageId);
+            DatasetImage image = EnsureImageExists(imageId);
             IList<DatasetAnnotation> items = datasets.GetAnnotationsByImage(imageId);
+            bool changed = false;
             foreach (DatasetAnnotation item in items)
             {
                 bool categoryMatches = categoryId.HasValue
@@ -306,7 +311,9 @@ namespace IAD.Services
                 item.IsVisible = isVisible;
                 item.UpdatedAtUtc = DateTime.UtcNow;
                 datasets.UpdateAnnotation(item);
+                changed = true;
             }
+            if (changed) ProductDataRevisionTracker.MarkChanged(image.ProductId);
         }
 
         public int RepairAnnotationBounds(long imageId)
@@ -338,6 +345,8 @@ namespace IAD.Services
                         "标注 #" + item.Id + "（" + (item.CategoryName ?? item.AnnotationType ?? "未知") + "）：" + ex.Message);
                 }
             }
+
+            if (changed > 0) ProductDataRevisionTracker.MarkChanged(image.ProductId);
 
             if (failures.Count > 0)
             {
@@ -384,6 +393,7 @@ namespace IAD.Services
             EnsureProductExists(productId);
             datasets.RestoreVersion(productId, versionId, DateTime.UtcNow);
             CleanupOrphanImageFiles();
+            ProductDataRevisionTracker.MarkChanged(productId);
         }
 
         public void CleanupOrphanImageFiles()
@@ -425,6 +435,7 @@ namespace IAD.Services
                 CreatedAtUtc = DateTime.UtcNow
             };
             version.Id = datasets.InsertVersion(version);
+            ProductDataRevisionTracker.MarkChanged(productId);
             return version;
         }
 
