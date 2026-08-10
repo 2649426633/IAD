@@ -15,6 +15,7 @@ namespace IAD.Pages
             dgvLayers.Enter += NonCanvasControl_Enter;
             cboCurrentClass.Enter += NonCanvasControl_Enter;
             InitializeMaskEditorRuntime();
+            InitializeMaskDataIntegration();
         }
 
         private void NonCanvasControl_Enter(object sender, EventArgs e)
