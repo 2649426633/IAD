@@ -216,16 +216,42 @@ namespace IAD.Services
         {
             DatasetImage image = EnsureImageExists(imageId);
             int changed = 0;
+            List<string> failures = new List<string>();
+
             foreach (DatasetAnnotation item in datasets.GetAnnotationsByImage(imageId))
             {
-                string repaired = AnnotationGeometry.Clamp(item.GeometryData, image.Width, image.Height);
-                repaired = AnnotationGeometry.ValidateAndNormalize(item.AnnotationType, repaired, image.Width, image.Height);
-                if (string.Equals(repaired, item.GeometryData, StringComparison.Ordinal)) continue;
-                item.GeometryData = repaired;
-                item.UpdatedAtUtc = DateTime.UtcNow;
-                datasets.UpdateAnnotation(item);
-                changed++;
+                try
+                {
+                    string repaired = AnnotationGeometry.RepairToBounds(
+                        item.AnnotationType,
+                        item.GeometryData,
+                        item.BrushWidth,
+                        image.Width,
+                        image.Height);
+
+                    if (string.Equals(repaired, item.GeometryData, StringComparison.Ordinal)) continue;
+                    item.GeometryData = repaired;
+                    item.UpdatedAtUtc = DateTime.UtcNow;
+                    datasets.UpdateAnnotation(item);
+                    changed++;
+                }
+                catch (Exception ex)
+                {
+                    failures.Add(
+                        "标注 #" + item.Id + "（" + (item.CategoryName ?? item.AnnotationType ?? "未知") + "）：" + ex.Message);
+                }
             }
+
+            if (failures.Count > 0)
+            {
+                string message = "边界检查已处理完成，已自动修复 " + changed + " 个标注，但有 " + failures.Count + " 个标注无法自动修复。";
+                int detailCount = Math.Min(5, failures.Count);
+                for (int i = 0; i < detailCount; i++) message += "\r\n• " + failures[i];
+                if (failures.Count > detailCount) message += "\r\n• 其余 " + (failures.Count - detailCount) + " 个未展开。";
+                message += "\r\n请使用“编辑标注”人工调整这些异常标注。";
+                throw new InvalidOperationException(message);
+            }
+
             return changed;
         }
 
