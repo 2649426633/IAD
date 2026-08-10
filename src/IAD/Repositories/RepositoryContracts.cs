@@ -46,6 +46,18 @@ namespace IAD.Repositories
         long Insert(InspectionRecipe recipe);
         void Update(InspectionRecipe recipe);
         void Activate(long productId, long recipeId);
+        void ReplaceRules(long recipeId, IList<RecipeRule> rules);
+    }
+
+    public interface IInferenceModelRepository
+    {
+        IList<InferenceModel> GetByProduct(long productId);
+        InferenceModel GetById(long id);
+        InferenceModel GetActiveByProduct(long productId);
+        long Insert(InferenceModel model);
+        void Update(InferenceModel model);
+        void Activate(long productId, long modelId);
+        void Delete(long productId, long modelId);
     }
 
     public interface IInspectionResultRepository
@@ -53,6 +65,7 @@ namespace IAD.Repositories
         long Save(InspectionResult result);
         InspectionResult GetById(long id);
         IList<InspectionResult> GetRecent(int limit);
+        IList<InspectionResult> Query(InspectionResultQuery query);
     }
 
     public interface IDatasetRepository

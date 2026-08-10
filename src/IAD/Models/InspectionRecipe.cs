@@ -14,6 +14,8 @@ namespace IAD.Models
         public string RuleVersion { get; set; }
         public string CalibrationVersion { get; set; }
         public string ThresholdVersion { get; set; }
+        public long? ModelId { get; set; }
+        public System.Collections.Generic.List<RecipeRule> Rules { get; private set; } = new System.Collections.Generic.List<RecipeRule>();
         public bool IsActive { get; set; }
         public DateTime CreatedAtUtc { get; set; }
         public DateTime UpdatedAtUtc { get; set; }

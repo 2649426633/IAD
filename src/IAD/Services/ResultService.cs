@@ -45,6 +45,8 @@ namespace IAD.Services
             }
 
             result.Id = results.Save(result);
+            result.DefectCount = result.Defects.Count;
+            InspectionResultRevisionTracker.MarkChanged(result.ProductId);
             return result.Id;
         }
 
@@ -58,6 +60,14 @@ namespace IAD.Services
             if (limit <= 0) limit = 50;
             if (limit > 500) limit = 500;
             return results.GetRecent(limit);
+        }
+
+        public IList<InspectionResult> QueryResults(InspectionResultQuery query)
+        {
+            if (query == null) query = new InspectionResultQuery();
+            if (query.Limit <= 0) query.Limit = 200;
+            if (query.Limit > 1000) query.Limit = 1000;
+            return results.Query(query);
         }
     }
 }

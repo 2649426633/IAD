@@ -46,6 +46,7 @@
   <ItemGroup>
     <PackageReference Include="System.Data.SQLite" Version="2.0.3" />
     <PackageReference Include="SourceGear.sqlite3" Version="3.50.4.5" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.28.0" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -64,6 +65,9 @@
     <Compile Include="Models\DatasetVersion.cs" />
     <Compile Include="Models\DatasetWorkflow.cs" />
     <Compile Include="Models\DefectRecognition.cs" />
+    <Compile Include="Models\InferenceModel.cs" />
+    <Compile Include="Models\RecipeRule.cs" />
+    <Compile Include="Models\InspectionResultQuery.cs" />
 
     <Compile Include="Infrastructure\Storage\ProjectStoragePaths.cs" />
     <Compile Include="Infrastructure\Database\SqliteConnectionFactory.cs" />
@@ -71,6 +75,7 @@
     <Compile Include="Infrastructure\Database\DatabaseInitializer.cs" />
     <Compile Include="Infrastructure\Database\DatasetMaskDatabaseMigration.cs" />
     <Compile Include="Infrastructure\Database\DatasetWorkflowDatabaseMigration.cs" />
+    <Compile Include="Infrastructure\Database\InferenceDatabaseMigration.cs" />
 
     <Compile Include="Repositories\RepositoryContracts.cs" />
     <Compile Include="Repositories\ProductRepository.cs" />
@@ -79,6 +84,7 @@
     <Compile Include="Repositories\RoiRepository.cs" />
     <Compile Include="Repositories\InspectionRecipeRepository.cs" />
     <Compile Include="Repositories\InspectionResultRepository.cs" />
+    <Compile Include="Repositories\InferenceModelRepository.cs" />
     <Compile Include="Repositories\DatasetRepository.cs" />
     <Compile Include="Repositories\DatasetMaskRepository.cs" />
     <Compile Include="Repositories\DefectRecognitionRepository.cs" />
@@ -96,6 +102,10 @@
     <Compile Include="Services\DefectRecognitionService.cs" />
     <Compile Include="Services\RecipeService.cs" />
     <Compile Include="Services\ResultService.cs" />
+    <Compile Include="Services\InferenceModelService.cs" />
+    <Compile Include="Services\RecipeRuleEngine.cs" />
+    <Compile Include="Services\OnnxInferenceEngine.cs" />
+    <Compile Include="Services\OfflineInspectionService.cs" />
     <Compile Include="Services\AppServices.cs" />
 
     <Compile Include="Security\AppSession.cs" />
@@ -105,6 +115,7 @@
     <Compile Include="Shell\ProductSelectionDialog.Designer.cs"><DependentUpon>ProductSelectionDialog.cs</DependentUpon></Compile>
     <Compile Include="Shell\RoiManagerDialog.cs"><SubType>Form</SubType></Compile>
     <Compile Include="Shell\RoiManagerDialog.Designer.cs"><DependentUpon>RoiManagerDialog.cs</DependentUpon></Compile>
+    <Compile Include="Shell\ModelImportDialog.cs" />
     <Compile Include="Shell\DatasetManagerDialog.cs"><SubType>Form</SubType></Compile>
     <Compile Include="Shell\DatasetManagerDialog.Designer.cs"><DependentUpon>DatasetManagerDialog.cs</DependentUpon></Compile>
     <Compile Include="Shell\MainForm.cs"><SubType>Form</SubType></Compile>

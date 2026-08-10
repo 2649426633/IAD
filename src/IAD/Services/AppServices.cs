@@ -18,6 +18,8 @@ namespace IAD.Services
         public static DefectRecognitionService DefectRecognition { get; private set; }
         public static RecipeService Recipes { get; private set; }
         public static ResultService Results { get; private set; }
+        public static InferenceModelService Models { get; private set; }
+        public static OfflineInspectionService OfflineInspection { get; private set; }
         public static string DatabasePath { get { return ProjectStoragePaths.DatabasePath; } }
 
         public static void Initialize()
@@ -30,6 +32,7 @@ namespace IAD.Services
             DatabaseInitializer.Initialize(connectionFactory);
             DatasetMaskDatabaseMigration.Apply(connectionFactory);
             DatasetWorkflowDatabaseMigration.Apply(connectionFactory);
+            InferenceDatabaseMigration.Apply(connectionFactory);
 
             IProductRepository productRepository = new ProductRepository(connectionFactory);
             IProductDefinitionSettingsRepository definitionSettingsRepository = new ProductDefinitionSettingsRepository(connectionFactory);
@@ -37,6 +40,7 @@ namespace IAD.Services
             IRoiRepository roiRepository = new RoiRepository(connectionFactory);
             IInspectionRecipeRepository recipeRepository = new InspectionRecipeRepository(connectionFactory);
             IInspectionResultRepository resultRepository = new InspectionResultRepository(connectionFactory);
+            IInferenceModelRepository modelRepository = new InferenceModelRepository(connectionFactory);
             IDatasetRepository datasetRepository = new DatasetRepository(connectionFactory);
             IDatasetMaskRepository maskRepository = new DatasetMaskRepository(connectionFactory);
             IDefectRecognitionRepository recognitionRepository = new DefectRecognitionRepository(connectionFactory);
@@ -50,6 +54,8 @@ namespace IAD.Services
             DefectRecognition = new DefectRecognitionService(productRepository, categoryRepository, Datasets, recognitionRepository);
             Recipes = new RecipeService(productRepository, recipeRepository);
             Results = new ResultService(productRepository, resultRepository);
+            Models = new InferenceModelService(productRepository, categoryRepository, modelRepository);
+            OfflineInspection = new OfflineInspectionService(Products, Recipes, Models, Results);
 
             try { Masks.CleanupOrphanFiles(); }
             catch { }

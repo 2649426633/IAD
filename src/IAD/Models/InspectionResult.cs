@@ -13,12 +13,20 @@ namespace IAD.Models
         public long Id { get; set; }
         public long ProductId { get; set; }
         public long? RecipeId { get; set; }
+        public long? ModelId { get; set; }
         public string BatchCode { get; set; }
         public string SourceImagePath { get; set; }
+        public string OriginalImagePath { get; set; }
+        public string ArchivedImagePath { get; set; }
+        public string AnnotatedImagePath { get; set; }
         public string OverallResult { get; set; }
         public double LocalizationScore { get; set; }
         public string ModelVersion { get; set; }
         public string RuleVersion { get; set; }
+        public long InferenceMilliseconds { get; set; }
+        public string OperatorName { get; set; }
+        public string ErrorMessage { get; set; }
+        public int DefectCount { get; set; }
         public DateTime StartedAtUtc { get; set; }
         public DateTime FinishedAtUtc { get; set; }
         public List<DefectInstance> Defects { get; private set; }

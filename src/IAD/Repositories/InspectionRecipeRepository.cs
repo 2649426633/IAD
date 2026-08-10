@@ -23,7 +23,7 @@ namespace IAD.Repositories
             {
                 command.CommandText = @"SELECT Id, ProductId, RecipeCode, RecipeName, DatasetVersion, LocalizationTemplateVersion,
                                                ModelVersion, RuleVersion, CalibrationVersion, ThresholdVersion,
-                                               IsActive, CreatedAtUtc, UpdatedAtUtc
+                                               ModelId, IsActive, CreatedAtUtc, UpdatedAtUtc
                                         FROM InspectionRecipes WHERE ProductId = @ProductId
                                         ORDER BY IsActive DESC, UpdatedAtUtc DESC;";
                 command.Parameters.AddWithValue("@ProductId", productId);
@@ -31,6 +31,7 @@ namespace IAD.Repositories
                 {
                     while (reader.Read()) items.Add(Map(reader));
                 }
+                foreach (InspectionRecipe item in items) LoadRules(connection, item);
             }
             return items;
         }
@@ -53,9 +54,9 @@ namespace IAD.Repositories
                 {
                     command.CommandText = @"INSERT INTO InspectionRecipes
                         (ProductId, RecipeCode, RecipeName, DatasetVersion, LocalizationTemplateVersion, ModelVersion, RuleVersion,
-                         CalibrationVersion, ThresholdVersion, IsActive, CreatedAtUtc, UpdatedAtUtc)
+                         CalibrationVersion, ThresholdVersion, ModelId, IsActive, CreatedAtUtc, UpdatedAtUtc)
                         VALUES (@ProductId, @RecipeCode, @RecipeName, @DatasetVersion, @LocalizationTemplateVersion, @ModelVersion, @RuleVersion,
-                                @CalibrationVersion, @ThresholdVersion, @IsActive, @CreatedAtUtc, @UpdatedAtUtc);";
+                                @CalibrationVersion, @ThresholdVersion, @ModelId, @IsActive, @CreatedAtUtc, @UpdatedAtUtc);";
                     AddParameters(command, recipe);
                     command.ExecuteNonQuery();
                 }
@@ -79,6 +80,7 @@ namespace IAD.Repositories
                     RuleVersion = @RuleVersion,
                     CalibrationVersion = @CalibrationVersion,
                     ThresholdVersion = @ThresholdVersion,
+                    ModelId = @ModelId,
                     IsActive = @IsActive,
                     UpdatedAtUtc = @UpdatedAtUtc
                     WHERE Id = @Id AND ProductId = @ProductId;";
@@ -113,6 +115,41 @@ namespace IAD.Repositories
             }
         }
 
+        public void ReplaceRules(long recipeId, IList<RecipeRule> rules)
+        {
+            using (SQLiteConnection connection = connectionFactory.CreateOpenConnection())
+            using (SQLiteTransaction transaction = connection.BeginTransaction())
+            {
+                using (SQLiteCommand delete = new SQLiteCommand("DELETE FROM RecipeRules WHERE RecipeId=@RecipeId;", connection, transaction))
+                {
+                    delete.Parameters.AddWithValue("@RecipeId", recipeId);
+                    delete.ExecuteNonQuery();
+                }
+                foreach (RecipeRule rule in rules ?? new List<RecipeRule>())
+                {
+                    using (SQLiteCommand command = new SQLiteCommand(@"INSERT INTO RecipeRules
+                        (RecipeId, CategoryId, CategoryCode, CategoryName, RoiName, MinConfidence, MinArea, MinWidth, MinHeight, MaxAllowedCount, Decision, IsEnabled)
+                        VALUES (@RecipeId,@CategoryId,@CategoryCode,@CategoryName,@RoiName,@MinConfidence,@MinArea,@MinWidth,@MinHeight,@MaxAllowedCount,@Decision,@IsEnabled);", connection, transaction))
+                    {
+                        command.Parameters.AddWithValue("@RecipeId", recipeId);
+                        command.Parameters.AddWithValue("@CategoryId", DbConvert.DbNullIfMissing(rule.CategoryId));
+                        command.Parameters.AddWithValue("@CategoryCode", rule.CategoryCode);
+                        command.Parameters.AddWithValue("@CategoryName", DbConvert.DbNullIfEmpty(rule.CategoryName));
+                        command.Parameters.AddWithValue("@RoiName", DbConvert.DbNullIfEmpty(rule.RoiName));
+                        command.Parameters.AddWithValue("@MinConfidence", rule.MinConfidence);
+                        command.Parameters.AddWithValue("@MinArea", rule.MinArea);
+                        command.Parameters.AddWithValue("@MinWidth", rule.MinWidth);
+                        command.Parameters.AddWithValue("@MinHeight", rule.MinHeight);
+                        command.Parameters.AddWithValue("@MaxAllowedCount", rule.MaxAllowedCount);
+                        command.Parameters.AddWithValue("@Decision", rule.Decision);
+                        command.Parameters.AddWithValue("@IsEnabled", rule.IsEnabled ? 1 : 0);
+                        command.ExecuteNonQuery();
+                    }
+                }
+                transaction.Commit();
+            }
+        }
+
         private InspectionRecipe GetSingle(string whereSql, long value)
         {
             using (SQLiteConnection connection = connectionFactory.CreateOpenConnection())
@@ -120,12 +157,15 @@ namespace IAD.Repositories
             {
                 command.CommandText = @"SELECT Id, ProductId, RecipeCode, RecipeName, DatasetVersion, LocalizationTemplateVersion,
                                                ModelVersion, RuleVersion, CalibrationVersion, ThresholdVersion,
-                                               IsActive, CreatedAtUtc, UpdatedAtUtc
+                                               ModelId, IsActive, CreatedAtUtc, UpdatedAtUtc
                                         FROM InspectionRecipes WHERE " + whereSql + " LIMIT 1;";
                 command.Parameters.AddWithValue("@Value", value);
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
-                    return reader.Read() ? Map(reader) : null;
+                    InspectionRecipe recipe = reader.Read() ? Map(reader) : null;
+                    reader.Close();
+                    if (recipe != null) LoadRules(connection, recipe);
+                    return recipe;
                 }
             }
         }
@@ -141,6 +181,7 @@ namespace IAD.Repositories
             command.Parameters.AddWithValue("@RuleVersion", DbConvert.DbNullIfEmpty(recipe.RuleVersion));
             command.Parameters.AddWithValue("@CalibrationVersion", DbConvert.DbNullIfEmpty(recipe.CalibrationVersion));
             command.Parameters.AddWithValue("@ThresholdVersion", DbConvert.DbNullIfEmpty(recipe.ThresholdVersion));
+            command.Parameters.AddWithValue("@ModelId", DbConvert.DbNullIfMissing(recipe.ModelId));
             command.Parameters.AddWithValue("@IsActive", recipe.IsActive ? 1 : 0);
             command.Parameters.AddWithValue("@CreatedAtUtc", DbConvert.ToUtcText(recipe.CreatedAtUtc));
             command.Parameters.AddWithValue("@UpdatedAtUtc", DbConvert.ToUtcText(recipe.UpdatedAtUtc));
@@ -160,10 +201,38 @@ namespace IAD.Repositories
                 RuleVersion = DbConvert.GetString(reader, "RuleVersion"),
                 CalibrationVersion = DbConvert.GetString(reader, "CalibrationVersion"),
                 ThresholdVersion = DbConvert.GetString(reader, "ThresholdVersion"),
+                ModelId = DbConvert.GetNullableInt64(reader, "ModelId"),
                 IsActive = DbConvert.GetBoolean(reader, "IsActive"),
                 CreatedAtUtc = DbConvert.GetUtcDateTime(reader, "CreatedAtUtc"),
                 UpdatedAtUtc = DbConvert.GetUtcDateTime(reader, "UpdatedAtUtc")
             };
+        }
+
+        private static void LoadRules(SQLiteConnection connection, InspectionRecipe recipe)
+        {
+            using (SQLiteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = @"SELECT Id, RecipeId, CategoryId, CategoryCode, CategoryName, RoiName,
+                    MinConfidence, MinArea, MinWidth, MinHeight, MaxAllowedCount, Decision, IsEnabled
+                    FROM RecipeRules WHERE RecipeId=@RecipeId ORDER BY Id;";
+                command.Parameters.AddWithValue("@RecipeId", recipe.Id);
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        recipe.Rules.Add(new RecipeRule
+                        {
+                            Id=DbConvert.GetInt64(reader,"Id"), RecipeId=DbConvert.GetInt64(reader,"RecipeId"),
+                            CategoryId=DbConvert.GetNullableInt64(reader,"CategoryId"), CategoryCode=DbConvert.GetString(reader,"CategoryCode"),
+                            CategoryName=DbConvert.GetString(reader,"CategoryName"), RoiName=DbConvert.GetString(reader,"RoiName"),
+                            MinConfidence=DbConvert.GetDouble(reader,"MinConfidence"), MinArea=DbConvert.GetDouble(reader,"MinArea"),
+                            MinWidth=DbConvert.GetDouble(reader,"MinWidth"), MinHeight=DbConvert.GetDouble(reader,"MinHeight"),
+                            MaxAllowedCount=DbConvert.GetInt32(reader,"MaxAllowedCount"), Decision=DbConvert.GetString(reader,"Decision"),
+                            IsEnabled=DbConvert.GetBoolean(reader,"IsEnabled")
+                        });
+                    }
+                }
+            }
         }
     }
 }

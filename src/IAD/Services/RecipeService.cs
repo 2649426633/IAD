@@ -28,6 +28,11 @@ namespace IAD.Services
             return recipes.GetActiveByProduct(productId);
         }
 
+        public InspectionRecipe GetRecipe(long recipeId)
+        {
+            return recipes.GetById(recipeId);
+        }
+
         public InspectionRecipe SaveRecipe(InspectionRecipe recipe)
         {
             if (recipe == null) throw new ArgumentNullException("recipe");
@@ -35,6 +40,16 @@ namespace IAD.Services
 
             recipe.RecipeCode = Require(recipe.RecipeCode, "Recipe编码");
             recipe.RecipeName = Require(recipe.RecipeName, "Recipe名称");
+            foreach (RecipeRule rule in recipe.Rules)
+            {
+                rule.CategoryCode = Require(rule.CategoryCode, "瑕疵类别编号");
+                if (string.IsNullOrWhiteSpace(rule.CategoryName)) rule.CategoryName = rule.CategoryCode;
+                if (rule.MinConfidence < 0 || rule.MinConfidence > 1)
+                    throw new ArgumentException("规则置信度必须在 0 到 1 之间。");
+                if (rule.MinArea < 0 || rule.MinWidth < 0 || rule.MinHeight < 0 || rule.MaxAllowedCount < 0)
+                    throw new ArgumentException("规则面积、尺寸和允许数量不能为负数。");
+                rule.Decision = string.IsNullOrWhiteSpace(rule.Decision) ? "NG" : rule.Decision.Trim().ToUpperInvariant();
+            }
             DateTime now = DateTime.UtcNow;
 
             if (recipe.Id <= 0)
@@ -52,6 +67,10 @@ namespace IAD.Services
             if (recipe.IsActive)
                 recipes.Activate(recipe.ProductId, recipe.Id);
 
+            foreach (RecipeRule rule in recipe.Rules) rule.RecipeId = recipe.Id;
+            recipes.ReplaceRules(recipe.Id, recipe.Rules);
+            InspectionConfigurationRevisionTracker.MarkChanged(recipe.ProductId);
+
             return recipe;
         }
 
@@ -63,6 +82,7 @@ namespace IAD.Services
                 throw new InvalidOperationException("Recipe不存在或不属于当前产品。Id=" + recipeId);
 
             recipes.Activate(productId, recipeId);
+            InspectionConfigurationRevisionTracker.MarkChanged(productId);
         }
 
         private void EnsureProductExists(long productId)

@@ -2,19 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using IAD.Models;
+using IAD.Pages;
+using IAD.Security;
 using IAD.Services;
 
 namespace IAD.WorkflowSmokeTests
 {
     internal static class Program
     {
+        [STAThread]
         private static int Main()
         {
             try
             {
                 Run();
-                Console.WriteLine("IAD dataset workflow smoke tests passed.");
+                Console.WriteLine("IAD workflow smoke tests passed.");
                 return 0;
             }
             catch (Exception ex)
@@ -58,6 +63,10 @@ namespace IAD.WorkflowSmokeTests
                 IsEnabled = true
             });
             Assert(ProductDataRevisionTracker.GetRevision(product.Id) > productRevision, "产品类别修改没有更新数据修订号。");
+
+            VerifyOfflineInference(product, category, defectImagePath, input);
+            AppSession.SelectProduct(product.Id);
+            VerifyInspectionPages();
 
             DatasetImageImportResult firstImport = AppServices.Datasets.ImportImageChecked(product.Id, defectImagePath);
             DatasetImageImportResult duplicateImport = AppServices.Datasets.ImportImageChecked(product.Id, defectImagePath);
@@ -195,6 +204,49 @@ namespace IAD.WorkflowSmokeTests
                     Assert(foreground > 16, "CPU Mask 精修没有从种子扩展到缺陷边缘。");
                 }
             }
+        }
+
+        private static void VerifyOfflineInference(Product product, DefectCategory category, string imagePath, string inputDirectory)
+        {
+            const string ModelBase64 = "CAg6gAEKOBIGb3V0cHV0IghDb25zdGFudCokCgV2YWx1ZSoYCAEIAhABIgjNzMw9ZmZmP0IGc2NvcmVzoAEEEglpYWQtc21va2VaHwoFaW5wdXQSFgoUCAESEAoCCAEKAggDCgIIBAoCCARiGAoGb3V0cHV0Eg4KDAgBEggKAggBCgIIAkIECgAQDQ==";
+            string modelPath = Path.Combine(inputDirectory, "classification-smoke.onnx");
+            File.WriteAllBytes(modelPath, Convert.FromBase64String(ModelBase64));
+            InferenceModel model = AppServices.Models.Import(modelPath, new InferenceModel
+            {
+                ProductId=product.Id, ModelCode="CLS-SMOKE", ModelName="Classification smoke model", Version="1.0.0",
+                ModelType="Classification", InputWidth=4, InputHeight=4, Labels="normal,SCRATCH",
+                ConfidenceThreshold=0.5, NmsThreshold=0.45, IsActive=true
+            });
+            Assert(model.Id > 0 && File.Exists(AppServices.Models.ResolveModelPath(model)), "ONNX 模型导入或归档失败。");
+
+            InspectionRecipe recipe = new InspectionRecipe
+            {
+                ProductId=product.Id, RecipeCode="RCP-SMOKE", RecipeName="Offline inference smoke recipe",
+                ModelId=model.Id, ModelVersion=model.Version, RuleVersion="RULE-1.0", IsActive=true
+            };
+            recipe.Rules.Add(new RecipeRule
+            {
+                CategoryId=category.Id, CategoryCode=category.CategoryCode, CategoryName=category.CategoryName,
+                RoiName="全图", MinConfidence=0.5, MaxAllowedCount=0, Decision="NG", IsEnabled=true
+            });
+            AppServices.Recipes.SaveRecipe(recipe);
+            InspectionResult result = AppServices.OfflineInspection.Inspect(product.Id, imagePath, "SMOKE-BATCH", "smoke-test", CancellationToken.None);
+            Assert(result.Id > 0 && result.OverallResult == "NG" && result.Defects.Count == 1, "ONNX 推理和 Recipe 规则判定未形成 NG 结果。");
+            Assert(result.Defects[0].CategoryCode == category.CategoryCode && result.Defects[0].Result == "NG", "ONNX 类别与产品瑕疵类别映射失败。");
+            Assert(File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Workspace", result.ArchivedImagePath)), "检测原图未归档。");
+            IList<InspectionResult> traced = AppServices.Results.QueryResults(new InspectionResultQuery
+            {
+                ProductId=product.Id, CategoryCode=category.CategoryCode, OverallResult="NG", Limit=10
+            });
+            Assert(traced.Any(r => r.Id == result.Id && r.DefectCount == 1), "检测结果追溯查询失败。");
+        }
+
+        private static void VerifyInspectionPages()
+        {
+            using (TrainingModelsPage models = new TrainingModelsPage()) models.InitializeRuntime();
+            using (RulesRecipePage recipes = new RulesRecipePage()) recipes.InitializeRuntime();
+            using (OnlineInspectionPage inspection = new OnlineInspectionPage()) inspection.InitializeRuntime();
+            using (TraceabilityPage traceability = new TraceabilityPage()) traceability.InitializeRuntime();
         }
 
         private static void RecreateDirectory(string path)
