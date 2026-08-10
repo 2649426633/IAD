@@ -80,6 +80,7 @@ namespace IAD.Services
             {
                 TryDeleteFile(tempPath);
                 if (current != null) DeleteMask(imageId, categoryId);
+                else RefreshImageStatus(imageId);
                 return null;
             }
 
@@ -108,6 +109,7 @@ namespace IAD.Services
                     result.Id = masks.Insert(result);
                 else
                     masks.Update(result);
+                datasets.UpdateImageStatus(image.Id, "已标注", now);
             }
             catch
             {
@@ -124,11 +126,16 @@ namespace IAD.Services
             DatasetImage image = EnsureImage(imageId);
             EnsureCategory(image, categoryId);
             DatasetMask current = masks.GetByImageAndCategory(imageId, categoryId);
-            if (current == null) return;
+            if (current == null)
+            {
+                RefreshImageStatus(imageId);
+                return;
+            }
 
             masks.Delete(current.Id, imageId);
             if (!masks.IsRelativePathReferencedByVersion(current.RelativePath))
                 TryDeleteFile(ResolveMaskPath(current.RelativePath));
+            RefreshImageStatus(imageId);
         }
 
         public DatasetMask RasterizeAnnotations(long imageId, long categoryId)
@@ -178,6 +185,16 @@ namespace IAD.Services
                 string fullPath = Path.GetFullPath(path);
                 if (!referenced.Contains(fullPath)) TryDeleteFile(fullPath);
             }
+
+            foreach (string path in Directory.GetFiles(ProjectStoragePaths.MasksPath, "*.tmp-*", SearchOption.AllDirectories))
+                TryDeleteFile(path);
+        }
+
+        private void RefreshImageStatus(long imageId)
+        {
+            bool hasVectorAnnotation = datasets.GetAnnotationsByImage(imageId).Count > 0;
+            bool hasMask = masks.GetByImage(imageId).Count > 0;
+            datasets.UpdateImageStatus(imageId, hasVectorAnnotation || hasMask ? "已标注" : "未标注", DateTime.UtcNow);
         }
 
         private DatasetImage EnsureImage(long imageId)
@@ -275,9 +292,9 @@ namespace IAD.Services
                         int index = row + x * 4;
                         int brightness = Math.Max(buffer[index], Math.Max(buffer[index + 1], buffer[index + 2]));
                         bool foreground = brightness >= 128;
-                        buffer[index] = foreground ? (byte)255 : (byte)255;
-                        buffer[index + 1] = foreground ? (byte)255 : (byte)255;
-                        buffer[index + 2] = foreground ? (byte)255 : (byte)255;
+                        buffer[index] = 255;
+                        buffer[index + 1] = 255;
+                        buffer[index + 2] = 255;
                         buffer[index + 3] = foreground ? (byte)255 : (byte)0;
                     }
                 }
