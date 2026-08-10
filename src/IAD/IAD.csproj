@@ -116,6 +116,7 @@
     <Compile Include="Pages\DatasetAnnotationPage.cs"><SubType>UserControl</SubType></Compile>
     <Compile Include="Pages\DatasetAnnotationPage.Canvas.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
     <Compile Include="Pages\DatasetAnnotationPage.Mask.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
+    <Compile Include="Pages\DatasetAnnotationPage.MaskIntegration.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
     <Compile Include="Pages\DatasetAnnotationPage.ThemeBridge.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
     <Compile Include="Pages\DatasetAnnotationPage.InteractionGuards.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
     <Compile Include="Pages\DatasetAnnotationPage.Designer.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
