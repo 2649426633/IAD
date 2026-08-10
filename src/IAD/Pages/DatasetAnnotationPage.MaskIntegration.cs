@@ -42,33 +42,25 @@ namespace IAD.Pages
         {
             if (datasetImages == null || dgvQueue == null) return;
 
+            IDictionary<long, int> classCounts;
+            try
+            {
+                classCounts = currentProduct == null
+                    ? new Dictionary<long, int>()
+                    : AppServices.Datasets.GetClassCounts(currentProduct.Id);
+            }
+            catch
+            {
+                return;
+            }
+
             foreach (DataGridViewRow row in dgvQueue.Rows)
             {
                 DatasetImage image = row.Tag as DatasetImage;
                 if (image == null) continue;
-
-                HashSet<string> categories = new HashSet<string>(StringComparer.Ordinal);
-                try
-                {
-                    foreach (DatasetAnnotation annotation in AppServices.Datasets.GetAnnotations(image.Id))
-                        categories.Add("A|" + (annotation.CategoryId ?? 0) + "|" + (annotation.CategoryName ?? string.Empty));
-                    foreach (DatasetMask mask in AppServices.Masks.GetMasks(image.Id))
-                        categories.Add("M|" + (mask.CategoryId ?? 0) + "|" + (mask.CategoryName ?? string.Empty));
-                }
-                catch
-                {
-                    continue;
-                }
-
-                // A/M 只表示数据来源；最终按类别 Id/名称去重。
-                HashSet<string> normalized = new HashSet<string>(StringComparer.Ordinal);
-                foreach (string key in categories)
-                {
-                    int separator = key.IndexOf('|');
-                    if (separator >= 0 && separator + 1 < key.Length)
-                        normalized.Add(key.Substring(separator + 1));
-                }
-                if (row.Cells.Count > 3) row.Cells[3].Value = normalized.Count.ToString();
+                int count;
+                classCounts.TryGetValue(image.Id, out count);
+                if (row.Cells.Count > 3) row.Cells[3].Value = count.ToString();
             }
         }
 

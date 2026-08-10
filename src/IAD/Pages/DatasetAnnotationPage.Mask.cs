@@ -35,6 +35,7 @@ namespace IAD.Pages
         private Button btnMaskAdd;
         private Button btnMaskErase;
         private Button btnMaskRasterize;
+        private Button btnMaskRefine;
         private Button btnMaskUndo;
         private Button btnMaskRedo;
         private Button btnMaskClear;
@@ -145,6 +146,7 @@ namespace IAD.Pages
             btnMaskAdd = CreateMaskPanelButton("增加Mask");
             btnMaskErase = CreateMaskPanelButton("擦除Mask");
             btnMaskRasterize = CreateMaskPanelButton("由标注生成");
+            btnMaskRefine = CreateMaskPanelButton("CPU边缘精修");
             btnMaskUndo = CreateMaskPanelButton("撤销Mask");
             btnMaskRedo = CreateMaskPanelButton("重做Mask");
             btnMaskClear = CreateMaskPanelButton("清空Mask");
@@ -160,6 +162,7 @@ namespace IAD.Pages
             btnMaskAdd.Click += delegate { SetMaskPaintMode(PixelMaskPaintMode.Add); };
             btnMaskErase.Click += delegate { SetMaskPaintMode(PixelMaskPaintMode.Erase); };
             btnMaskRasterize.Click += delegate { RasterizeCurrentCategoryToMask(); };
+            btnMaskRefine.Click += delegate { RefineCurrentMask(); };
             btnMaskUndo.Click += delegate { UndoMaskEdit(); };
             btnMaskRedo.Click += delegate { RedoMaskEdit(); };
             btnMaskClear.Click += delegate { ClearCurrentMask(); };
@@ -168,6 +171,7 @@ namespace IAD.Pages
             maskToolPanel.Controls.Add(btnMaskAdd);
             maskToolPanel.Controls.Add(btnMaskErase);
             maskToolPanel.Controls.Add(btnMaskRasterize);
+            maskToolPanel.Controls.Add(btnMaskRefine);
             maskToolPanel.Controls.Add(btnMaskUndo);
             maskToolPanel.Controls.Add(btnMaskRedo);
             maskToolPanel.Controls.Add(btnMaskClear);
@@ -461,6 +465,34 @@ namespace IAD.Pages
             }
         }
 
+        private void RefineCurrentMask()
+        {
+            if (currentImage == null || currentBitmap == null || currentMaskBitmap == null) return;
+
+            byte[] before = CaptureMaskSnapshot();
+            try
+            {
+                using (Bitmap refined = AppServices.MaskRefinement.Refine(currentBitmap, currentMaskBitmap))
+                {
+                    DisposeCurrentMaskBitmap();
+                    currentMaskBitmap = new Bitmap(refined);
+                }
+                PersistCurrentMask();
+                PushMaskHistory(maskUndoHistory, before);
+                maskRedoHistory.Clear();
+                pnlCanvas.Invalidate();
+            }
+            catch (Exception ex)
+            {
+                RestoreMaskSnapshot(before);
+                MessageBox.Show(this, ex.Message, "Mask 精修失败", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            finally
+            {
+                UpdateMaskToolState();
+            }
+        }
+
         private void ClearCurrentMask()
         {
             if (currentImage == null || currentMaskBitmap == null) return;
@@ -583,6 +615,7 @@ namespace IAD.Pages
             if (btnMaskAdd != null) btnMaskAdd.Enabled = hasContext;
             if (btnMaskErase != null) btnMaskErase.Enabled = hasContext;
             if (btnMaskRasterize != null) btnMaskRasterize.Enabled = currentImage != null && GetSelectedCategory() != null;
+            if (btnMaskRefine != null) btnMaskRefine.Enabled = hasContext;
             if (btnMaskUndo != null) btnMaskUndo.Enabled = hasContext && maskUndoHistory.Count > 0;
             if (btnMaskRedo != null) btnMaskRedo.Enabled = hasContext && maskRedoHistory.Count > 0;
             if (btnMaskClear != null) btnMaskClear.Enabled = hasContext && currentMaskRecord != null;

@@ -24,3 +24,6 @@ jobs:
 
       - name: Build
         run: msbuild IAD.sln /t:Rebuild /p:Configuration=Debug /p:Platform=x64 /m /v:minimal
+
+      - name: Dataset workflow smoke tests
+        run: .\tests\IAD.WorkflowSmokeTests\bin\Debug\IAD.WorkflowSmokeTests.exe

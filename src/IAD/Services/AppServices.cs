@@ -13,6 +13,8 @@ namespace IAD.Services
         public static DatasetService Datasets { get; private set; }
         public static AnnotationEditingService AnnotationEditing { get; private set; }
         public static DatasetMaskService Masks { get; private set; }
+        public static MaskRefinementService MaskRefinement { get; private set; }
+        public static DatasetWorkflowService DatasetWorkflow { get; private set; }
         public static DefectRecognitionService DefectRecognition { get; private set; }
         public static RecipeService Recipes { get; private set; }
         public static ResultService Results { get; private set; }
@@ -27,6 +29,7 @@ namespace IAD.Services
             SqliteConnectionFactory connectionFactory = new SqliteConnectionFactory(ProjectStoragePaths.DatabasePath);
             DatabaseInitializer.Initialize(connectionFactory);
             DatasetMaskDatabaseMigration.Apply(connectionFactory);
+            DatasetWorkflowDatabaseMigration.Apply(connectionFactory);
 
             IProductRepository productRepository = new ProductRepository(connectionFactory);
             IProductDefinitionSettingsRepository definitionSettingsRepository = new ProductDefinitionSettingsRepository(connectionFactory);
@@ -42,11 +45,15 @@ namespace IAD.Services
             Datasets = new DatasetService(productRepository, definitionSettingsRepository, categoryRepository, datasetRepository, maskRepository);
             AnnotationEditing = new AnnotationEditingService(datasetRepository, categoryRepository);
             Masks = new DatasetMaskService(datasetRepository, categoryRepository, maskRepository);
+            MaskRefinement = new MaskRefinementService();
+            DatasetWorkflow = new DatasetWorkflowService(productRepository, categoryRepository, datasetRepository, maskRepository, Datasets, Masks);
             DefectRecognition = new DefectRecognitionService(productRepository, categoryRepository, Datasets, recognitionRepository);
             Recipes = new RecipeService(productRepository, recipeRepository);
             Results = new ResultService(productRepository, resultRepository);
 
             try { Masks.CleanupOrphanFiles(); }
+            catch { }
+            try { Datasets.CleanupOrphanImageFiles(); }
             catch { }
 
             initialized = true;

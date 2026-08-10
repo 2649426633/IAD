@@ -59,8 +59,11 @@ namespace IAD.Repositories
     {
         IList<DatasetImage> GetImagesByProduct(long productId);
         DatasetImage GetImageById(long imageId);
+        DatasetImage GetImageByContentHash(long productId, string contentHash);
         long InsertImage(DatasetImage image);
         void UpdateImageStatus(long imageId, string status, DateTime updatedAtUtc);
+        void UpdateImageWorkflow(DatasetImage image);
+        void UpdateImageContentHash(long imageId, string contentHash, DateTime updatedAtUtc);
         bool IsImageReferencedByVersion(long imageId);
         void DeleteImage(long imageId, long productId);
         IList<DatasetAnnotation> GetAnnotationsByImage(long imageId);
@@ -68,9 +71,17 @@ namespace IAD.Repositories
         void UpdateAnnotation(DatasetAnnotation annotation);
         void DeleteAnnotation(long annotationId, long imageId);
         DatasetVersion GetLatestVersion(long productId);
+        IList<DatasetVersion> GetVersions(long productId);
+        IList<DatasetVersionImage> GetVersionImages(long versionId);
+        IList<DatasetVersionAnnotation> GetVersionAnnotations(long versionId);
+        IList<DatasetVersionMask> GetVersionMasks(long versionId);
+        void RestoreVersion(long productId, long versionId, DateTime restoredAtUtc);
         long InsertVersion(DatasetVersion version);
         int CountImages(long productId);
         int CountAnnotations(long productId);
+        int CountMasks(long productId);
+        IDictionary<long, int> GetClassCounts(long productId);
+        IList<string> GetAllReferencedImagePaths();
     }
 
     public interface IDatasetMaskRepository

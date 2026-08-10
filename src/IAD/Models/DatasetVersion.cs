@@ -10,6 +10,7 @@ namespace IAD.Models
         public string ProductDefinitionVersion { get; set; }
         public int ImageCount { get; set; }
         public int AnnotationCount { get; set; }
+        public int MaskCount { get; set; }
         public string Notes { get; set; }
         public DateTime CreatedAtUtc { get; set; }
     }

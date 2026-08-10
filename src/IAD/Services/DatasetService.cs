@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Security.Cryptography;
 using IAD.Infrastructure.Storage;
 using IAD.Models;
 using IAD.Repositories;
@@ -37,6 +38,17 @@ namespace IAD.Services
             return datasets.GetImagesByProduct(productId);
         }
 
+        public DatasetImage GetImage(long imageId)
+        {
+            return EnsureImageExists(imageId);
+        }
+
+        public IDictionary<long, int> GetClassCounts(long productId)
+        {
+            EnsureProductExists(productId);
+            return datasets.GetClassCounts(productId);
+        }
+
         public ProductDefinitionSettings GetSavedProductDefinition(long productId)
         {
             EnsureProductExists(productId);
@@ -44,6 +56,11 @@ namespace IAD.Services
         }
 
         public DatasetImage ImportImage(long productId, string sourcePath)
+        {
+            return ImportImageChecked(productId, sourcePath).Image;
+        }
+
+        public DatasetImageImportResult ImportImageChecked(long productId, string sourcePath, bool backfillExistingHashes = true)
         {
             Product product = EnsureProductExists(productId);
             ProductDefinitionSettings savedDefinition = EnsureSavedProductDefinition(productId);
@@ -59,6 +76,18 @@ namespace IAD.Services
             }
             if (width <= 0 || height <= 0)
                 throw new InvalidDataException("图片尺寸无效：" + sourcePath);
+
+            string contentHash = ComputeContentHash(sourcePath);
+            if (backfillExistingHashes) BackfillContentHashes(productId);
+            DatasetImage duplicate = datasets.GetImageByContentHash(productId, contentHash);
+            if (duplicate != null)
+            {
+                return new DatasetImageImportResult
+                {
+                    Image = duplicate,
+                    IsDuplicate = true
+                };
+            }
 
             string productFolder = MakeSafeFileName(product.ProductCode);
             string targetDirectory = Path.Combine(ProjectStoragePaths.ImagesPath, productFolder);
@@ -79,17 +108,55 @@ namespace IAD.Services
                     Width = width,
                     Height = height,
                     Status = "未标注",
+                    ReviewStatus = DatasetReviewStatus.Pending,
+                    DatasetSplit = DatasetSplit.Unassigned,
+                    ContentHash = contentHash,
                     ProductDefinitionVersion = savedDefinition.ProductDefinitionVersion,
                     CreatedAtUtc = now,
                     UpdatedAtUtc = now
                 };
                 image.Id = datasets.InsertImage(image);
-                return image;
+                return new DatasetImageImportResult { Image = image, IsDuplicate = false };
             }
             catch
             {
                 if (File.Exists(targetPath)) File.Delete(targetPath);
                 throw;
+            }
+        }
+
+        public void BackfillContentHashes(long productId)
+        {
+            EnsureProductExists(productId);
+            IList<DatasetImage> images = datasets.GetImagesByProduct(productId);
+            foreach (DatasetImage image in images)
+            {
+                if (!string.IsNullOrWhiteSpace(image.ContentHash)) continue;
+                string path;
+                try
+                {
+                    path = GetImagePath(image);
+                    if (!File.Exists(path)) continue;
+                    string hash = ComputeContentHash(path);
+                    DatasetImage existing = datasets.GetImageByContentHash(productId, hash);
+                    if (existing != null && existing.Id != image.Id) continue;
+                    datasets.UpdateImageContentHash(image.Id, hash, DateTime.UtcNow);
+                    image.ContentHash = hash;
+                }
+                catch
+                {
+                    // 单张历史文件损坏或被移走时不阻塞其他图片导入。
+                }
+            }
+        }
+
+        public static string ComputeContentHash(string path)
+        {
+            using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (SHA256 sha = SHA256.Create())
+            {
+                byte[] hash = sha.ComputeHash(stream);
+                return BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
             }
         }
 
@@ -113,11 +180,22 @@ namespace IAD.Services
             string imagePath = GetImagePath(image);
             bool retainedByVersion = datasets.IsImageReferencedByVersion(image.Id);
             string stagedPath = null;
+            Dictionary<string, string> stagedMaskPaths = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             if (!retainedByVersion && File.Exists(imagePath))
             {
                 stagedPath = imagePath + ".deleting-" + Guid.NewGuid().ToString("N");
                 File.Move(imagePath, stagedPath);
+            }
+
+            foreach (DatasetMask mask in masks.GetByImage(image.Id))
+            {
+                if (masks.IsRelativePathReferencedByVersion(mask.RelativePath)) continue;
+                string maskPath = ResolveWorkspacePath(mask.RelativePath);
+                if (!File.Exists(maskPath)) continue;
+                string stagedMaskPath = maskPath + ".deleting-" + Guid.NewGuid().ToString("N");
+                File.Move(maskPath, stagedMaskPath);
+                stagedMaskPaths[maskPath] = stagedMaskPath;
             }
 
             try
@@ -128,6 +206,8 @@ namespace IAD.Services
             {
                 if (!string.IsNullOrWhiteSpace(stagedPath) && File.Exists(stagedPath) && !File.Exists(imagePath))
                     File.Move(stagedPath, imagePath);
+                foreach (KeyValuePair<string, string> pair in stagedMaskPaths)
+                    if (File.Exists(pair.Value) && !File.Exists(pair.Key)) File.Move(pair.Value, pair.Key);
                 throw;
             }
 
@@ -145,7 +225,21 @@ namespace IAD.Services
                     return "图片记录和标注已删除，但存储副本清理失败：" + ex.Message;
                 }
             }
+            foreach (string stagedMaskPath in stagedMaskPaths.Values)
+            {
+                try { if (File.Exists(stagedMaskPath)) File.Delete(stagedMaskPath); }
+                catch (Exception ex) { return "图片记录、矢量标注和 Mask 已删除，但 Mask 文件清理失败：" + ex.Message; }
+            }
             return null;
+        }
+
+        private static string ResolveWorkspacePath(string relativePath)
+        {
+            string root = Path.GetFullPath(ProjectStoragePaths.RootPath).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+            string fullPath = Path.GetFullPath(Path.Combine(ProjectStoragePaths.RootPath, relativePath ?? string.Empty));
+            if (!fullPath.StartsWith(root, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("数据文件路径超出当前 Workspace。");
+            return fullPath;
         }
 
         public IList<DatasetAnnotation> GetAnnotations(long imageId)
@@ -264,6 +358,52 @@ namespace IAD.Services
             return datasets.GetLatestVersion(productId);
         }
 
+        public IList<DatasetVersion> GetVersions(long productId)
+        {
+            EnsureProductExists(productId);
+            return datasets.GetVersions(productId);
+        }
+
+        public IList<DatasetVersionImage> GetVersionImages(long versionId)
+        {
+            return datasets.GetVersionImages(versionId);
+        }
+
+        public IList<DatasetVersionAnnotation> GetVersionAnnotations(long versionId)
+        {
+            return datasets.GetVersionAnnotations(versionId);
+        }
+
+        public IList<DatasetVersionMask> GetVersionMasks(long versionId)
+        {
+            return datasets.GetVersionMasks(versionId);
+        }
+
+        public void RestoreVersion(long productId, long versionId)
+        {
+            EnsureProductExists(productId);
+            datasets.RestoreVersion(productId, versionId, DateTime.UtcNow);
+            CleanupOrphanImageFiles();
+        }
+
+        public void CleanupOrphanImageFiles()
+        {
+            if (!Directory.Exists(ProjectStoragePaths.ImagesPath)) return;
+            HashSet<string> referenced = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (string relativePath in datasets.GetAllReferencedImagePaths())
+            {
+                try { referenced.Add(ResolveWorkspacePath(relativePath)); }
+                catch { }
+            }
+            foreach (string path in Directory.GetFiles(ProjectStoragePaths.ImagesPath, "*.*", SearchOption.AllDirectories))
+            {
+                string fullPath = Path.GetFullPath(path);
+                if (referenced.Contains(fullPath)) continue;
+                try { File.Delete(fullPath); }
+                catch { }
+            }
+        }
+
         public DatasetVersion CreateVersion(long productId, string notes)
         {
             EnsureProductExists(productId);
@@ -280,6 +420,7 @@ namespace IAD.Services
                 ProductDefinitionVersion = savedDefinition.ProductDefinitionVersion,
                 ImageCount = imageCount,
                 AnnotationCount = datasets.CountAnnotations(productId),
+                MaskCount = datasets.CountMasks(productId),
                 Notes = notes,
                 CreatedAtUtc = DateTime.UtcNow
             };

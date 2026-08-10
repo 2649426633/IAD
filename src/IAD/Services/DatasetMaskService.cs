@@ -55,6 +55,12 @@ namespace IAD.Services
             }
         }
 
+        public string GetMaskPath(DatasetMask mask)
+        {
+            if (mask == null) throw new ArgumentNullException("mask");
+            return ResolveMaskPath(mask.RelativePath);
+        }
+
         public DatasetMask SaveMask(long imageId, long categoryId, Bitmap editableBitmap)
         {
             if (editableBitmap == null) throw new ArgumentNullException("editableBitmap");

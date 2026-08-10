@@ -4,6 +4,8 @@ VisualStudioVersion = 17.0.00000.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IAD", "src\IAD\IAD.csproj", "{1145871D-4176-4AA9-8263-6CEFA0A06689}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IAD.WorkflowSmokeTests", "tests\IAD.WorkflowSmokeTests\IAD.WorkflowSmokeTests.csproj", "{7B20913E-56AF-4CCB-B3D8-0B280D957A17}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -14,5 +16,9 @@ Global
 		{1145871D-4176-4AA9-8263-6CEFA0A06689}.Debug|x64.Build.0 = Debug|x64
 		{1145871D-4176-4AA9-8263-6CEFA0A06689}.Release|x64.ActiveCfg = Release|x64
 		{1145871D-4176-4AA9-8263-6CEFA0A06689}.Release|x64.Build.0 = Release|x64
+		{7B20913E-56AF-4CCB-B3D8-0B280D957A17}.Debug|x64.ActiveCfg = Debug|x64
+		{7B20913E-56AF-4CCB-B3D8-0B280D957A17}.Debug|x64.Build.0 = Debug|x64
+		{7B20913E-56AF-4CCB-B3D8-0B280D957A17}.Release|x64.ActiveCfg = Release|x64
+		{7B20913E-56AF-4CCB-B3D8-0B280D957A17}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 EndGlobal

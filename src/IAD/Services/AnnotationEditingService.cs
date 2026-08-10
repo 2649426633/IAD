@@ -28,6 +28,7 @@ namespace IAD.Services
             ValidateAnnotation(annotation, image);
             annotation.UpdatedAtUtc = DateTime.UtcNow;
             datasets.UpdateAnnotation(annotation);
+            datasets.UpdateImageStatus(image.Id, "待审核", annotation.UpdatedAtUtc);
             return annotation;
         }
 

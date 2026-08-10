@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using IAD.Models;
 using IAD.Security;
@@ -274,6 +276,9 @@ namespace IAD.Pages
             dgvImages.Rows.Clear();
             dgvQueue.Rows.Clear();
             int preferredRow = -1;
+            IDictionary<long, int> classCounts = currentProduct == null
+                ? new Dictionary<long, int>()
+                : AppServices.Datasets.GetClassCounts(currentProduct.Id);
 
             for (int i = 0; i < datasetImages.Count; i++)
             {
@@ -281,7 +286,8 @@ namespace IAD.Pages
                 int imageRow = dgvImages.Rows.Add(image.FileName, image.Status, DisplayDefinitionVersion(image.ProductDefinitionVersion));
                 dgvImages.Rows[imageRow].Tag = image;
 
-                int classCount = CountClasses(image.Id);
+                int classCount;
+                classCounts.TryGetValue(image.Id, out classCount);
                 int queueRow = dgvQueue.Rows.Add((i + 1).ToString("0000"), image.FileName, image.Status, classCount.ToString(), DisplayDefinitionVersion(image.ProductDefinitionVersion));
                 dgvQueue.Rows[queueRow].Tag = image;
                 if (image.Id == preferredImageId) preferredRow = imageRow;
@@ -298,14 +304,6 @@ namespace IAD.Pages
             dgvImages.ClearSelection();
             dgvImages.Rows[preferredRow].Selected = true;
             dgvImages.CurrentCell = dgvImages.Rows[preferredRow].Cells[0];
-        }
-
-        private int CountClasses(long imageId)
-        {
-            HashSet<string> names = new HashSet<string>(StringComparer.Ordinal);
-            foreach (DatasetAnnotation annotation in AppServices.Datasets.GetAnnotations(imageId))
-                names.Add((annotation.CategoryId ?? 0) + "|" + (annotation.CategoryName ?? string.Empty));
-            return names.Count;
         }
 
         private void SelectImageFromGrid()
@@ -373,7 +371,7 @@ namespace IAD.Pages
             }
         }
 
-        private void ImportPaths(IEnumerable<string> paths, string operationName)
+        private async void ImportPaths(IEnumerable<string> paths, string operationName)
         {
             if (currentProduct == null || currentProductDefinition == null)
             {
@@ -391,41 +389,57 @@ namespace IAD.Pages
                 return;
             }
 
-            int imported = 0;
-            long preferredId = 0;
-            List<string> failures = new List<string>(discoveryFailures);
-            UseWaitCursor = true;
+            if (!datasetWorkflowInitialized) InitializeDatasetWorkflowUi();
+            long productId = currentProduct.Id;
+            DatasetImportBatchSummary summary = new DatasetImportBatchSummary();
+            summary.Failures.AddRange(discoveryFailures);
+            CancellationToken cancellationToken = BeginImportProgress(files.Count);
+            IProgress<int> progress = new Progress<int>(delegate(int completed) { ReportImportProgress(completed, files.Count); });
             try
             {
-                foreach (string fileName in files)
+                await Task.Run(delegate
                 {
-                    try
+                    AppServices.Datasets.BackfillContentHashes(productId);
+                    for (int i = 0; i < files.Count; i++)
                     {
-                        DatasetImage image = AppServices.Datasets.ImportImage(currentProduct.Id, fileName);
-                        if (preferredId == 0) preferredId = image.Id;
-                        imported++;
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            summary.Cancelled = true;
+                            break;
+                        }
+                        string fileName = files[i];
+                        try
+                        {
+                            DatasetImageImportResult result = AppServices.Datasets.ImportImageChecked(productId, fileName, false);
+                            if (summary.PreferredImageId == 0) summary.PreferredImageId = result.Image.Id;
+                            if (result.IsDuplicate) summary.Duplicates++;
+                            else summary.Imported++;
+                        }
+                        catch (Exception ex)
+                        {
+                            summary.Failures.Add(Path.GetFileName(fileName) + "：" + ex.Message);
+                        }
+                        progress.Report(i + 1);
                     }
-                    catch (Exception ex)
-                    {
-                        failures.Add(Path.GetFileName(fileName) + "：" + ex.Message);
-                    }
-                }
+                });
             }
             finally
             {
-                UseWaitCursor = false;
+                EndImportProgress();
             }
 
-            LoadDataset(preferredId);
-            string message = "发现 " + files.Count + " 张图片，成功导入 " + imported + " 张。";
-            if (failures.Count > 0)
+            LoadDataset(summary.PreferredImageId);
+            string message = "发现 " + files.Count + " 张图片，成功导入 " + summary.Imported + " 张。";
+            if (summary.Duplicates > 0) message += "\r\n按 SHA-256 跳过重复图片 " + summary.Duplicates + " 张。";
+            if (summary.Cancelled) message += "\r\n导入已由用户取消，已完成的图片保持有效。";
+            if (summary.Failures.Count > 0)
             {
-                message += "\r\n失败或跳过 " + failures.Count + " 项：\r\n";
-                for (int i = 0; i < Math.Min(5, failures.Count); i++) message += failures[i] + "\r\n";
-                if (failures.Count > 5) message += "其余 " + (failures.Count - 5) + " 项未展开。";
+                message += "\r\n失败 " + summary.Failures.Count + " 项：\r\n";
+                for (int i = 0; i < Math.Min(5, summary.Failures.Count); i++) message += summary.Failures[i] + "\r\n";
+                if (summary.Failures.Count > 5) message += "其余 " + (summary.Failures.Count - 5) + " 项未展开。";
             }
-            MessageBox.Show(this, message.TrimEnd(), failures.Count == 0 ? "导入完成" : "部分图片未导入",
-                MessageBoxButtons.OK, failures.Count == 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+            MessageBox.Show(this, message.TrimEnd(), summary.Failures.Count == 0 ? "导入完成" : "部分图片未导入",
+                MessageBoxButtons.OK, summary.Failures.Count == 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
         }
 
         private static List<string> CollectImagePaths(IEnumerable<string> paths, IList<string> failures)
@@ -552,14 +566,19 @@ namespace IAD.Pages
             if (selected.Count == 0) return;
 
             int annotationCount = 0;
+            int maskCount = 0;
             try
             {
                 foreach (DatasetImage image in selected)
+                {
                     annotationCount += AppServices.Datasets.GetAnnotations(image.Id).Count;
+                    maskCount += AppServices.Masks.GetMasks(image.Id).Count;
+                }
             }
             catch
             {
                 annotationCount = -1;
+                maskCount = -1;
             }
 
             string names = string.Empty;
@@ -567,7 +586,9 @@ namespace IAD.Pages
             if (selected.Count > 5) names += "\r\n• 其余 " + (selected.Count - 5) + " 张图片";
             DialogResult answer = MessageBox.Show(this,
                 "确定从当前产品数据集中删除 " + selected.Count + " 张图片吗？" +
-                (annotationCount >= 0 ? "\r\n关联的 " + annotationCount + " 个标注也会删除。" : "\r\n所有关联标注也会一并删除。") + names +
+                (annotationCount >= 0
+                    ? "\r\n关联的 " + annotationCount + " 个矢量标注和 " + maskCount + " 个 Mask 也会删除。"
+                    : "\r\n所有关联矢量标注和 Mask 也会一并删除。") + names +
                 "\r\n\r\n已发布的数据集版本不会被修改。",
                 "删除数据集图片", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (answer != DialogResult.Yes) return;
@@ -614,7 +635,7 @@ namespace IAD.Pages
             }
 
             LoadDataset(preferredId);
-            string result = "成功删除 " + deleted + " 张图片及其标注。";
+            string result = "成功删除 " + deleted + " 张图片及其矢量标注和 Mask。";
             if (retainedByVersion > 0)
                 result += "\r\n其中 " + retainedByVersion + " 张的存储文件被历史发布版本引用，已安全保留。";
             if (warnings.Count > 0)
@@ -741,9 +762,7 @@ namespace IAD.Pages
             RefreshLayerGrid();
             int total = currentAnnotations.Count;
             lblTotalAnnotations.Text = total.ToString();
-            lblBoundaryScore.Text = total == 0 ? "-" : "1.00";
-            lblQualityScore.Text = total == 0 ? "-" : "1.00";
-            lblQualityAdvice.Text = total == 0 ? "待标注" : "通过";
+            RefreshQualityMetrics();
         }
 
         private void RefreshLayerGrid()
@@ -809,20 +828,42 @@ namespace IAD.Pages
         private void PublishVersion()
         {
             if (currentProduct == null || currentProductDefinition == null || datasetImages.Count == 0) return;
+            DatasetQualityReport qualityReport;
+            try
+            {
+                qualityReport = AppServices.DatasetWorkflow.EvaluateProduct(currentProduct.Id);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, ex.Message, "质量门禁执行失败", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (qualityReport.ErrorCount > 0)
+            {
+                MessageBox.Show(this,
+                    "数据集存在 " + qualityReport.ErrorCount + " 张未通过质量门禁的图片，暂不能发布版本。\r\n\r\n" +
+                    "请打开“数据集管理”，完成缺陷标注或将无缺陷图片标记为正常样本，然后审核通过。",
+                    "发布前质量门禁", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             DialogResult answer = MessageBox.Show(this,
                 "当前产品：" + currentProduct.ProductCode + " · " + currentProduct.ProductName +
                 "\r\n产品定义：" + currentProductDefinition.ProductDefinitionVersion +
-                "\r\n\r\n将以当前图片和标注创建只读数据集版本。是否继续？",
+                "\r\n质量门禁：通过 " + qualityReport.PassedCount + "，警告 " + qualityReport.WarningCount +
+                "\r\n\r\n将以当前图片、矢量标注、Mask、审核状态和数据划分创建只读版本。是否继续？",
                 "发布数据集版本", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (answer != DialogResult.Yes) return;
 
+            string versionNotes;
+            if (!TryPromptVersionNotes(out versionNotes)) return;
+
             try
             {
-                DatasetVersion version = AppServices.Datasets.CreateVersion(currentProduct.Id, "由数据集标注页面发布");
+                DatasetVersion version = AppServices.Datasets.CreateVersion(currentProduct.Id, versionNotes);
                 UpdateVersionCaption();
                 MessageBox.Show(this,
                     "已发布 " + version.VersionCode + "\r\n产品定义：" + version.ProductDefinitionVersion +
-                    "\r\n图片：" + version.ImageCount + "\r\n标注：" + version.AnnotationCount,
+                    "\r\n图片：" + version.ImageCount + "\r\n矢量标注：" + version.AnnotationCount + "\r\nMask：" + version.MaskCount,
                     "发布成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)

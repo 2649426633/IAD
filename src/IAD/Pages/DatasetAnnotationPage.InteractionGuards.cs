@@ -16,6 +16,7 @@ namespace IAD.Pages
             cboCurrentClass.Enter += NonCanvasControl_Enter;
             InitializeMaskEditorRuntime();
             InitializeMaskDataIntegration();
+            InitializeDatasetWorkflowUi();
         }
 
         private void NonCanvasControl_Enter(object sender, EventArgs e)

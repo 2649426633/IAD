@@ -41,6 +41,7 @@ namespace IAD.Pages
         private readonly Dictionary<long, AnnotationIdentity> annotationIdentities = new Dictionary<long, AnnotationIdentity>();
         private readonly List<AnnotationHistoryItem> undoHistory = new List<AnnotationHistoryItem>();
         private readonly List<AnnotationHistoryItem> redoHistory = new List<AnnotationHistoryItem>();
+        private readonly Dictionary<long, AnnotationHistoryState> annotationHistoryByImage = new Dictionary<long, AnnotationHistoryState>();
         private string lastEnhancedCaption;
 
         private void BindCanvasEvents()
@@ -88,12 +89,37 @@ namespace IAD.Pages
             {
                 if (keyData == (Keys.Control | Keys.Z))
                 {
-                    UndoLastAnnotationAction();
+                    UndoActiveAnnotationAction();
                     return true;
                 }
                 if (keyData == (Keys.Control | Keys.Y))
                 {
-                    RedoLastAnnotationAction();
+                    RedoActiveAnnotationAction();
+                    return true;
+                }
+                if (keyData == (Keys.Control | Keys.C))
+                {
+                    CopySelectedAnnotation();
+                    return true;
+                }
+                if (keyData == (Keys.Control | Keys.V))
+                {
+                    PasteCopiedAnnotation();
+                    return true;
+                }
+                if (keyData == Keys.PageDown || keyData == (Keys.Alt | Keys.Right))
+                {
+                    SelectRelativeImage(1);
+                    return true;
+                }
+                if (keyData == Keys.PageUp || keyData == (Keys.Alt | Keys.Left))
+                {
+                    SelectRelativeImage(-1);
+                    return true;
+                }
+                if (keyData >= Keys.D1 && keyData <= Keys.D9)
+                {
+                    SelectCategoryShortcut((int)keyData - (int)Keys.D1);
                     return true;
                 }
                 if (keyData == Keys.Delete && selectedAnnotationId > 0 && string.Equals(activeTool, "Select", StringComparison.Ordinal))
@@ -452,14 +478,14 @@ namespace IAD.Pages
         {
             if (e.Control && e.KeyCode == Keys.Z)
             {
-                UndoLastAnnotationAction();
+                UndoActiveAnnotationAction();
                 e.Handled = true;
                 e.SuppressKeyPress = true;
                 return;
             }
             if (e.Control && e.KeyCode == Keys.Y)
             {
-                RedoLastAnnotationAction();
+                RedoActiveAnnotationAction();
                 e.Handled = true;
                 e.SuppressKeyPress = true;
                 return;
@@ -783,6 +809,18 @@ namespace IAD.Pages
             {
                 MessageBox.Show(this, ex.Message, "撤销失败", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+        }
+
+        private void UndoActiveAnnotationAction()
+        {
+            if (maskModeActive) UndoMaskEdit();
+            else UndoLastAnnotationAction();
+        }
+
+        private void RedoActiveAnnotationAction()
+        {
+            if (maskModeActive) RedoMaskEdit();
+            else RedoLastAnnotationAction();
         }
 
         private void RedoLastAnnotationAction()
@@ -1181,17 +1219,47 @@ namespace IAD.Pages
             long imageId = currentImage == null ? 0 : currentImage.Id;
             if (editingImageId == imageId) return;
 
+            SaveCurrentAnnotationHistory();
             editingImageId = imageId;
             selectedAnnotationId = 0;
             annotationIdentities.Clear();
             undoHistory.Clear();
             redoHistory.Clear();
+            AnnotationHistoryState state;
+            if (imageId > 0 && annotationHistoryByImage.TryGetValue(imageId, out state))
+            {
+                foreach (KeyValuePair<long, AnnotationIdentity> pair in state.Identities)
+                    annotationIdentities[pair.Key] = pair.Value;
+                undoHistory.AddRange(state.Undo);
+                redoHistory.AddRange(state.Redo);
+            }
             viewZoom = 1F;
             viewPan = PointF.Empty;
             panningCanvas = false;
             spacePanHeld = false;
             lastEnhancedCaption = null;
             ClearAnnotationEditState();
+        }
+
+        private void SaveCurrentAnnotationHistory()
+        {
+            if (editingImageId <= 0) return;
+            AnnotationHistoryState state = new AnnotationHistoryState();
+            foreach (KeyValuePair<long, AnnotationIdentity> pair in annotationIdentities)
+                state.Identities[pair.Key] = pair.Value;
+            state.Undo.AddRange(undoHistory);
+            state.Redo.AddRange(redoHistory);
+            annotationHistoryByImage[editingImageId] = state;
+        }
+
+        private void ResetAllAnnotationHistory()
+        {
+            annotationHistoryByImage.Clear();
+            annotationIdentities.Clear();
+            undoHistory.Clear();
+            redoHistory.Clear();
+            editingImageId = currentImage == null ? 0 : currentImage.Id;
+            selectedAnnotationId = 0;
         }
 
         private Color GetAnnotationColor(DatasetAnnotation annotation)
@@ -1346,6 +1414,13 @@ namespace IAD.Pages
             public AnnotationIdentity Identity { get; private set; }
             public DatasetAnnotation Before { get; private set; }
             public DatasetAnnotation After { get; private set; }
+        }
+
+        private sealed class AnnotationHistoryState
+        {
+            public readonly Dictionary<long, AnnotationIdentity> Identities = new Dictionary<long, AnnotationIdentity>();
+            public readonly List<AnnotationHistoryItem> Undo = new List<AnnotationHistoryItem>();
+            public readonly List<AnnotationHistoryItem> Redo = new List<AnnotationHistoryItem>();
         }
     }
 }

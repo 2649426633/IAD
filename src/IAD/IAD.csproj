@@ -40,6 +40,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +62,7 @@
     <Compile Include="Models\DatasetAnnotation.cs" />
     <Compile Include="Models\DatasetMask.cs" />
     <Compile Include="Models\DatasetVersion.cs" />
+    <Compile Include="Models\DatasetWorkflow.cs" />
     <Compile Include="Models\DefectRecognition.cs" />
 
     <Compile Include="Infrastructure\Storage\ProjectStoragePaths.cs" />
@@ -68,6 +70,7 @@
     <Compile Include="Infrastructure\Database\DbConvert.cs" />
     <Compile Include="Infrastructure\Database\DatabaseInitializer.cs" />
     <Compile Include="Infrastructure\Database\DatasetMaskDatabaseMigration.cs" />
+    <Compile Include="Infrastructure\Database\DatasetWorkflowDatabaseMigration.cs" />
 
     <Compile Include="Repositories\RepositoryContracts.cs" />
     <Compile Include="Repositories\ProductRepository.cs" />
@@ -86,6 +89,8 @@
     <Compile Include="Services\DatasetService.cs" />
     <Compile Include="Services\AnnotationEditingService.cs" />
     <Compile Include="Services\DatasetMaskService.cs" />
+    <Compile Include="Services\MaskRefinementService.cs" />
+    <Compile Include="Services\DatasetWorkflowService.cs" />
     <Compile Include="Services\TemplateMatchingEngine.cs" />
     <Compile Include="Services\DefectRecognitionService.cs" />
     <Compile Include="Services\RecipeService.cs" />
@@ -99,6 +104,8 @@
     <Compile Include="Shell\ProductSelectionDialog.Designer.cs"><DependentUpon>ProductSelectionDialog.cs</DependentUpon></Compile>
     <Compile Include="Shell\RoiManagerDialog.cs"><SubType>Form</SubType></Compile>
     <Compile Include="Shell\RoiManagerDialog.Designer.cs"><DependentUpon>RoiManagerDialog.cs</DependentUpon></Compile>
+    <Compile Include="Shell\DatasetManagerDialog.cs"><SubType>Form</SubType></Compile>
+    <Compile Include="Shell\DatasetManagerDialog.Designer.cs"><DependentUpon>DatasetManagerDialog.cs</DependentUpon></Compile>
     <Compile Include="Shell\MainForm.cs"><SubType>Form</SubType></Compile>
     <Compile Include="Shell\MainForm.Designer.cs"><DependentUpon>MainForm.cs</DependentUpon></Compile>
     <Compile Include="Shell\MainForm.Session.cs"><DependentUpon>MainForm.cs</DependentUpon></Compile>
@@ -119,6 +126,7 @@
     <Compile Include="Pages\DatasetAnnotationPage.MaskIntegration.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
     <Compile Include="Pages\DatasetAnnotationPage.ThemeBridge.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
     <Compile Include="Pages\DatasetAnnotationPage.InteractionGuards.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
+    <Compile Include="Pages\DatasetAnnotationPage.Workflow.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
     <Compile Include="Pages\DatasetAnnotationPage.Designer.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
 
     <Compile Include="Pages\TemplateRecognitionPage.cs"><SubType>UserControl</SubType></Compile>
