@@ -81,6 +81,7 @@
     <Compile Include="Services\DefectCategoryCsv.cs" />
     <Compile Include="Services\AnnotationGeometry.cs" />
     <Compile Include="Services\DatasetService.cs" />
+    <Compile Include="Services\AnnotationEditingService.cs" />
     <Compile Include="Services\TemplateMatchingEngine.cs" />
     <Compile Include="Services\DefectRecognitionService.cs" />
     <Compile Include="Services\RecipeService.cs" />
