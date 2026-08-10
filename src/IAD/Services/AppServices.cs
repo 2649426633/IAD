@@ -19,6 +19,7 @@ namespace IAD.Services
         public static RecipeService Recipes { get; private set; }
         public static ResultService Results { get; private set; }
         public static InferenceModelService Models { get; private set; }
+        public static YoloTrainingService YoloTraining { get; private set; }
         public static OfflineInspectionService OfflineInspection { get; private set; }
         public static string DatabasePath { get { return ProjectStoragePaths.DatabasePath; } }
 
@@ -55,6 +56,7 @@ namespace IAD.Services
             Recipes = new RecipeService(productRepository, recipeRepository);
             Results = new ResultService(productRepository, resultRepository);
             Models = new InferenceModelService(productRepository, categoryRepository, modelRepository);
+            YoloTraining = new YoloTrainingService(Products, DatasetWorkflow, Models);
             OfflineInspection = new OfflineInspectionService(Products, Recipes, Models, Results);
 
             try { Masks.CleanupOrphanFiles(); }

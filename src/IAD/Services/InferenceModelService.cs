@@ -15,7 +15,7 @@ namespace IAD.Services
     {
         private static readonly HashSet<string> SupportedTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            "Classification", "YoloV5", "YoloV8"
+            "Classification", "YoloV5", "YoloV8", "Yolo26"
         };
         private readonly IProductRepository products;
         private readonly IDefectCategoryRepository categories;
@@ -48,7 +48,7 @@ namespace IAD.Services
             definition.ModelName = Required(definition.ModelName, "模型名称");
             definition.Version = Required(definition.Version, "模型版本");
             definition.ModelType = Required(definition.ModelType, "输出类型");
-            if (!SupportedTypes.Contains(definition.ModelType)) throw new ArgumentException("输出类型仅支持 Classification、YoloV5 或 YoloV8。");
+            if (!SupportedTypes.Contains(definition.ModelType)) throw new ArgumentException("输出类型仅支持 Classification、YoloV5、YoloV8 或 Yolo26。");
             ValidateThreshold(definition.ConfidenceThreshold, "置信度阈值");
             ValidateThreshold(definition.NmsThreshold, "NMS 阈值");
             string[] labels = OnnxInferenceEngine.ParseLabels(definition.Labels);
@@ -56,7 +56,8 @@ namespace IAD.Services
             IList<DefectCategory> productCategories = categories.GetByProduct(definition.ProductId);
             string[] unknownLabels = labels.Where(label => !IsNormalLabel(label) && !productCategories.Any(category =>
                 string.Equals(category.CategoryCode, label, StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(category.CategoryName, label, StringComparison.OrdinalIgnoreCase))).ToArray();
+                string.Equals(category.CategoryName, label, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(category.CategoryCode + "_" + category.CategoryName, label, StringComparison.OrdinalIgnoreCase))).ToArray();
             if (unknownLabels.Length > 0) throw new ArgumentException("以下模型类别未在当前产品中定义：" + string.Join("、", unknownLabels));
 
             using (InferenceSession session = new InferenceSession(sourcePath))
@@ -79,6 +80,21 @@ namespace IAD.Services
                     int classCount = outputDimensions.Length == 0 ? -1 : outputDimensions[outputDimensions.Length - 1];
                     if (classCount > 0 && classCount != labels.Length)
                         throw new InvalidOperationException("分类模型输出类别数为 " + classCount + "，但类别顺序填写了 " + labels.Length + " 项。");
+                }
+                else if (string.Equals(definition.ModelType, "YoloV8", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(definition.ModelType, "Yolo26", StringComparison.OrdinalIgnoreCase))
+                {
+                    int[] outputDimensions = output.Value.Dimensions;
+                    if (outputDimensions.Length != 3)
+                        throw new InvalidOperationException("YOLO ONNX 输出必须是 [1,N,C] 或 [1,C,N] 三维张量。");
+                    if (string.Equals(definition.ModelType, "Yolo26", StringComparison.OrdinalIgnoreCase) &&
+                        outputDimensions[1] >= 10 && outputDimensions[2] == 6)
+                        throw new InvalidOperationException("YOLO26 端到端 ONNX 暂不支持。请在导出时设置 end2end=False。");
+                    int first = outputDimensions[1];
+                    int second = outputDimensions[2];
+                    int attributes = first > 0 && second > 0 ? Math.Min(first, second) : -1;
+                    if (attributes > 0 && attributes != labels.Length + 4)
+                        throw new InvalidOperationException("YOLO 输出属性数为 " + attributes + "，应为 4 + 类别数（" + labels.Length + "）。请确认类别顺序或使用 end2end=False 导出。");
                 }
             }
 

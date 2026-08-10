@@ -51,7 +51,6 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-
     <Compile Include="Models\Product.cs" />
     <Compile Include="Models\ProductDefinitionSettings.cs" />
     <Compile Include="Models\DefectCategory.cs" />
@@ -66,9 +65,9 @@
     <Compile Include="Models\DatasetWorkflow.cs" />
     <Compile Include="Models\DefectRecognition.cs" />
     <Compile Include="Models\InferenceModel.cs" />
+    <Compile Include="Models\YoloTraining.cs" />
     <Compile Include="Models\RecipeRule.cs" />
     <Compile Include="Models\InspectionResultQuery.cs" />
-
     <Compile Include="Infrastructure\Storage\ProjectStoragePaths.cs" />
     <Compile Include="Infrastructure\Database\SqliteConnectionFactory.cs" />
     <Compile Include="Infrastructure\Database\DbConvert.cs" />
@@ -76,7 +75,6 @@
     <Compile Include="Infrastructure\Database\DatasetMaskDatabaseMigration.cs" />
     <Compile Include="Infrastructure\Database\DatasetWorkflowDatabaseMigration.cs" />
     <Compile Include="Infrastructure\Database\InferenceDatabaseMigration.cs" />
-
     <Compile Include="Repositories\RepositoryContracts.cs" />
     <Compile Include="Repositories\ProductRepository.cs" />
     <Compile Include="Repositories\ProductDefinitionSettingsRepository.cs" />
@@ -88,7 +86,6 @@
     <Compile Include="Repositories\DatasetRepository.cs" />
     <Compile Include="Repositories\DatasetMaskRepository.cs" />
     <Compile Include="Repositories\DefectRecognitionRepository.cs" />
-
     <Compile Include="Services\ProductService.cs" />
     <Compile Include="Services\ProductDataRevisionTracker.cs" />
     <Compile Include="Services\DefectCategoryCsv.cs" />
@@ -106,61 +103,137 @@
     <Compile Include="Services\RecipeRuleEngine.cs" />
     <Compile Include="Services\OnnxInferenceEngine.cs" />
     <Compile Include="Services\OfflineInspectionService.cs" />
+    <Compile Include="Services\YoloTrainingService.cs" />
     <Compile Include="Services\AppServices.cs" />
-
     <Compile Include="Security\AppSession.cs" />
-    <Compile Include="Shell\LoginForm.cs"><SubType>Form</SubType></Compile>
-    <Compile Include="Shell\LoginForm.Designer.cs"><DependentUpon>LoginForm.cs</DependentUpon></Compile>
-    <Compile Include="Shell\ProductSelectionDialog.cs"><SubType>Form</SubType></Compile>
-    <Compile Include="Shell\ProductSelectionDialog.Designer.cs"><DependentUpon>ProductSelectionDialog.cs</DependentUpon></Compile>
-    <Compile Include="Shell\RoiManagerDialog.cs"><SubType>Form</SubType></Compile>
-    <Compile Include="Shell\RoiManagerDialog.Designer.cs"><DependentUpon>RoiManagerDialog.cs</DependentUpon></Compile>
-    <Compile Include="Shell\ModelImportDialog.cs" />
-    <Compile Include="Shell\DatasetManagerDialog.cs"><SubType>Form</SubType></Compile>
-    <Compile Include="Shell\DatasetManagerDialog.Designer.cs"><DependentUpon>DatasetManagerDialog.cs</DependentUpon></Compile>
-    <Compile Include="Shell\MainForm.cs"><SubType>Form</SubType></Compile>
-    <Compile Include="Shell\MainForm.Designer.cs"><DependentUpon>MainForm.cs</DependentUpon></Compile>
-    <Compile Include="Shell\MainForm.Session.cs"><DependentUpon>MainForm.cs</DependentUpon></Compile>
+    <Compile Include="Shell\LoginForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Shell\LoginForm.Designer.cs">
+      <DependentUpon>LoginForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Shell\ProductSelectionDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Shell\ProductSelectionDialog.Designer.cs">
+      <DependentUpon>ProductSelectionDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Shell\RoiManagerDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Shell\RoiManagerDialog.Designer.cs">
+      <DependentUpon>RoiManagerDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Shell\ModelImportDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Shell\DatasetManagerDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Shell\DatasetManagerDialog.Designer.cs">
+      <DependentUpon>DatasetManagerDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Shell\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Shell\MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Shell\MainForm.Session.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\UiTheme.cs" />
     <Compile Include="UI\UiFactory.cs" />
     <Compile Include="UI\ResponsiveLayoutManager.cs" />
     <Compile Include="UI\PageFillLayoutManager.cs" />
-
-    <Compile Include="Pages\DashboardPage.cs"><SubType>UserControl</SubType></Compile>
-    <Compile Include="Pages\DashboardPage.Designer.cs"><DependentUpon>DashboardPage.cs</DependentUpon></Compile>
-
-    <Compile Include="Pages\ProductDefinitionPage.cs"><SubType>UserControl</SubType></Compile>
-    <Compile Include="Pages\ProductDefinitionPage.Designer.cs"><DependentUpon>ProductDefinitionPage.cs</DependentUpon></Compile>
-
-    <Compile Include="Pages\DatasetAnnotationPage.cs"><SubType>UserControl</SubType></Compile>
-    <Compile Include="Pages\DatasetAnnotationPage.Canvas.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
-    <Compile Include="Pages\DatasetAnnotationPage.Mask.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
-    <Compile Include="Pages\DatasetAnnotationPage.MaskIntegration.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
-    <Compile Include="Pages\DatasetAnnotationPage.ThemeBridge.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
-    <Compile Include="Pages\DatasetAnnotationPage.InteractionGuards.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
-    <Compile Include="Pages\DatasetAnnotationPage.Workflow.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
-    <Compile Include="Pages\DatasetAnnotationPage.Designer.cs"><DependentUpon>DatasetAnnotationPage.cs</DependentUpon></Compile>
-
-    <Compile Include="Pages\TemplateRecognitionPage.cs"><SubType>UserControl</SubType></Compile>
-    <Compile Include="Pages\TemplateRecognitionPage.Designer.cs"><DependentUpon>TemplateRecognitionPage.cs</DependentUpon></Compile>
-
-    <Compile Include="Pages\TrainingModelsPage.cs"><SubType>UserControl</SubType></Compile>
-    <Compile Include="Pages\TrainingModelsPage.Designer.cs"><DependentUpon>TrainingModelsPage.cs</DependentUpon></Compile>
-
-    <Compile Include="Pages\RulesRecipePage.cs"><SubType>UserControl</SubType></Compile>
-    <Compile Include="Pages\RulesRecipePage.Designer.cs"><DependentUpon>RulesRecipePage.cs</DependentUpon></Compile>
-
-    <Compile Include="Pages\OnlineInspectionPage.cs"><SubType>UserControl</SubType></Compile>
-    <Compile Include="Pages\OnlineInspectionPage.Designer.cs"><DependentUpon>OnlineInspectionPage.cs</DependentUpon></Compile>
-
-    <Compile Include="Pages\TraceabilityPage.cs"><SubType>UserControl</SubType></Compile>
-    <Compile Include="Pages\TraceabilityPage.Designer.cs"><DependentUpon>TraceabilityPage.cs</DependentUpon></Compile>
-
-    <Compile Include="Pages\SystemSettingsPage.cs"><SubType>UserControl</SubType></Compile>
-    <Compile Include="Pages\SystemSettingsPage.Designer.cs"><DependentUpon>SystemSettingsPage.cs</DependentUpon></Compile>
+    <Compile Include="Pages\DashboardPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Pages\DashboardPage.Designer.cs">
+      <DependentUpon>DashboardPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ProductDefinitionPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Pages\ProductDefinitionPage.Designer.cs">
+      <DependentUpon>ProductDefinitionPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\DatasetAnnotationPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Pages\DatasetAnnotationPage.Canvas.cs">
+      <DependentUpon>DatasetAnnotationPage.cs</DependentUpon>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Pages\DatasetAnnotationPage.Mask.cs">
+      <DependentUpon>DatasetAnnotationPage.cs</DependentUpon>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Pages\DatasetAnnotationPage.MaskIntegration.cs">
+      <DependentUpon>DatasetAnnotationPage.cs</DependentUpon>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Pages\DatasetAnnotationPage.ThemeBridge.cs">
+      <DependentUpon>DatasetAnnotationPage.cs</DependentUpon>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Pages\DatasetAnnotationPage.InteractionGuards.cs">
+      <DependentUpon>DatasetAnnotationPage.cs</DependentUpon>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Pages\DatasetAnnotationPage.Workflow.cs">
+      <DependentUpon>DatasetAnnotationPage.cs</DependentUpon>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Pages\DatasetAnnotationPage.Designer.cs">
+      <DependentUpon>DatasetAnnotationPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\TemplateRecognitionPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Pages\TemplateRecognitionPage.Designer.cs">
+      <DependentUpon>TemplateRecognitionPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\TrainingModelsPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Pages\TrainingModelsPage.Designer.cs">
+      <DependentUpon>TrainingModelsPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\RulesRecipePage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Pages\RulesRecipePage.Designer.cs">
+      <DependentUpon>RulesRecipePage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\OnlineInspectionPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Pages\OnlineInspectionPage.Designer.cs">
+      <DependentUpon>OnlineInspectionPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\TraceabilityPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Pages\TraceabilityPage.Designer.cs">
+      <DependentUpon>TraceabilityPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\SystemSettingsPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Pages\SystemSettingsPage.Designer.cs">
+      <DependentUpon>SystemSettingsPage.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <Content Include="Training\requirements-yolo.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Training\yolo_worker.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pages\DashboardPage.resx">

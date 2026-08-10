@@ -36,8 +36,8 @@ namespace IAD.Shell
             txtName.Text = baseName;
             txtVersion.Text = "V" + DateTime.Now.ToString("yyyyMMdd-HHmm");
             cboType.DropDownStyle = ComboBoxStyle.DropDownList;
-            cboType.Items.AddRange(new object[] { "Classification", "YoloV5", "YoloV8" });
-            cboType.SelectedIndex = 2;
+            cboType.Items.AddRange(new object[] { "Classification", "YoloV5", "YoloV8", "Yolo26" });
+            cboType.SelectedIndex = 3;
             cboType.SelectedIndexChanged += delegate
             {
                 if (Convert.ToString(cboType.SelectedItem) == "Classification" && !txtLabels.Text.TrimStart().StartsWith("normal", StringComparison.OrdinalIgnoreCase))

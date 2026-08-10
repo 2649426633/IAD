@@ -23,6 +23,14 @@ namespace IAD.Services
 
     internal sealed class OnnxInferenceEngine
     {
+        private sealed class PreprocessedInput
+        {
+            public DenseTensor<float> Tensor { get; set; }
+            public double Scale { get; set; }
+            public double PadX { get; set; }
+            public double PadY { get; set; }
+        }
+
         private readonly InferenceModelService modelService;
         private readonly object syncRoot = new object();
         private readonly Dictionary<long, InferenceSession> sessions = new Dictionary<long, InferenceSession>();
@@ -37,8 +45,9 @@ namespace IAD.Services
             if (model == null) throw new ArgumentNullException("model");
             if (source == null) throw new ArgumentNullException("source");
             InferenceSession session = GetSession(model);
-            DenseTensor<float> input = CreateInput(source, model.InputWidth, model.InputHeight);
-            List<NamedOnnxValue> inputs = new List<NamedOnnxValue> { NamedOnnxValue.CreateFromTensor(model.InputName, input) };
+            bool classification = string.Equals(model.ModelType, "Classification", StringComparison.OrdinalIgnoreCase);
+            PreprocessedInput input = CreateInput(source, model.InputWidth, model.InputHeight, !classification);
+            List<NamedOnnxValue> inputs = new List<NamedOnnxValue> { NamedOnnxValue.CreateFromTensor(model.InputName, input.Tensor) };
             using (IDisposableReadOnlyCollection<DisposableNamedOnnxValue> results = session.Run(inputs, new[] { model.OutputName }))
             {
                 DisposableNamedOnnxValue output = results.First();
@@ -46,9 +55,9 @@ namespace IAD.Services
                 int[] dimensions = tensor.Dimensions.ToArray();
                 float[] values = tensor.ToArray();
                 string[] labels = ParseLabels(model.Labels);
-                if (string.Equals(model.ModelType, "Classification", StringComparison.OrdinalIgnoreCase))
+                if (classification)
                     return ParseClassification(values, labels, model.ConfidenceThreshold, source.Width, source.Height);
-                return ParseYolo(values, dimensions, labels, model, source.Width, source.Height);
+                return ParseYolo(values, dimensions, labels, model, source.Width, source.Height, input);
             }
         }
 
@@ -65,15 +74,21 @@ namespace IAD.Services
             }
         }
 
-        private static DenseTensor<float> CreateInput(Bitmap source, int width, int height)
+        private static PreprocessedInput CreateInput(Bitmap source, int width, int height, bool preserveAspectRatio)
         {
             if (width <= 0 || height <= 0) throw new InvalidOperationException("模型输入尺寸无效。");
             using (Bitmap resized = new Bitmap(width, height, PixelFormat.Format24bppRgb))
             {
+                double scale = preserveAspectRatio ? Math.Min(width / (double)source.Width, height / (double)source.Height) : 1D;
+                int drawWidth = preserveAspectRatio ? Math.Max(1, (int)Math.Round(source.Width * scale)) : width;
+                int drawHeight = preserveAspectRatio ? Math.Max(1, (int)Math.Round(source.Height * scale)) : height;
+                int padX = preserveAspectRatio ? (width - drawWidth) / 2 : 0;
+                int padY = preserveAspectRatio ? (height - drawHeight) / 2 : 0;
                 using (Graphics graphics = Graphics.FromImage(resized))
                 {
+                    graphics.Clear(preserveAspectRatio ? Color.FromArgb(114, 114, 114) : Color.Black);
                     graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
-                    graphics.DrawImage(source, 0, 0, width, height);
+                    graphics.DrawImage(source, padX, padY, drawWidth, drawHeight);
                 }
                 Rectangle rectangle = new Rectangle(0, 0, width, height);
                 BitmapData bits = resized.LockBits(rectangle, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
@@ -96,7 +111,13 @@ namespace IAD.Services
                             data[plane * 2 + targetIndex] = pixels[sourceIndex] / 255f;
                         }
                     }
-                    return new DenseTensor<float>(data, new[] { 1, 3, height, width });
+                    return new PreprocessedInput
+                    {
+                        Tensor = new DenseTensor<float>(data, new[] { 1, 3, height, width }),
+                        Scale = preserveAspectRatio ? scale : 1D,
+                        PadX = padX,
+                        PadY = padY
+                    };
                 }
                 finally { resized.UnlockBits(bits); }
             }
@@ -124,14 +145,17 @@ namespace IAD.Services
             };
         }
 
-        private static IList<InferencePrediction> ParseYolo(float[] values, int[] dimensions, string[] labels, InferenceModel model, int sourceWidth, int sourceHeight)
+        private static IList<InferencePrediction> ParseYolo(float[] values, int[] dimensions, string[] labels, InferenceModel model, int sourceWidth, int sourceHeight, PreprocessedInput input)
         {
             if (dimensions.Length != 3 || dimensions[0] != 1) throw new InvalidOperationException("YOLO 输出必须是 [1,N,C] 或 [1,C,N] 三维张量。");
-            bool v8 = string.Equals(model.ModelType, "YoloV8", StringComparison.OrdinalIgnoreCase);
-            bool transposed = v8 && dimensions[1] < dimensions[2];
+            bool modern = string.Equals(model.ModelType, "YoloV8", StringComparison.OrdinalIgnoreCase) ||
+                          string.Equals(model.ModelType, "Yolo26", StringComparison.OrdinalIgnoreCase);
+            if (string.Equals(model.ModelType, "Yolo26", StringComparison.OrdinalIgnoreCase) && dimensions[2] == 6 && dimensions[1] >= 10)
+                throw new InvalidOperationException("当前 YOLO26 ONNX 是端到端输出，请使用 end2end=False 重新导出后再导入。");
+            bool transposed = modern && dimensions[1] < dimensions[2];
             int rows = transposed ? dimensions[2] : dimensions[1];
             int attributes = transposed ? dimensions[1] : dimensions[2];
-            int classOffset = v8 ? 4 : 5;
+            int classOffset = modern ? 4 : 5;
             if (attributes <= classOffset) throw new InvalidOperationException("YOLO 输出类别维度无效。");
             List<InferencePrediction> predictions = new List<InferencePrediction>();
             for (int row = 0; row < rows; row++)
@@ -140,7 +164,7 @@ namespace IAD.Services
                 {
                     return transposed ? values[attribute * rows + row] : values[row * attributes + attribute];
                 };
-                double objectness = v8 ? 1D : get(4);
+                double objectness = modern ? 1D : get(4);
                 int classIndex = 0;
                 double classScore = get(classOffset);
                 for (int i = classOffset + 1; i < attributes; i++)
@@ -151,15 +175,24 @@ namespace IAD.Services
                 double confidence = objectness * classScore;
                 if (confidence < model.ConfidenceThreshold) continue;
                 double cx = get(0), cy = get(1), boxWidth = get(2), boxHeight = get(3);
-                bool normalized = Math.Abs(cx) <= 2 && Math.Abs(cy) <= 2 && boxWidth <= 2 && boxHeight <= 2;
-                double scaleX = normalized ? sourceWidth : (double)sourceWidth / model.InputWidth;
-                double scaleY = normalized ? sourceHeight : (double)sourceHeight / model.InputHeight;
-                double width = Math.Max(0, boxWidth * scaleX);
-                double height = Math.Max(0, boxHeight * scaleY);
-                double x = Math.Max(0, cx * scaleX - width / 2);
-                double y = Math.Max(0, cy * scaleY - height / 2);
-                width = Math.Min(width, sourceWidth - x);
-                height = Math.Min(height, sourceHeight - y);
+                bool normalized = Math.Abs(cx) <= 1 && Math.Abs(cy) <= 1 && boxWidth <= 1 && boxHeight <= 1;
+                if (normalized)
+                {
+                    cx *= model.InputWidth;
+                    cy *= model.InputHeight;
+                    boxWidth *= model.InputWidth;
+                    boxHeight *= model.InputHeight;
+                }
+                double scale = input.Scale <= 0 ? 1D : input.Scale;
+                double left = Math.Max(0D, Math.Min(sourceWidth, (cx - boxWidth / 2D - input.PadX) / scale));
+                double top = Math.Max(0D, Math.Min(sourceHeight, (cy - boxHeight / 2D - input.PadY) / scale));
+                double right = Math.Max(0D, Math.Min(sourceWidth, (cx + boxWidth / 2D - input.PadX) / scale));
+                double bottom = Math.Max(0D, Math.Min(sourceHeight, (cy + boxHeight / 2D - input.PadY) / scale));
+                double x = left;
+                double y = top;
+                double width = Math.Max(0D, right - left);
+                double height = Math.Max(0D, bottom - top);
+                if (width <= 0D || height <= 0D) continue;
                 predictions.Add(new InferencePrediction
                 {
                     ClassIndex=classIndex, Label=classIndex < labels.Length ? labels[classIndex] : "class_" + classIndex,

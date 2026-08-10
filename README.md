@@ -1,6 +1,6 @@
 # IAD — 通用工业瑕疵质检系统
 
-IAD（Industrial Anomaly Detection）是一套面向工业视觉质检场景的 Windows 桌面应用。目前项目已经打通两条本地业务闭环：“产品定义 → 数据集导入 → 人工标注 → 瑕疵模板辅助识别 → 标注回写”，以及“ONNX 模型导入 → CPU 离线推理 → Recipe 规则判定 → 结果归档 → 条件追溯”。业务配置和检测记录由 SQLite 持久化，模型、图片、Mask 与结果文件保存在本地 Workspace。
+IAD（Industrial Anomaly Detection）是一套面向工业视觉质检场景的 Windows 桌面应用。目前项目已经打通三条本地业务闭环：“产品定义 → 数据集导入 → 人工标注 → 瑕疵模板辅助识别 → 标注回写”、“审核数据 → YOLO26 微调 → ONNX 自动导出与入库”，以及“ONNX 模型 → CPU 离线推理 → Recipe 规则判定 → 结果归档 → 条件追溯”。业务配置和检测记录由 SQLite 持久化，模型、图片、Mask、训练产物与结果文件保存在本地 Workspace。
 
 完整功能说明、逐步操作、快捷键、模型约定和常见问题见 [`操作手册.md`](操作手册.md)。
 
@@ -12,7 +12,7 @@ IAD（Industrial Anomaly Detection）是一套面向工业视觉质检场景的 
 | 数据集标注 | 生产工作流可用 | 后台可取消导入与 SHA-256 去重、矢量/像素 Mask 标注、审核与质量门禁、Train/Validation/Test 划分、COCO/YOLO/YOLO-Seg/Mask 导入导出、版本比较与恢复 |
 | 产品与标注联动 | 可用 | 标注页面严格跟随当前产品，自动加载对应产品定义版本、缺陷类别、图片、标注和数据集版本 |
 | 瑕疵模板识别 | 基础闭环可用 | 基于已确认标注构建正样本，CPU 原型匹配生成候选，Top-K/NMS、边缘框精修、确认回写、拒绝及 Hard Negative 学习 |
-| 训练与模型 | 离线模型库可用 | ONNX 文件校验、工作区归档、SHA-256、输入输出元数据、类别顺序、阈值、启用和安全删除；训练 Worker 尚待接入 |
+| 训练与模型 | YOLO 训练闭环可用 | YOLO26n/s/m/l 预训练微调、环境检查/安装、质量门禁、YOLO 数据自动导出、CPU/GPU 设备选择、实时日志、停止、历史任务、mAP/Precision/Recall、best.pt 与兼容 ONNX 导出、自动校验入库和启用；保留外部 ONNX 手动导入 |
 | 规则与 Recipe | 离线判定闭环可用 | Recipe 绑定模型；按瑕疵类别配置置信度、面积、宽高、允许数量和 NG/OK/IGNORE 判定；保存、版本列表和启用 |
 | 离线检测与追溯 | 可用 | 多图片/文件夹队列、ONNX Runtime CPU 推理、分类与 YOLO 输出解析、NMS、原图和标注图归档、错误留痕、条件查询、详情回看和 CSV 导出 |
 | 系统设置 | 页面框架 | 运行时、存储、部署、备份及适配器配置界面已建立 |
@@ -28,10 +28,11 @@ IAD（Industrial Anomaly Detection）是一套面向工业视觉质检场景的 
 7. 发布数据集版本，保存图片、矢量标注、Mask、审核状态和数据划分快照；历史版本可以比较、导出或恢复。
 8. 进入“瑕疵模板识别”，选择产品类别，以已有标注作为正样本生成候选。
 9. 对候选执行精修、确认、拒绝或加入难负样本；确认后的候选会直接写回该产品的数据集标注。
-10. 在“训练与模型”页面导入 `.onnx` 文件，选择 `Classification`、`YoloV5` 或 `YoloV8` 输出格式，按模型训练时的顺序填写类别编码并启用模型。
-11. 在“规则与 Recipe”页面选择模型，调整每个产品瑕疵类别的阈值、最小尺寸和允许数量，保存并启用 Recipe。
-12. 在“在线检测”页面导入单张、多张图片或整个文件夹，执行本地 CPU 离线检测；检测成功和失败都会保存记录。
-13. 在“结果追溯”页面按日期、状态、类别、Recipe 或关键字查询，回看归档原图、标注图、推理耗时、规则命中详情和错误信息，并可导出 CSV。
+10. 进入“训练与模型”，先执行“检查环境”；未就绪时点击“安装环境”。选择 YOLO26 规模、输入尺寸、Batch、Epoch、学习率和设备后开始训练。
+11. 系统会自动导出已审核数据、训练并生成 `best.pt` 与非端到端 ONNX；模型校验通过后自动进入模型库并设为启用。已有外部模型仍可手动导入，格式支持 `Classification`、`YoloV5`、`YoloV8` 和 `Yolo26`。
+12. 在“规则与 Recipe”页面选择模型，调整每个产品瑕疵类别的阈值、最小尺寸和允许数量，保存并启用 Recipe。
+13. 在“在线检测”页面导入单张、多张图片或整个文件夹，执行本地 CPU 离线检测；检测成功和失败都会保存记录。
+14. 在“结果追溯”页面按日期、状态、类别、Recipe 或关键字查询，回看归档原图、标注图、推理耗时、规则命中详情和错误信息，并可导出 CSV。
 
 > 产品定义、数据集标注和模板识别共享当前产品上下文。开始标注前应先选择并保存产品；各产品的类别、图片、标注和识别数据彼此隔离。
 
@@ -54,6 +55,8 @@ IAD（Industrial Anomaly Detection）是一套面向工业视觉质检场景的 
 - WinForms / .NET Framework 4.7.2
 - System.Data.SQLite
 - Microsoft.ML.OnnxRuntime 1.28（CPU Execution Provider）
+- Python 3.10+（仅内置 YOLO 训练需要）
+- Ultralytics、PyTorch、ONNX、ONNX Runtime Python 包（可在“训练与模型 → 安装环境”自动安装）
 - Windows x64
 - Visual Studio（需安装“.NET 桌面开发”工作负载及 .NET Framework 4.7.2 Developer Pack）
 
@@ -72,7 +75,7 @@ IAD（Industrial Anomaly Detection）是一套面向工业视觉质检场景的 
 msbuild IAD.sln /restore /p:Configuration=Debug /p:Platform=x64
 ```
 
-仓库包含 `IAD.WorkflowSmokeTests` 业务工作流冒烟测试，Windows CI 会在 Debug x64 构建后执行它，覆盖图片去重、标注与 Mask、质量审核、数据划分、版本、四类格式导入导出、文件清理，并使用一个真实的最小 ONNX 模型验证模型导入、CPU 推理、Recipe 判定、结果归档和追溯查询。
+仓库包含 `IAD.WorkflowSmokeTests` 业务工作流冒烟测试，Windows CI 会在 Debug x64 构建后执行它，覆盖图片去重、标注与 Mask、质量审核、数据划分、版本、四类格式导入导出、文件清理，并使用真实的最小 Classification 与 YOLO26 ONNX 模型验证模型导入、Letterbox 预处理、CPU 推理、Recipe 判定、结果归档和追溯查询。YOLO Worker 还完成过 YOLO26n 一轮真实微调及 ONNX 导出验证。
 
 当前开发版本暂时跳过登录页并直接进入主界面；登录窗体和会话框架已经保留，正式部署前需恢复登录流程并接入角色权限。
 
@@ -113,14 +116,15 @@ src/IAD/
 
 瑕疵模板识别目前采用无需外部运行时的纯 CPU 灰度特征与类别原型匹配；Mask 编辑器提供基于前景种子、颜色模型和连通区域的 CPU 边缘精修。这两项能力可直接用于本地辅助标注和业务流程验证，但不等同于最终工业部署模型。
 
-离线推理当前使用 ONNX Runtime CPU Execution Provider，约定图像输入为 `NCHW float RGB` 并归一化至 `0~1`；支持分类向量、YOLOv5 `[1,N,5+C]` 以及 YOLOv8 `[1,N,4+C]` / `[1,4+C,N]` 输出。暂不支持分割模型的 Mask 输出、自定义 mean/std、多个输入节点或模型内置的非标准后处理。后续计划接入：
+离线推理当前使用 ONNX Runtime CPU Execution Provider，约定图像输入为 `NCHW float RGB` 并归一化至 `0~1`；检测模型使用保持宽高比的 Letterbox 预处理，支持分类向量、YOLOv5 `[1,N,5+C]`，以及 YOLOv8/YOLO26 非端到端 `[1,N,4+C]` / `[1,4+C,N]` 输出。暂不支持分割模型的 Mask 输出、自定义 mean/std、多个输入节点或模型内置的非标准后处理。后续计划接入：
 
 - CUDA / TensorRT Execution Provider、可配置预处理和更多模型输出适配器；
 - HALCON 定位及模板算子；
 - SAM2 等深度模型像素级分割后端，并保留当前 CPU 精修作为无模型回退；
 - 百万级图片的分页、任务队列和增量质量索引；
 - 相机、PLC、MES 等现场适配器；
-- 完整训练 Worker、模型验收、相机在线采集和生产节拍控制闭环。
+- 更完整的训练调度、超参数搜索、实例/语义分割训练与模型自动验收；
+- 相机在线采集和生产节拍控制闭环。
 
 ## 开发记录
 

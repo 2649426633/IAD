@@ -155,6 +155,35 @@ namespace IAD.WorkflowSmokeTests
                 Path.Combine(exported.OutputDirectory, "yolo-segmentation"));
             Assert(yoloSegImport.ImageCount == 2 && yoloSegImport.AnnotationCount == 1, "YOLO-Seg 回流导入失败。");
 
+            Product maskDetectionProduct = AppServices.Products.CreateProduct("WF-MASK-DET", "Mask 检测框导出测试", null);
+            DefectCategory maskDetectionCategory = AppServices.Products.SaveDefectCategory(new DefectCategory
+            {
+                ProductId=maskDetectionProduct.Id, CategoryCode="MASK-DEFECT", CategoryName="Mask缺陷",
+                DefectType="Surface", DetectionStrategy="Manual", DefaultThreshold=0.5D,
+                MinArea=1D, DisplayOrder=1, IsEnabled=true
+            });
+            DatasetImage maskDetectionImage = AppServices.Datasets.ImportImage(maskDetectionProduct.Id, defectImagePath);
+            using (Bitmap mask = new Bitmap(64, 64))
+            using (Graphics graphics = Graphics.FromImage(mask))
+            {
+                graphics.Clear(Color.Transparent);
+                graphics.FillRectangle(Brushes.White, 10, 12, 20, 16);
+                AppServices.Masks.SaveMask(maskDetectionImage.Id, maskDetectionCategory.Id, mask);
+            }
+            AppServices.DatasetWorkflow.SetReviewStatus(maskDetectionProduct.Id, new[] { maskDetectionImage.Id }, DatasetReviewStatus.Approved, "Mask-only", "smoke-test");
+            AppServices.DatasetWorkflow.SetSplit(maskDetectionProduct.Id, new[] { maskDetectionImage.Id }, DatasetSplit.Train);
+            DatasetExportResult maskDetectionExport = AppServices.DatasetWorkflow.ExportCurrent(maskDetectionProduct.Id, new DatasetExportOptions
+            {
+                DestinationDirectory=exports, ExportYolo=true, ApprovedOnly=true, RequireQualityGate=true
+            });
+            string maskDetectionLabel = Directory.GetFiles(Path.Combine(maskDetectionExport.OutputDirectory, "labels", "train"), "*.txt").Single();
+            string[] maskTokens = File.ReadAllText(maskDetectionLabel).Split(new[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            Assert(maskTokens.Length == 5, "Mask-only 类别没有导出为 YOLO 检测框。");
+            double maskWidth = double.Parse(maskTokens[3], System.Globalization.CultureInfo.InvariantCulture);
+            double maskHeight = double.Parse(maskTokens[4], System.Globalization.CultureInfo.InvariantCulture);
+            Assert(Math.Abs(maskWidth - 20D / 64D) < 0.001 && Math.Abs(maskHeight - 16D / 64D) < 0.001,
+                "Mask-only YOLO 外接框尺寸不正确。");
+
             DatasetImage imageWithDisposableMask = null;
             DatasetMask disposableMask = null;
             foreach (DatasetImage image in AppServices.Datasets.GetImages(yoloProduct.Id))
@@ -239,6 +268,23 @@ namespace IAD.WorkflowSmokeTests
                 ProductId=product.Id, CategoryCode=category.CategoryCode, OverallResult="NG", Limit=10
             });
             Assert(traced.Any(r => r.Id == result.Id && r.DefectCount == 1), "检测结果追溯查询失败。");
+
+            const string Yolo26ModelBase64 = "CAgSCWlhZC1zbW9rZTrNAgr8ARIGb3V0cHV0IghDb25zdGFudCrnAQoFdmFsdWUq2gEIAQgFCAoQASLIAQAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzM3M/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQgV2YWx1ZaABBBIMeW9sbzI2LXNtb2tlWiAKBmltYWdlcxIWChQIARIQCgIIAQoCCAMKAggECgIIBGIcCgZvdXRwdXQSEgoQCAESDAoCCAEKAggFCgIICkIECgAQDQ==";
+            string yolo26Path = Path.Combine(inputDirectory, "yolo26-smoke.onnx");
+            File.WriteAllBytes(yolo26Path, Convert.FromBase64String(Yolo26ModelBase64));
+            InferenceModel yolo26 = AppServices.Models.Import(yolo26Path, new InferenceModel
+            {
+                ProductId=product.Id, ModelCode="YOLO26-SMOKE", ModelName="YOLO26 smoke model", Version="1.0.0",
+                ModelType="Yolo26", InputWidth=4, InputHeight=4, Labels="SCRATCH",
+                ConfidenceThreshold=0.5, NmsThreshold=0.45, IsActive=true
+            });
+            recipe.ModelId = yolo26.Id;
+            recipe.ModelVersion = yolo26.Version;
+            AppServices.Recipes.SaveRecipe(recipe);
+            InspectionResult yolo26Result = AppServices.OfflineInspection.Inspect(product.Id, imagePath, "YOLO26-SMOKE", "smoke-test", CancellationToken.None);
+            Assert(yolo26Result.OverallResult == "NG" && yolo26Result.Defects.Count == 1, "YOLO26 非端到端 ONNX 输出解析失败。");
+            Assert(yolo26Result.Defects[0].Width > 30 && yolo26Result.Defects[0].Height > 30,
+                "YOLO26 Letterbox 坐标没有正确还原到原图。");
         }
 
         private static void VerifyInspectionPages()

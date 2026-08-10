@@ -2,8 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web.Script.Serialization;
@@ -617,7 +620,7 @@ namespace IAD.Services
             }
 
             WriteClasses(output, categoryIds);
-            if (options.ExportYolo) WriteYolo(output, images, annotations, categoryIds, exportedNames);
+            if (options.ExportYolo) WriteYolo(output, images, annotations, exportMasks, categoryIds, exportedNames);
             if (options.ExportCoco) WriteCoco(output, product, versionCode, images, annotations, categoryIds, exportedNames);
             if (options.ExportMasks) WriteMasks(output, exportMasks, imageById, exportedNames);
             WriteManifest(output, product, versionCode, images, annotations, exportMasks, categoryIds, options);
@@ -640,10 +643,11 @@ namespace IAD.Services
             return result;
         }
 
-        private static void WriteYolo(string output, IList<ExportImage> images, IList<ExportAnnotation> annotations,
+        private static void WriteYolo(string output, IList<ExportImage> images, IList<ExportAnnotation> annotations, IList<ExportMask> exportMasks,
             IDictionary<string, int> categoryIds, IDictionary<long, string> exportedNames)
         {
             Dictionary<long, List<ExportAnnotation>> byImage = GroupAnnotations(annotations);
+            Dictionary<long, List<ExportMask>> masksByImage = GroupMasks(exportMasks);
             foreach (ExportImage image in images)
             {
                 string split = SplitFolder(NormalizeSplit(image.Split));
@@ -659,6 +663,28 @@ namespace IAD.Services
                         RectangleF box = AnnotationBounds(annotation);
                         int categoryId;
                         if (!categoryIds.TryGetValue(CategoryKey(annotation.CategoryCode, annotation.CategoryName), out categoryId)) continue;
+                        double cx = (box.Left + box.Width / 2D) / image.Width;
+                        double cy = (box.Top + box.Height / 2D) / image.Height;
+                        double width = box.Width / image.Width;
+                        double height = box.Height / image.Height;
+                        text.Append(categoryId).Append(' ')
+                            .Append(F(cx)).Append(' ').Append(F(cy)).Append(' ')
+                            .Append(F(width)).Append(' ').Append(F(height)).AppendLine();
+                    }
+                }
+                List<ExportMask> imageMasks;
+                if (masksByImage.TryGetValue(image.Id, out imageMasks))
+                {
+                    foreach (ExportMask mask in imageMasks)
+                    {
+                        bool categoryAlreadyCovered = items != null && items.Any(annotation =>
+                            string.Equals(CategoryKey(annotation.CategoryCode, annotation.CategoryName),
+                                CategoryKey(mask.CategoryCode, mask.CategoryName), StringComparison.Ordinal));
+                        if (categoryAlreadyCovered) continue;
+                        int categoryId;
+                        if (!categoryIds.TryGetValue(CategoryKey(mask.CategoryCode, mask.CategoryName), out categoryId)) continue;
+                        RectangleF box = MaskBounds(mask);
+                        if (box.IsEmpty || box.Width <= 0 || box.Height <= 0) continue;
                         double cx = (box.Left + box.Width / 2D) / image.Width;
                         double cy = (box.Top + box.Height / 2D) / image.Height;
                         double width = box.Width / image.Width;
@@ -885,6 +911,60 @@ namespace IAD.Services
                 items.Add(annotation);
             }
             return result;
+        }
+
+        private static Dictionary<long, List<ExportMask>> GroupMasks(IList<ExportMask> masks)
+        {
+            Dictionary<long, List<ExportMask>> result = new Dictionary<long, List<ExportMask>>();
+            foreach (ExportMask mask in masks)
+            {
+                List<ExportMask> items;
+                if (!result.TryGetValue(mask.ImageId, out items))
+                {
+                    items = new List<ExportMask>();
+                    result[mask.ImageId] = items;
+                }
+                items.Add(mask);
+            }
+            return result;
+        }
+
+        private static RectangleF MaskBounds(ExportMask mask)
+        {
+            string path = ResolveWorkspacePath(mask.RelativePath);
+            if (!File.Exists(path)) throw new FileNotFoundException("Mask PNG 不存在。", path);
+            using (Bitmap source = new Bitmap(path))
+            using (Bitmap bitmap = new Bitmap(source.Width, source.Height, PixelFormat.Format32bppArgb))
+            {
+                using (Graphics graphics = Graphics.FromImage(bitmap)) graphics.DrawImageUnscaled(source, 0, 0);
+                Rectangle rectangle = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
+                BitmapData data = bitmap.LockBits(rectangle, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+                try
+                {
+                    int stride = Math.Abs(data.Stride);
+                    byte[] pixels = new byte[stride * bitmap.Height];
+                    Marshal.Copy(data.Scan0, pixels, 0, pixels.Length);
+                    int left = bitmap.Width, top = bitmap.Height, right = -1, bottom = -1;
+                    for (int y = 0; y < bitmap.Height; y++)
+                    {
+                        int row = data.Stride >= 0 ? y * stride : (bitmap.Height - 1 - y) * stride;
+                        for (int x = 0; x < bitmap.Width; x++)
+                        {
+                            int index = row + x * 4;
+                            int brightness = Math.Max(pixels[index], Math.Max(pixels[index + 1], pixels[index + 2]));
+                            if (brightness < 128) continue;
+                            if (x < left) left = x;
+                            if (x > right) right = x;
+                            if (y < top) top = y;
+                            if (y > bottom) bottom = y;
+                        }
+                    }
+                    return right < left || bottom < top
+                        ? RectangleF.Empty
+                        : new RectangleF(left, top, right - left + 1, bottom - top + 1);
+                }
+                finally { bitmap.UnlockBits(data); }
+            }
         }
 
         private static IList<KeyValuePair<string, int>> SortCategories(IDictionary<string, int> values)
